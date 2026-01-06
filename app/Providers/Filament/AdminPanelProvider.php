@@ -18,19 +18,28 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\FontProviders\GoogleFontProvider;
 
-class DozerPanelProvider extends PanelProvider
+class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
             ->default()
-            ->id('dozer')
-            ->path('dozer')
+            ->id('admin')
+            ->path('admin')
             ->login()
+            // ->registration()
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->font('Exo 2' , provider: GoogleFontProvider::class)
+            // ->brandLogo(asset('/logo/images.png'))
+            ->brandName('BILLION SPA')
+            // ->favicon(asset('logo/images.png'))
+
+            ->sidebarCollapsibleOnDesktop()
+            // ->registory()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -38,8 +47,8 @@ class DozerPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                // AccountWidget::class,
+                // FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

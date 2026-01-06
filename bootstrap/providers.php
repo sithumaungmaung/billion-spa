@@ -1,6 +1,10 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\Filament\AdminPanelProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\DozerPanelProvider::class,
+    AppServiceProvider::class,
+    // App\Providers\Filament\DozerPanelProvider::class,
+    AdminPanelProvider::class,
 ];
