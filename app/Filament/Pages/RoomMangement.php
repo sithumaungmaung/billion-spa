@@ -46,11 +46,11 @@ class RoomMangement extends Page
                 'time_slot_id' => $this->selectedSlotId,
             ],
             [
-                'therapist_id' => $this->selectedStaffId,
+                'therapist_id' => $this->selectedTherapistId,
             ]
         );
 
-        $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedStaffId']);
+        $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
     }
 
     public function getThapistName($roomId, $slotId): string
@@ -62,5 +62,10 @@ class RoomMangement extends Page
         ])->with('therapist')->first();
 
         return $schedule?->therapist?->name ?? '-';
+    }
+
+    public function render()
+    {
+        return view('filament.pages.room-mangement');
     }
 }
