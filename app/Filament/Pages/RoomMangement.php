@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\DailyRoomRecord;
+use App\Models\Product;
 use App\Models\Room;
 use App\Models\Therapist;
 use App\Models\TimeSlot;
@@ -18,10 +19,15 @@ class RoomMangement extends Page
     public $rooms;
     public $timeSlots;
     public $therapists;
+    public $products;
 
     public ?int $selectedRoomId = null;
+    public ?array $selectedRoomIdsForVoucher = [];
     public ?int $selectedSlotId = null;
     public ?int $selectedTherapistId = null;
+    public ?int $selectedProductId = null;
+    public ?int $searchRoomId = 0;
+
 
     public function mount(): void
     {
@@ -29,6 +35,7 @@ class RoomMangement extends Page
         $this->rooms = Room::get();
         $this->timeSlots = TimeSlot::get();
         $this->therapists = Therapist::get();
+        $this->products = Product::get();
     }
 
     public function selectCell(int $roomId, int $slotId): void
@@ -53,6 +60,25 @@ class RoomMangement extends Page
         $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
     }
 
+    public function addProduct(): void
+    {
+        $cost = 0
+
+        ProductSale::updateOrCreate(
+            [
+                'record_date' => $this->date,
+                'room_id' => $this->selectedRoomId,
+                'time_slot_id' => $this->selectedSlotId,
+            ],
+            [
+                'product_id' => $this->product,
+                'price' => $cost,
+            ]
+        );
+
+        $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
+    }
+
     public function getThapistName($roomId, $slotId): string
     {
         $schedule = DailyRoomRecord::where([
@@ -61,11 +87,6 @@ class RoomMangement extends Page
             'time_slot_id' => $slotId,
         ])->with('therapist')->first();
 
-        return $schedule?->therapist?->name ?? '-';
-    }
-
-    public function render()
-    {
-        return view('filament.pages.room-mangement');
+        return $schedule?->therapist?->name ?? "";
     }
 }

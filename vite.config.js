@@ -15,4 +15,8 @@ export default defineConfig({
             ignored: ['**/storage/framework/views/**'],
         },
     },
+    input: [
+        // ...
+        'resources/css/filament/admin/theme.css',
+    ]
 });
