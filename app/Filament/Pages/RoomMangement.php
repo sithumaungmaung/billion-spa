@@ -31,6 +31,7 @@ class RoomMangement extends Page
     public ?int $selectedTherapistId = null;
     public ?int $selectedProductId = null;
     public ?int $searchRoomId = 0;
+    public ?int $selectedType = 1;
 
 
     public function mount(): void
@@ -46,6 +47,8 @@ class RoomMangement extends Page
     {
         $this->selectedRoomId = $roomId;
         $this->selectedSlotId = $slotId;
+
+        //  $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
     }
 
     public function assign(): void
@@ -58,6 +61,7 @@ class RoomMangement extends Page
             ],
             [
                 'therapist_id' => $this->selectedTherapistId,
+                'service_type' => $this->selectedType
             ]
         );
 
@@ -75,6 +79,8 @@ class RoomMangement extends Page
 
         $product = Product::where('id', $this->selectedProductId)->first();
 
+        // dump($productSale ?? $productSale->toArray());
+
         if(!$product) {
             return;
         }
@@ -83,7 +89,7 @@ class RoomMangement extends Page
             $productSale->update([
                 'quantity' => $productSale->quantity + 1,
                 'unit_price' => $product->price,
-                'quantity' => 1,
+                'quantity' => $productSale->quantity + 1,
                 'branch_id' => 1,
                 'total_price' => $productSale->quantity * $product->price
             ]);
@@ -98,8 +104,14 @@ class RoomMangement extends Page
             ]);
         }
 
-        $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
+        $this->reset(['selectedProductId']);
     }
+
+    // public function updatedSelectedType(): void {
+    //     $room = DailyRoomRecord::where('room_id', $this->selectedRoomId)->first();
+    //     $room->service_type = $this->selectedType;
+    //     $room->save();
+    // }
 
     public function getCanAddProductProperty() : bool {
         $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)
