@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('product_sales', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('daily_room_record_id');
+            $table->unsignedInteger('product_id');
             $table->unsignedInteger('quantity');
-            $table->unsignedInteger('unit_cost');
-            $table->unsignedInteger('total_cost');
+            $table->unsignedInteger('unit_price');
+            $table->unsignedInteger('total_price');
             $table->tinyInteger('branch_id')->default(0);
             $table->timestamps();
         });

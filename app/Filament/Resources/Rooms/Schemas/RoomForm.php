@@ -23,6 +23,10 @@ class RoomForm
                     ->label('Floor')
                     ->numeric()
                     ->nullable(),
+                TextInput::make('price')
+                    ->label('Price')
+                    ->numeric()
+                    ->required(),
 
                 TextInput::make('room_number')
                     ->label('Room Number')
