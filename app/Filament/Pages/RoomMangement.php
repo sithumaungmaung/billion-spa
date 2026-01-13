@@ -65,11 +65,11 @@ class RoomMangement extends Page
     }
 
     public function addProduct(): void
-    { 
+    {
         $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)->where('room_id', $this->selectedRoomId)
                                             ->where('time_slot_id', $this->selectedSlotId)
                                             ->first();
-        
+
         $productSale = ProductSale::where('daily_room_record_id', $dailyRoomRecord->id)
                                 ->where('product_id', $this->selectedProductId)->first();
 
@@ -107,8 +107,8 @@ class RoomMangement extends Page
                             ->where('time_slot_id', $this->selectedSlotId)
                             ->first();
 
-        $result = $dailyRoomRecord ? 0 : 1;    
-        return $result;    
+        $result = $dailyRoomRecord ? 0 : 1;
+        return $result;
     }
 
     public function getThapistName($roomId, $slotId): string
@@ -120,5 +120,30 @@ class RoomMangement extends Page
         ])->with('therapist')->first();
 
         return $schedule?->therapist?->name ?? "";
+    }
+
+    public function getSelectedRoomRecordProductsProperty(): ? Array
+    {
+        if ($this->selectedRoomId && $this->selectedSlotId) {
+
+            $dailyRoomRecord = DailyRoomRecord::where([
+                'record_date' => $this->date,
+                'room_id' => $this->selectedRoomId,
+                'time_slot_id' => $this->selectedSlotId,
+            ])->first();
+
+            if (!$dailyRoomRecord) {
+                return [];
+            }
+
+            $productSale = ProductSale::with('product')->where('daily_room_record_id', $dailyRoomRecord->id)->get();
+
+            return [
+                'dailyRoomRecord' => $dailyRoomRecord,
+                'productSales' => $productSale
+            ];
+        }
+
+        return [];
     }
 }

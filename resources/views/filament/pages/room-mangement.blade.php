@@ -22,7 +22,37 @@
 
         </x-filament::input.wrapper> <br>
 
-        <div class="overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg">
+        <div class="flex items-end gap-4">
+            <div class="flex-1">
+                <x-filament::input.wrapper label="Select Therapist">
+                    <x-filament::input.select wire:model.live="selectedTherapistId">
+                        <option value="">Choose Staff</option>
+                        @foreach ($therapists as $person)
+                            <option value="{{ $person->id }}">{{ $person->name }}</option>
+                        @endforeach
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
+            </div>
+            <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedTherapistId">
+                Assign
+            </x-filament::button>
+
+            <div class="flex-1">
+                <x-filament::input.wrapper label="Select Product">
+                    <x-filament::input.select wire:model.live="selectedProductId">
+                        <option value="">Choose Product</option>
+                        @foreach ($products as $product)
+                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        @endforeach
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
+            </div>
+            <x-filament::button wire:click="addProduct" size="lg" :disabled="$this->canAddProduct">
+                Add
+            </x-filament::button>
+        </div>
+
+        <div class="mt-5 overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg">
 
             <table class="w-full text-sm text-left table-fixed">
                 <thead class="bg-gray-50 dark:bg-white/5 uppercase text-xs">
@@ -55,8 +85,9 @@
 
                                     {{ $this->getThapistName($room->id, $slot->id) ?: '—' }} <br> <br>
 
+
                                     @if ($this->getThapistName($room->id, $slot->id))
-                                        <input type="checkbox" wire:model.live="selectedTherapistIds"
+                                        <input type="checkbox" wire:model.live="selectedRoomIdsForVoucher"
                                             value="{{ $room->id . '-' . $slot->id }}">
                                     @endif
                                 </td>
@@ -68,36 +99,36 @@
         </div>
     </x-filament::section>
 
-    <!-- {{ $selectedRoomId . '-' . $selectedSlotId . '-' . $selectedTherapistId }} -->
 
-    <div class="flex items-end gap-4">
-        <div class="flex-1">
-            <x-filament::input.wrapper label="Select Therapist">
-                <x-filament::input.select wire:model.live="selectedTherapistId">
-                    <option value="">Choose Staff</option>
-                    @foreach ($therapists as $person)
-                        <option value="{{ $person->id }}">{{ $person->name }}</option>
-                    @endforeach
-                </x-filament::input.select>
-            </x-filament::input.wrapper>
-        </div>
-        <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedTherapistId">
-            Assign
-        </x-filament::button>
+    <x-filament::section>
+        <x-filament::card>
+            <table class="w-full text-sm text-left table-fixed">
+                <thead class="bg-gray-50 dark:bg-white/5 uppercase text-xs">
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Unit</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
 
-        <div class="flex-1">
-            <x-filament::input.wrapper label="Select Product">
-                <x-filament::input.select wire:model.live="selectedProductId">
-                    <option value="">Choose Product</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                    @endforeach
-                </x-filament::input.select>
-            </x-filament::input.wrapper>
-        </div>
-        <x-filament::button wire:click="addProduct" size="lg" :disabled="$this->canAddProduct">
-            Add
-        </x-filament::button>
-    </div>
+                <tbody class="divide-y dark:divide-white/10">
+                    @if (array_key_exists('productSales', $this->selectedRoomRecordProducts))
+                        @foreach ($this->selectedRoomRecordProducts['productSales'] as $key => $product)
+                            <tr>
+                                <td>{{ $key + 1 }}.</td>
+                                <td>{{ $product->product->name }}</td>
+                                <td>{{ $product->quantity }}</td>
+                                <td>{{ $product->unit_price }}</td>
+                                <td>{{ $product->quantity * $product->unit_price }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
+                </tbody>
+            </table>
+        </x-filament::card>
+    </x-filament::section>
+
 
 </x-filament-panels::page>
