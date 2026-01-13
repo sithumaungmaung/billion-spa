@@ -62,21 +62,7 @@ class RoomMangement extends Page
 
     public function addProduct(): void
     {
-        $cost = 0
-
-        ProductSale::updateOrCreate(
-            [
-                'record_date' => $this->date,
-                'room_id' => $this->selectedRoomId,
-                'time_slot_id' => $this->selectedSlotId,
-            ],
-            [
-                'product_id' => $this->product,
-                'price' => $cost,
-            ]
-        );
-
-        $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
+        
     }
 
     public function getThapistName($roomId, $slotId): string

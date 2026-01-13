@@ -18,6 +18,7 @@ return new class extends Migration
             $table->tinyInteger('time_slot_id');
             $table->foreignId('therapist_id')->nullable()->constrained('therapists', 'therapist_id')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users', 'user_id')->onDelete('set null');
+            $table->tinyInteger('service_type')->default(0); // 0 for Normal, 1 for By Name
             $table->timestamps();
             
             // Composite unique constraint to prevent duplicate entries
