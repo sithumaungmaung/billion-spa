@@ -81,13 +81,13 @@
                 </x-filament::input.select>
             </x-filament::input.wrapper>
         </div>
-        <x-filament::button wire:click="assign" size="lg">
+        <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedTherapistId">
             Assign
         </x-filament::button>
 
         <div class="flex-1">
-            <x-filament::input.wrapper label="Select Therapist">
-                <x-filament::input.select wire:model.live="selectedTherapistId">
+            <x-filament::input.wrapper label="Select Product">
+                <x-filament::input.select wire:model.live="selectedProductId">
                     <option value="">Choose Product</option>
                     @foreach ($products as $product)
                         <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -95,7 +95,7 @@
                 </x-filament::input.select>
             </x-filament::input.wrapper>
         </div>
-        <x-filament::button wire:click="addProduct" size="lg">
+        <x-filament::button wire:click="addProduct" size="lg" :disabled="$this->canAddProduct">
             Add
         </x-filament::button>
     </div>

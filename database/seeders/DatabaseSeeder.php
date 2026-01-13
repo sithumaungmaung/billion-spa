@@ -39,5 +39,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TherapistSeeder::class);
 
 
+        $this->call(TimeSlotSeeder::class);
     }
 }
