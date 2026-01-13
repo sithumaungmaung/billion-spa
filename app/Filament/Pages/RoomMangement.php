@@ -121,4 +121,25 @@ class RoomMangement extends Page
 
         return $schedule?->therapist?->name ?? "";
     }
+
+    public function getSelectedRoomRecordProductsProperty(): ? Array
+    {
+        if ($this->selectedRoomId && $this->selectedSlotId) {
+            
+            $dailyRoomRecord = DailyRoomRecord::where([
+                'record_date' => $this->date,
+                'room_id' => $this->selectedRoomId,
+                'time_slot_id' => $this->selectedSlotId,
+            ])->first();
+
+            $productSale = ProductSale::with('product')->where('daily_room_record_id', $dailyRoomRecord->id)->get();
+            
+            return [
+                'dailyRoomRecord' => $dailyRoomRecord,
+                'productSales' => $productSale
+            ];
+        }
+
+        return [];
+    }
 }
