@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\RoomSeeder;
 use Database\Seeders\BranchSeeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Seeders\TherapistSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
@@ -33,8 +34,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        // $this->call(BranchSeeder::class);
-        // $this->call(RoomSeeder::class);
+        $this->call(BranchSeeder::class);
+        $this->call(RoomSeeder::class);
+        $this->call(TherapistSeeder::class);
 
 
     }
