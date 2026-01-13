@@ -62,7 +62,7 @@ class RoomMangement extends Page
 
     public function addProduct(): void
     {
-        $cost = 0
+        $cost = 0;
 
         ProductSale::updateOrCreate(
             [

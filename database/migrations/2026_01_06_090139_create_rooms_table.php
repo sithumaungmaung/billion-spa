@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('room_number')->nullable();
             $table->string('floor')->nullable();
-            // $table->string('capacity')->nullable();
+            $table->unsignedInteger('price')->default(0);
             $table->foreignId('branch_id')->nullable()->constrained();
             $table->timestamps();
         });

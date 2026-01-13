@@ -27,6 +27,10 @@ class RoomsTable
                     ->label('Floor')
                     ->searchable(),
 
+                TextColumn::make('price')
+                    ->label('Price')
+                    ->searchable(),
+
                 TextColumn::make('branch.name')
                         ->label('Branch')
                         ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state)
