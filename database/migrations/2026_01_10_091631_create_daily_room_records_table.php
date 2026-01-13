@@ -16,8 +16,8 @@ return new class extends Migration
             $table->date('record_date');
             $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
             $table->tinyInteger('time_slot_id');
-            $table->foreignId('therapist_id')->nullable()->constrained('therapists', 'therapist_id')->onDelete('set null');
-            $table->foreignId('user_id')->nullable()->constrained('users', 'user_id')->onDelete('set null');
+            $table->foreignId('therapist_id')->nullable()->constrained('therapists')->onDelete('set null');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->unsignedInteger('price')->default(0);
             $table->tinyInteger('service_type')->default(0); // 0 for Normal, 1 for By Name
             $table->timestamps();
