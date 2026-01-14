@@ -79,9 +79,6 @@
                 Add
             </x-filament::button>
 
-
-
-
         </div>
 
         <div class="mt-5 overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg">
@@ -129,14 +126,39 @@
                 </tbody>
             </table>
         </div>
-        <x-filament::button
-            wire:click="goToCheckBill"
-            color="primary"
-            class="mt-1"
-        >
+        <x-filament::button wire:click="goToCheckBill" color="primary" class="mt-2">
             Check Bill
         </x-filament::button>
     </x-filament::section>
+
+
+
+    <x-filament::section>
+        @if ($selectedRoomId || $selectedSlotId)
+            <div class="flex items-center justify-start ">
+                <div class="mx-3 font-medium">Room : {{ $selectedRoomName ?? '—' }}</div>
+
+                <div class="mx-3 font-medium">
+                    Therapist :
+                    @if ($selectedTherapistName)
+                        <span class="text-primary-600">{{ $selectedTherapistName }}</span>
+                    @else
+                        <span class="text-gray-400 italic">Not Assigned</span>
+                    @endif
+                </div>
+
+                <div class="mx-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div>
+
+                <div class="mx-3 ">
+                    <x-filament::button wire:click="removeTherapist" color="danger" size="sm"
+                        wire:confirm="Are you sure you want to unassign room and therapist?">
+                        Unassign room and therapist
+                    </x-filament::button>
+                </div>
+            </div>
+        @endif
+    </x-filament::section>
+
 
 
     <x-filament::section>
@@ -152,6 +174,7 @@
                         <th class="px-4 py-3 text-right">Unit</th>
                         <th class="px-4 py-3 text-right">Price</th>
                         <th class="px-4 py-3 text-right">Total</th>
+                        <th class="px-4 py-3 text-right">Action</th>
                     </tr>
                 </thead>
 
@@ -181,6 +204,19 @@
 
                                 <td class="px-4 py-3 text-right font-mono font-semibold ">
                                     {{ number_format($product->quantity * $product->unit_price) }}
+                                </td>
+
+                                <td class="px-4 py-3 text-right font-mono">
+                                    <x-filament::button class="mx-2" wire:click="removeProduct({{ $product->id }})"
+                                        color="danger" size="sm">
+                                        Remove {{ $product->daily_room_record_id }}
+                                    </x-filament::button>
+
+                                    <x-filament::button class="mx-2 text-white"
+                                        wire:click="reduceProduct({{ $product->id }})" :disabled="$product->quantity <= 1"
+                                        color="primary" size="sm">
+                                        Reduce
+                                    </x-filament::button>
                                 </td>
                             </tr>
                         @endforeach
