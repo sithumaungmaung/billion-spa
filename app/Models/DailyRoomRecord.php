@@ -11,4 +11,10 @@ class DailyRoomRecord extends Model
     {
         return $this->belongsTo(Therapist::class);
     }
+
+    public function timeSlot()
+    {
+        return $this->belongsTo(TimeSlot::class);
+    }
+
 }

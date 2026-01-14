@@ -35,19 +35,33 @@
                 </x-filament::input.wrapper>
             </div>
 
-            <div class="flex-1">
+
+            <div class="flex-1 items-end gap-4">
+                <div class="flex-1">
+                    {{ $this->form }}
+                </div>
+
+            </div>
+            <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId">
+                Assign
+            </x-filament::button>
+
+
+            {{-- <div class="flex-1">
                 <x-filament::input.wrapper label="Select Therapist">
                     <x-filament::input.select wire:model.live="selectedTherapistId">
-                        <option value="">Choose Staff</option>
+                        <option value="">Select a therapist...</option>
                         @foreach ($therapists as $person)
-                            <option value="{{ $person->id }}">{{ $person->name }}</option>
+                            <option value="{{ $person->id }}">
+                                {{ $person->name }}
+                            </option>
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
-            </div>
-            <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedTherapistId">
+            </div> --}}
+            {{-- <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedTherapistId">
                 Assign
-            </x-filament::button>
+            </x-filament::button> --}}
 
             <div class="flex-1">
                 <x-filament::input.wrapper label="Select Product">
