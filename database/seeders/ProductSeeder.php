@@ -35,15 +35,22 @@ class ProductSeeder extends Seeder
             'others' => [
                 ['name' => 'Snow tower', 'price' => 5000, 'description' => 'other'],
                 ['name' => 'cigarette', 'price' => 10000, 'description' => 'other'],
+                ['name' => 'Tissue', 'price' => 1000, 'description' => 'other'],
             ],
         ];
 
-        foreach ($allProducts as $type => $products) {
+        foreach ($branches as $id) {
+            foreach ($allProducts as $type => $products) {
 
-            foreach ($branches as $id) {
                 foreach ($products as $product) {
-                    $product['branch_id'] = $id;
-                    Product::create($product);
+                    Product::firstOrCreate( [
+                        'branch_id' => $id,
+                        'name' => $product['name'], // unique per branch
+                    ],
+                    [
+                        'price' => $product['price'],
+                        'description' => $product['description'],
+                    ]);
                 }
             }
 

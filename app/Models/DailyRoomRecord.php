@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DailyRoomRecord extends Model
 {
-    protected $fillable = ['record_date', 'room_id', 'time_slot_id', 'therapist_id', 'user_id'];
+    protected $fillable = ['record_date', 'room_id', 'time_slot_id', 'therapist_id', 'user_id', 'service_type'];
     public function therapist()
     {
         return $this->belongsTo(Therapist::class);
@@ -16,4 +16,9 @@ class DailyRoomRecord extends Model
     {
         return $this->belongsTo(Room::class);
     }
+    public function timeSlot()
+    {
+        return $this->belongsTo(TimeSlot::class);
+    }
+
 }
