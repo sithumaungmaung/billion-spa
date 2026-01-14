@@ -133,6 +133,7 @@
             wire:click="goToCheckBill"
             color="primary"
             class="mt-1"
+            :disabled="!$selectedRoomIdsForBill"
         >
             Check Bill
         </x-filament::button>

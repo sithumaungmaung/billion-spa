@@ -75,6 +75,7 @@ class RoomMangement extends Page implements HasForms
     {
 
         $this->selectedTherapistId = $this->data['therapist_id'] ?? null;
+        $room = Room::find($this->selectedRoomId);
 
         DailyRoomRecord::updateOrCreate(
             [
@@ -84,7 +85,8 @@ class RoomMangement extends Page implements HasForms
             ],
             [
                 'therapist_id' => $this->selectedTherapistId,
-                'service_type' => $this->selectedType
+                'service_type' => $this->selectedType,
+                'price' => $room ? $room->price : 3333,
             ]
         );
         $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
