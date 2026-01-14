@@ -39,7 +39,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RoomSeeder::class);
         $this->call(TherapistSeeder::class);
         $this->call(ProductSeeder::class);
-
         $this->call(TimeSlotSeeder::class);
     }
 }

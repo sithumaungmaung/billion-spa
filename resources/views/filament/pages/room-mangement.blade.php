@@ -87,8 +87,8 @@
 
 
                                     @if ($this->getThapistName($room->id, $slot->id))
-                                        <input type="checkbox" wire:model.live="selectedRoomIdsForVoucher"
-                                            value="{{ $room->id . '-' . $slot->id }}">
+                                        <input type="checkbox" wire:model.live="selectedRoomIdsForBill"
+                                            value="{{ $this->getDailyRoomRecordId($room->id, $slot->id) }}">
                                     @endif
                                 </td>
                             @endforeach
@@ -97,6 +97,13 @@
                 </tbody>
             </table>
         </div>
+        <x-filament::button
+            wire:click="goToCheckBill"
+            color="primary"
+            class="mt-1"
+        >
+            Check Bill
+        </x-filament::button>
     </x-filament::section>
 
 

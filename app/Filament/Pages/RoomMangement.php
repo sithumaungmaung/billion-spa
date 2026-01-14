@@ -26,7 +26,7 @@ class RoomMangement extends Page
     public $products;
 
     public ?int $selectedRoomId = null;
-    public ?array $selectedRoomIdsForVoucher = [];
+    public ?array $selectedRoomIdsForBill = [];
     public ?int $selectedSlotId = null;
     public ?int $selectedTherapistId = null;
     public ?int $selectedProductId = null;
@@ -122,6 +122,17 @@ class RoomMangement extends Page
         return $schedule?->therapist?->name ?? "";
     }
 
+    public function getDailyRoomRecordId($roomId, $slotId): string
+    {
+        $schedule = DailyRoomRecord::where([
+            'record_date' => $this->date,
+            'room_id' => $roomId,
+            'time_slot_id' => $slotId,
+        ])->select('id')->first();
+
+        return $schedule?->id ?? null;
+    }
+
     public function getSelectedRoomRecordProductsProperty(): ? Array
     {
         if ($this->selectedRoomId && $this->selectedSlotId) {
@@ -145,5 +156,15 @@ class RoomMangement extends Page
         }
 
         return [];
+    }
+
+    public function goToCheckBill()
+    {
+        // if (! $this->selectedRoomId || ! $this->selectedSlotId) {
+        //     return;
+        // }
+        return redirect()->route('filament.admin.pages.check-bill', [
+            'bill_for' => implode(',', $this->selectedRoomIdsForBill)
+        ]);
     }
 }

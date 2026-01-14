@@ -11,4 +11,9 @@ class DailyRoomRecord extends Model
     {
         return $this->belongsTo(Therapist::class);
     }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
 }
