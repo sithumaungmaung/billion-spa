@@ -56,9 +56,6 @@ class RoomMangement extends Page implements HasForms
         $this->form->fill();
 
         $this->products = Product::get();
-
-
-
     }
 
 

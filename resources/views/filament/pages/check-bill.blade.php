@@ -5,21 +5,19 @@
             <div class="flex items-end gap-4 mb-3">
                 <div class="flex-1">
                     <x-filament::input.wrapper label="Select Type">
-                        <x-filament::input.select wire:model.live="selectedType">
+                        <x-filament::input.select wire:model.live="onePlusone">
                                 <option value="1">Normal</option>
                                 <option value="2">1+1</option>
-                                <option value="2">1+2</option>
                         </x-filament::input.select>
                     </x-filament::input.wrapper>
                 </div>
                 <div class="flex-1">
-                    <x-filament::button wire:click="assign">
+                    <x-filament::button wire:click="applyOnePlusOne">
                         Apply
                     </x-filament::button>
                 </div>
             </div>
             
-
             <table
                 class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">
@@ -46,19 +44,19 @@
                             </td>
 
                             <td class="px-4 py-3 font-medium">
-                                {{ $billRoom->room?$billRoom->room->name :"-" }}
+                                {{ $billRoom['room_name'] }}
                             </td>
 
                             <td class="px-4 py-3 text-right">
-                                1
+                                {{ $billRoom['quantity'] }}
                             </td>
 
                             <td class="px-4 py-3 text-right font-mono">
-                                {{ $billRoom->price }}
+                                {{ $billRoom['unit_price'] }}
                             </td>
 
                             <td class="px-4 py-3 text-right font-mono font-semibold ">
-                               {{ $billRoom->price }}
+                               {{ $billRoom['total_price'] }}
                             </td>
                         </tr>
                     @endforeach
@@ -105,7 +103,7 @@
                     </x-filament::button>
                 </div>
                 <div class="col">
-                    <x-filament::button wire:click="assign">
+                    <x-filament::button wire:click="confirmBill">
                         Confirm Bill
                     </x-filament::button>
                 </div>
