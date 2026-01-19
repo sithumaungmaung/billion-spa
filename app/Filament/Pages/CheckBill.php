@@ -142,6 +142,7 @@ class CheckBill extends Page
         }
 
         DailyRoomRecord::whereIn('id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
+        ProductSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
     }
 
     public function getInvoiceNo()

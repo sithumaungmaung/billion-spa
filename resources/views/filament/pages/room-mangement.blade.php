@@ -116,9 +116,10 @@
                                     ])>
 
                                     {{ $this->getThapistName($room->id, $slot->id) ?: '—' }} <br> <br>
-
-
-                                    @if ($this->getThapistName($room->id, $slot->id))
+                                    
+                                    @if ($this->checkBill($room->id, $slot->id))
+                                        <span class="text-green-600 font-medium">(Paid)</span>
+                                    @elseif($this->getThapistName($room->id, $slot->id))
                                         <input type="checkbox" wire:model.live="selectedRoomIdsForBill"
                                             value="{{ $this->getDailyRoomRecordId($room->id, $slot->id) }}">
                                     @endif

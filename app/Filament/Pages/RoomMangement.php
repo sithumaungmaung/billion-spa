@@ -10,12 +10,8 @@ use App\Models\TimeSlot;
 use Filament\Pages\Page;
 use App\Models\Therapist;
 use App\Models\ProductSale;
-use Ramsey\Uuid\Type\Integer;
-
+use Filament\Notifications\Notification;
 use App\Models\DailyRoomRecord;
-use function PHPSTORM_META\map;
-
-use Filament\Forms\Form;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Components\Select;
@@ -70,6 +66,20 @@ class RoomMangement extends Page implements HasForms
 
     public function assign(): void
     {
+        $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)->where('room_id', $this->selectedRoomId)
+                                            ->where('time_slot_id', $this->selectedSlotId)
+                                            ->whereNull('invoice_id')
+                                            ->first();
+
+        if (!$dailyRoomRecord) {
+            Notification::make()
+            ->title('Billing Error')
+            ->body('This room has already been billed.')
+            ->danger()
+            ->send();
+
+            return;
+        }
 
         $this->selectedTherapistId = $this->data['therapist_id'] ?? null;
         $room = Room::find($this->selectedRoomId);
@@ -97,7 +107,18 @@ class RoomMangement extends Page implements HasForms
     {
         $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)->where('room_id', $this->selectedRoomId)
                                             ->where('time_slot_id', $this->selectedSlotId)
+                                            ->whereNull('invoice_id')
                                             ->first();
+
+        if (!$dailyRoomRecord) {
+            Notification::make()
+            ->title('Billing Error')
+            ->body('This room has already been billed.')
+            ->danger()
+            ->send();
+
+            return;
+        }
 
         $productSale = ProductSale::where('daily_room_record_id', $dailyRoomRecord->id)
                                 ->where('product_id', $this->selectedProductId)->first();
@@ -159,6 +180,17 @@ class RoomMangement extends Page implements HasForms
         return $schedule?->therapist?->name ?? "";
     }
 
+    public function checkBill($roomId, $slotId): bool
+    {
+        $billCheck = DailyRoomRecord::where([
+            'record_date' => $this->date,
+            'room_id' => $roomId,
+            'time_slot_id' => $slotId,
+        ])->whereNotNull('invoice_id')->count();
+
+        return $billCheck ? true : false;
+    }
+
     public function getDailyRoomRecordId($roomId, $slotId): string
     {
         $schedule = DailyRoomRecord::where([
@@ -167,7 +199,7 @@ class RoomMangement extends Page implements HasForms
             'time_slot_id' => $slotId,
         ])->select('id')->first();
 
-        return $schedule?->id ?? null;
+        return $schedule?->id ?? "";
     }
 
     public function getSelectedRoomRecordProductsProperty(): ? Array
