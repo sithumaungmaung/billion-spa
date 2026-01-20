@@ -68,10 +68,10 @@ class RoomMangement extends Page implements HasForms
     {
         $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)->where('room_id', $this->selectedRoomId)
                                             ->where('time_slot_id', $this->selectedSlotId)
-                                            ->whereNull('invoice_id')
+                                            ->whereNotNull('invoice_id')
                                             ->first();
 
-        if (!$dailyRoomRecord) {
+        if ($dailyRoomRecord) {
             Notification::make()
             ->title('Billing Error')
             ->body('This room has already been billed.')
@@ -96,6 +96,7 @@ class RoomMangement extends Page implements HasForms
                 'price' => $room ? $room->price : 3333,
             ]
         );
+        
         $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
 
         $this->data['therapist_id'] = null;
