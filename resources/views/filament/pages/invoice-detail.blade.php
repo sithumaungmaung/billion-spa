@@ -2,21 +2,25 @@
     <x-filament::section>
 
 
-        {{-- <div class="flex items-end gap-4 mb-3">
+        <div class="flex items-end gap-4 mb-3">
             <div class="flex-1">
-                <x-filament::input.wrapper label="Select Type">
-                    <x-filament::input.select wire:model.live="onePlusone">
-                        <option value="1">Normal</option>
-                        <option value="2">1+1</option>
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
+                <div class="h1 ">
+                    Invoice No:
+                    <span class="text-gray-500">
+                        {{ $invoiceDetail->invoice_no }}
+                    </span>
+                </div>
+                {{-- <div class="h1">
+                    Note: <span>
+                        {{ $invoiceDetail->note ?? '-' }}
+                    </span>
+                </div> --}}
+                <div class="h1">
+                    Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
+                </div>
             </div>
-            <div class="flex-1">
-                <x-filament::button wire:click="applyOnePlusOne">
-                    Apply
-                </x-filament::button>
-            </div>
-        </div> --}}
+
+        </div>
 
         <table class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">
