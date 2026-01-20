@@ -19,10 +19,10 @@ return new class extends Migration
             
             
             // Totals
-            $table->integer('sub_total', 12, 2)->default(0);
-            $table->integer('discount', 12, 2)->default(0);
-            $table->integer('tax', 12, 2)->default(0);
-            $table->integer('grand_total', 12, 2)->default(0);
+            $table->integer('sub_total')->default(0);
+            $table->integer('discount')->default(0);
+            $table->integer('tax')->default(0);
+            $table->integer('grand_total')->default(0);
 
             // Payment
             // $table->enum('payment_status', ['unpaid', 'partial', 'paid'])->default('unpaid');

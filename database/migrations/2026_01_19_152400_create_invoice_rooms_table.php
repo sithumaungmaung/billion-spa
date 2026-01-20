@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('room_name')->nullable();          // Snapshot
             $table->string('room_code')->nullable();
 
-            $table->integer('quantity', 10, 2)->default(1);
-            $table->integer('unit_price', 12, 2);
-            $table->integer('total_price', 12, 2);
+            $table->integer('quantity')->default(1);
+            $table->integer('unit_price')->default(0);
+            $table->integer('total_price')->default(0);
             $table->timestamps();
         });
     }
