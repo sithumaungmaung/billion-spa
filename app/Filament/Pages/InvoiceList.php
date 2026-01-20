@@ -17,7 +17,7 @@ class InvoiceList extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Invoice List';
+        return 'Invoice';
     }
 
     public static function getNavigationGroup(): ?string

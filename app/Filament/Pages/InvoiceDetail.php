@@ -9,6 +9,7 @@ use App\Models\DailyRoomRecord;
 class InvoiceDetail extends Page
 {
     protected string $view = 'filament.pages.invoice-detail';
+    protected static bool $shouldRegisterNavigation = false;
 
     public ?string $invoice_no = null;
     public $invoiceDetail;
