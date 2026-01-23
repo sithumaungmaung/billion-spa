@@ -162,8 +162,10 @@
 
 
 
+    {{-- Ordered Items --}}
     <x-filament::section>
         <x-filament::card>
+            <div class="my-2">Ordered Items</div>
             <table
                 class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">
@@ -227,6 +229,5 @@
             </table>
         </x-filament::card>
     </x-filament::section>
-
 
 </x-filament-panels::page>

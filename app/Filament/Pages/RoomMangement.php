@@ -11,11 +11,12 @@ use Filament\Forms\Form;
 use Filament\Pages\Page;
 use App\Models\Therapist;
 use App\Models\ProductSale;
-
+use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\DailyRoomRecord;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Forms\Concerns\InteractsWithForms;
 
@@ -76,6 +77,7 @@ class RoomMangement extends Page implements HasForms
 
         // dump($this->data);
 
+        // $this->mountAction('cellModal'); {{ to show up the modal box }}
         //  $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
     }
 
@@ -372,6 +374,38 @@ class RoomMangement extends Page implements HasForms
                 ->persistent() // Stays on screen until they click it
                 ->send();
     }
+
+
+
+
+
+    // protected function getActions(): array
+    // {
+    //     return [
+    //         Action::make('cellModal')
+    //             ->modalHeading('Details')
+    //             ->modalSubmitActionLabel('Save')
+    //             // ->form([
+    //             //      TextColumn::make('name')
+    //             //     ->searchable(),
+    //             // ])
+    //             ->modalContent(fn () => view(
+    //                 'filament.modals.section_detail',
+    //                 [
+    //                     'room' => Room::find($this->selectedRoomId),
+    //                     'slot' => TimeSlot::find($this->selectedSlotId),
+    //                     'therapist_name' => $this->getThapistName($this->selectedRoomId, $this->selectedSlotId),
+    //                 ]
+    //             ))
+    //             ->action(function (array $data) {
+    //                 Booking::create([
+    //                     'room_id'      => $this->selectedRoomId,
+    //                     'slot_id'      => $this->selectedSlotId,
+    //                     'therapist_id' => $data['therapist_id'],
+    //                 ]);
+    //             }),
+    //     ];
+    // }
 
 
 }
