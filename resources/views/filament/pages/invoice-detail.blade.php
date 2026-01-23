@@ -14,7 +14,7 @@
                     Confirm Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
                 </div>
                 <div class="h1">
-                    Confirm By: <span>
+                    Confirm By: <span class="text-gray-500">
                         {{ $invoiceDetail->users->name ?? '-' }}
                     </span>
                 </div>

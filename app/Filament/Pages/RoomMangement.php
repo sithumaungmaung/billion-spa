@@ -13,6 +13,7 @@ use App\Models\Therapist;
 use App\Models\ProductSale;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
+use App\Models\TherapistType;
 use App\Models\DailyRoomRecord;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
@@ -40,11 +41,14 @@ class RoomMangement extends Page implements HasForms
     public ?int $selectedTherapistId = null;
     public ?int $selectedProductId = null;
     public ?int $searchRoomId = 0;
-    public ?int $selectedType = 1;
+    public ?int $selectedType = null;
     public ?int $selectedProductQty = null;
+    public $therapistTypes;
 
+    // for detail section view
     public string $selectedRoomName = '';
     public string $selectedTherapistName = '';
+    public string $selectedTherapistType = '';
     public string $selectedTimeSection = '';
     public string $selectedStartTime = '';
     public string $selectedEndTime = '';
@@ -59,7 +63,7 @@ class RoomMangement extends Page implements HasForms
         $this->rooms = Room::get();
         $this->timeSlots = TimeSlot::get();
         $this->therapists = $this->getFreeTherapists();
-
+        $this->therapistTypes = $this->getTherapistTypes();
 
         $this->form->fill();
 
@@ -75,6 +79,8 @@ class RoomMangement extends Page implements HasForms
 
         $this->selectedRoomName = Room::find($roomId)->name;
         $this->selectedTherapistName = $this->getThapistName($roomId, $slotId);
+        $this->selectedTherapistType = $this->getTherapistType($roomId, $slotId);
+
         $this->selectedStartTime = TimeSlot::find($slotId)->start_time;
         $this->selectedEndTime =  TimeSlot::find($slotId)->end_time;
         $this->selectedTimeSection = $this->selectedStartTime . ' - ' . $this->selectedEndTime;
@@ -197,7 +203,7 @@ class RoomMangement extends Page implements HasForms
                 'total_price' => ($productSale->quantity + $this->selectedProductQty ?? 1) * $product->price
             ]);
         } else {
-            // dump([$this->selectedProductQty, $product->price]);
+
             ProductSale::create([
                 'daily_room_record_id' => $dailyRoomRecord->id,
                 'product_id' => $this->selectedProductId,
@@ -281,6 +287,17 @@ class RoomMangement extends Page implements HasForms
         return $schedule?->therapist?->name ?? "";
     }
 
+    public function getTherapistType($roomId, $slotId): string
+    {
+        $schedule = DailyRoomRecord::where([
+            'record_date' => $this->date,
+            'room_id' => $roomId,
+            'time_slot_id' => $slotId,
+        ])->with('therapistType')->first();
+
+        return $schedule?->therapistType?->title ?? "";
+    }
+
     public function checkBill($roomId, $slotId): bool
     {
         $billCheck = DailyRoomRecord::where([
@@ -354,6 +371,11 @@ class RoomMangement extends Page implements HasForms
 
         return $allStaffs->whereNotIn('id', $busyStaffIds)->values();
 
+    }
+
+    public function getTherapistTypes()
+    {
+        return TherapistType::all();
     }
 
 

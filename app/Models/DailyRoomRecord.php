@@ -26,6 +26,10 @@ class DailyRoomRecord extends Model
         return $this->hasMany(ProductSale::class);
     }
 
+    public function therapistType()
+    {
+        return $this->belongsTo(TherapistType::class, 'service_type');
+    }
 
 
 }

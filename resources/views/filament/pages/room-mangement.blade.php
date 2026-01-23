@@ -28,8 +28,11 @@
             <div class="flex-1">
                 <x-filament::input.wrapper label="Select Type">
                     <x-filament::input.select wire:model.live="selectedType">
-                        @foreach (['Normal' => 0, 'By Name' => 1] as $label => $value)
-                            <option value="{{ $value }}">{{ $label }}</option>
+                        <option value="" selected>Select Therapist Type</option>
+                        @foreach ($therapistTypes as $label => $type)
+                            <option value="{{ $type->id }}">{{ $type->title }} -
+                                ({{ $type->price == 0 ? 'No added fees' : $type->price }})
+                            </option>
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
@@ -158,6 +161,12 @@
                     @else
                         <span class="text-gray-400 italic">Not Assigned</span>
                     @endif
+                </div>
+                <div class="my-3 font-medium">
+                    Therapist Type :
+
+                    <span class="text-primary-600">{{ $selectedTherapistType }}</span>
+
                 </div>
 
                 {{-- <div class="my-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div> --}}

@@ -24,10 +24,26 @@ class CheckBill extends Page
         'bill_for',
     ];
 
+
+    //
+
+    protected static ?string $navigationLabel = 'Rooms';
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            route('filament.admin.pages.room-mangement') => 'Room Management',
+            route('filament.admin.pages.check-bill') => 'Check Bill'
+        ];
+    }
+
+
+
     public array $roomIds = [];
     public $billItems, $billRooms = [];
     public $total;
     public $onePlusone = 1;
+
 
     public function mount(): void
     {
@@ -40,6 +56,7 @@ class CheckBill extends Page
         $this->billItems = $this->getBillItems();
         $this->billRooms = $this->getBillRooms();
         $this->total = $this->totalBill();
+
     }
 
     public function getBillItems()
