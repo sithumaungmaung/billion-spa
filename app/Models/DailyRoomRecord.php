@@ -21,4 +21,11 @@ class DailyRoomRecord extends Model
         return $this->belongsTo(TimeSlot::class);
     }
 
+    public function saleProducts()
+    {
+        return $this->hasMany(ProductSale::class);
+    }
+
+
+
 }
