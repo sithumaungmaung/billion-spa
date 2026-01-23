@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invoice extends Model
 {
+
+    protected $guarded = [];
+
+    protected $table = 'invoices';
+
+
     public function invoiceRooms()
     {
         return $this->hasMany(InvoiceRoom::class);
@@ -15,4 +21,15 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceProduct::class);
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 }

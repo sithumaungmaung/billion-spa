@@ -41,10 +41,13 @@ class RoomMangement extends Page implements HasForms
     public ?int $selectedProductId = null;
     public ?int $searchRoomId = 0;
     public ?int $selectedType = 1;
+    public ?int $selectedProductQty = null;
 
     public string $selectedRoomName = '';
     public string $selectedTherapistName = '';
     public string $selectedTimeSection = '';
+    public string $selectedStartTime = '';
+    public string $selectedEndTime = '';
 
     public ?string $selectedProductSaleId = null;
 
@@ -72,10 +75,10 @@ class RoomMangement extends Page implements HasForms
 
         $this->selectedRoomName = Room::find($roomId)->name;
         $this->selectedTherapistName = $this->getThapistName($roomId, $slotId);
-        $this->selectedTimeSection = TimeSlot::find($slotId)->start_time . ' - ' . TimeSlot::find($slotId)->end_time;
+        $this->selectedStartTime = TimeSlot::find($slotId)->start_time;
+        $this->selectedEndTime =  TimeSlot::find($slotId)->end_time;
+        $this->selectedTimeSection = $this->selectedStartTime . ' - ' . $this->selectedEndTime;
 
-
-        // dump($this->data);
 
         // $this->mountAction('cellModal'); {{ to show up the modal box }}
         //  $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
@@ -188,20 +191,20 @@ class RoomMangement extends Page implements HasForms
 
         if ($productSale) {
             $productSale->update([
-                'quantity' => $productSale->quantity + 1,
+                'quantity' => $productSale->quantity + $this->selectedProductQty ?? 1,
                 'unit_price' => $product->price,
-                'quantity' => $productSale->quantity + 1,
                 'branch_id' => 1,
-                'total_price' => $productSale->quantity * $product->price
+                'total_price' => ($productSale->quantity + $this->selectedProductQty ?? 1) * $product->price
             ]);
         } else {
+            // dump([$this->selectedProductQty, $product->price]);
             ProductSale::create([
                 'daily_room_record_id' => $dailyRoomRecord->id,
                 'product_id' => $this->selectedProductId,
                 'unit_price' => $product->price,
-                'quantity' => 1,
+                'quantity' => $this->selectedProductQty ?? 1,
                 'branch_id' => 1,
-                'total_price' => $product->price
+                'total_price' =>( $this->selectedProductQty ?? 1) * $product->price
             ]);
         }
 
@@ -222,14 +225,31 @@ class RoomMangement extends Page implements HasForms
     public function reduceProduct($saleProduct)
     {
         $productSale = ProductSale::where('id', $saleProduct)->first();
+        $totalQty = $productSale->quantity - 1;
         $productSale->update([
-            'quantity' => $productSale->quantity - 1,
-            'total_price' => $productSale->quantity * $productSale->unit_price
+            'quantity' => $totalQty,
+            'total_price' => $totalQty * $productSale->unit_price
         ]);
 
         $this->notifySuccess(
             'Success: Reduce Success',
             'Product quantity reduced successfully.'
+        );
+        return;
+    }
+
+    public function addMoreProduct($saleProduct)
+    {
+        $productSale = ProductSale::where('id', $saleProduct)->first();
+        $toalQty = $productSale->quantity + 1;
+        $productSale->update([
+            'quantity' => $toalQty,
+            'total_price' => $toalQty * $productSale->unit_price
+        ]);
+
+        $this->notifySuccess(
+            'Success: Add Success',
+            'Product quantity added successfully.'
         );
         return;
     }
@@ -301,7 +321,8 @@ class RoomMangement extends Page implements HasForms
 
             return [
                 'dailyRoomRecord' => $dailyRoomRecord,
-                'productSales' => $productSale
+                'productSales' => $productSale,
+                'productSaleTotal' => $productSale->sum('total_price'),
             ];
         }
 
@@ -374,6 +395,7 @@ class RoomMangement extends Page implements HasForms
                 ->persistent() // Stays on screen until they click it
                 ->send();
     }
+
 
 
 

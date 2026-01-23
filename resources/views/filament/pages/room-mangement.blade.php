@@ -66,18 +66,30 @@
             <div class="flex-1">
                 <x-filament::input.wrapper label="Select Product">
                     <x-filament::input.select wire:model.live="selectedProductId">
-                        <option value="">Choose Product</option>
+                        <option value="" class="text-gray-400" selected>Choose Product</option>
                         @foreach ($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                            <option value="{{ $product->id }}">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span> {{ $product->name }}</span>
+                                    <span class="text-red-600"> ({{ $product->price }})</span>
+                                </div>
+                            </option>
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
             </div>
 
 
-            <x-filament::button wire:click="addProduct" size="lg" :disabled="$this->canAddProduct">
-                Add
-            </x-filament::button>
+            <div class="flex gap-2 w-[170px]">
+                <x-filament::input.wrapper>
+                    <x-filament::input wire:model="selectedProductQty" placeholder="Enter Qty" type="number"
+                        :disabled="!$selectedProductId" />
+                </x-filament::input.wrapper>
+
+                <x-filament::button wire:click="addProduct" size="lg" :disabled="$this->canAddProduct">
+                    Add
+                </x-filament::button>
+            </div>
 
         </div>
 
@@ -136,10 +148,10 @@
 
     <x-filament::section>
         @if ($selectedRoomId || $selectedSlotId)
-            <div class="flex items-center justify-start ">
-                <div class="mx-3 font-medium">Room : {{ $selectedRoomName ?? '—' }}</div>
+            <div class=" items-center justify-start ">
+                <div class="my-3 font-medium">Room : {{ $selectedRoomName ?? '—' }}</div>
 
-                <div class="mx-3 font-medium">
+                <div class="my-3 font-medium">
                     Therapist :
                     @if ($selectedTherapistName)
                         <span class="text-primary-600">{{ $selectedTherapistName }}</span>
@@ -148,9 +160,11 @@
                     @endif
                 </div>
 
-                <div class="mx-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div>
+                {{-- <div class="my-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div> --}}
+                <div class="my-3 font-medium">Start : {{ date('h:i A', strtotime($selectedStartTime)) ?? '—' }}</div>
+                <div class="my-3 font-medium">End : {{ date('h:i A', strtotime($selectedEndTime)) ?? '—' }}</div>
 
-                <div class="mx-3 ">
+                <div class="my-3 ">
                     <x-filament::button wire:click="removeTherapist" color="danger" size="sm"
                         wire:confirm="Are you sure you want to unassign room and therapist?">
                         Unassign room and therapist
@@ -165,7 +179,7 @@
     {{-- Ordered Items --}}
     <x-filament::section>
         <x-filament::card>
-            <div class="my-2">Ordered Items</div>
+            <div class="mb-4">Ordered Items</div>
             <table
                 class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">
@@ -206,25 +220,36 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-right font-mono font-semibold ">
-                                    {{ number_format($product->quantity * $product->unit_price) }}
+                                    {{-- {{ number_format($product->quantity * $product->unit_price) }} --}}
+                                    {{ number_format($product->total_price) }}
                                 </td>
 
-                                <td class="px-4 py-3 text-right font-mono">
-                                    <x-filament::button class="mx-2" wire:click="removeProduct({{ $product->id }})"
+                                <td class="px-4 py-3 text-right font-mono w-[270px]">
+                                    <x-filament::button class="mr-1" wire:click="removeProduct({{ $product->id }})"
                                         color="danger" size="sm">
                                         Remove
                                     </x-filament::button>
 
-                                    <x-filament::button class="mx-2 text-white"
+                                    <x-filament::button class="mr-1 text-white"
                                         wire:click="reduceProduct({{ $product->id }})" :disabled="$product->quantity <= 1"
                                         color="primary" size="sm">
                                         Reduce
+                                    </x-filament::button>
+
+                                    <x-filament::button class="mr-1 text-white bg-green-900"
+                                        wire:click="addMoreProduct({{ $product->id }})" size="sm">
+                                        Add
                                     </x-filament::button>
                                 </td>
                             </tr>
                         @endforeach
                     @endif
-
+                    <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
+                        Product Total Bill
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold ">
+                        {{ number_format($this->selectedRoomRecordProducts['productSaleTotal'] ?? 0) }}
+                    </td>
                 </tbody>
             </table>
         </x-filament::card>

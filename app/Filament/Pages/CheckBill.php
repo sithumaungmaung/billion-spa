@@ -2,14 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use Carbon\Carbon;
+use App\Models\Invoice;
 use App\Models\Product;
 use Filament\Pages\Page;
 use App\Models\ProductSale;
-use App\Models\DailyRoomRecord;
-use App\Models\Invoice;
-use Carbon\Carbon;
-use Filament\Notifications\Notification;
 use Ramsey\Uuid\Type\Integer;
+use App\Models\DailyRoomRecord;
+use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class CheckBill extends Page
 {
@@ -29,8 +30,8 @@ class CheckBill extends Page
     public $onePlusone = 1;
 
     public function mount(): void
-    {   
-        
+    {
+
         $this->roomIds = array_map(
             'intval',
             explode(',', $this->bill_for)
@@ -52,7 +53,7 @@ class CheckBill extends Page
         foreach ($this->billItems as $item) {
             $total += $item->quantity * $item->unit_price;
         }
-        
+
         foreach ($this->billRooms as $billRoom) {
             $total += $billRoom['total_price'];
         }
@@ -63,13 +64,13 @@ class CheckBill extends Page
     public function getBillRooms()
     {
         $dailyRooms = DailyRoomRecord::whereIn('id', $this->roomIds)->with('room')->get();
-        
+
         $grouped = $dailyRooms->groupBy(fn ($item) =>
             $item->room_id . '-' . $item->service_type
         );
 
         $items = [];
-        
+
         foreach ($grouped as $group) {
             $first = $group->first();
 
@@ -103,7 +104,7 @@ class CheckBill extends Page
                 ];
             }
         }
-        
+
         return $items;
     }
 
@@ -125,18 +126,19 @@ class CheckBill extends Page
         }
 
         $invoice = new Invoice();
-        $invoice->branch_id = 1;        
-        $invoice->invoice_no = $this->getInvoiceNo();        
-        $invoice->invoice_datetime = Carbon::now();        
-        $invoice->sub_total = $this->total;        
-        $invoice->discount = $this->total;        
-        $invoice->tax = $this->total;        
+        $invoice->branch_id = 1;
+        $invoice->user_id = Auth::id();
+        $invoice->invoice_no = $this->getInvoiceNo();
+        $invoice->invoice_datetime = Carbon::now();
+        $invoice->sub_total = $this->total;
+        $invoice->discount = $this->total;
+        $invoice->tax = $this->total;
         $invoice->grand_total = $this->total;
         $invoice->save();
-        
+
         $invoice->invoiceRooms()->createMany($this->billRooms);
         $billItems = $this->getBillItemsForSave();
-        
+
         if($billItems){
             $invoice->invoiceProducts()->createMany($billItems);
         }

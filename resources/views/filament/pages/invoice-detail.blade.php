@@ -10,13 +10,13 @@
                         {{ $invoiceDetail->invoice_no }}
                     </span>
                 </div>
-                {{-- <div class="h1">
-                    Note: <span>
-                        {{ $invoiceDetail->note ?? '-' }}
-                    </span>
-                </div> --}}
                 <div class="h1">
-                    Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
+                    Confirm Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
+                </div>
+                <div class="h1">
+                    Confirm By: <span>
+                        {{ $invoiceDetail->users->name ?? '-' }}
+                    </span>
                 </div>
             </div>
 
