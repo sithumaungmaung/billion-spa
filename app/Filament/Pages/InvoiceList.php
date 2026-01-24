@@ -30,7 +30,7 @@ class InvoiceList extends Page
 
     public function mount(): void
     {
-        $this->invoices = Invoice::get();
+        $this->invoices = Invoice::orderBy('id', 'desc')->get();
     }
 
     public function showInvoiceDetail($invoice_no)
@@ -38,6 +38,4 @@ class InvoiceList extends Page
         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice_no]);
 
     }
-
-
 }

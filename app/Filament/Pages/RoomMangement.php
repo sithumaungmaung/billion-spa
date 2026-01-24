@@ -92,7 +92,8 @@ class RoomMangement extends Page implements HasForms
 
     public function assign(): void
     {
-        $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)->where('room_id', $this->selectedRoomId)
+        $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)
+                                            ->where('room_id', $this->selectedRoomId)
                                             ->where('time_slot_id', $this->selectedSlotId)
                                             ->whereNotNull('invoice_id')
                                             ->first();
@@ -124,7 +125,7 @@ class RoomMangement extends Page implements HasForms
                 return;
 
         }
-
+        $therapistType = TherapistType::find($this->selectedType);
         DailyRoomRecord::updateOrCreate(
             [
                 'record_date' => $this->date,
@@ -135,6 +136,7 @@ class RoomMangement extends Page implements HasForms
                 'therapist_id' => $this->selectedTherapistId,
                 'service_type' => $this->selectedType,
                 'price' => $room ? $room->price : 3333,
+                'service_type_price' => $therapistType ? $therapistType->price : 0,
             ]
         );
 

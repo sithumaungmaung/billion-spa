@@ -95,7 +95,7 @@ class CheckBill extends Page
             $paidSlots  = (int) ceil($totalSlots / $this->onePlusone);
             $freeSlots  = $totalSlots - $paidSlots;
 
-            $price = $first->price;
+            $price = $first->price + $first->service_type_price;
 
             $serviceType = $first->service_type > 0 ? 'By Name' : 'Normal';
 
@@ -103,6 +103,7 @@ class CheckBill extends Page
                 'branch_id' => 1,
                 'room_id'     => $first->room_id,
                 'service_type' =>  $first->service_type,
+                'service_type_price' =>  $first->service_type_price,
                 'room_name'   => "{$first->room->name} – {$serviceType}",
                 'quantity'    => $paidSlots,
                 'unit_price'  => $price,
@@ -115,6 +116,7 @@ class CheckBill extends Page
                     'room_id'     => $first->room_id,
                     'room_name'   => "{$first->room->name} – {$serviceType}",
                     'service_type' =>  $first->service_type,
+                    'service_type_price' =>  0,
                     'quantity'    => $freeSlots,
                     'unit_price'  => 0,
                     'total_price' => 0,
@@ -127,6 +129,7 @@ class CheckBill extends Page
 
     public function applyOnePlusOne() {
         $this->billRooms = $this->getBillRooms();
+        $this->total = $this->totalBill();
     }
 
     public function confirmBill() {
@@ -162,6 +165,8 @@ class CheckBill extends Page
 
         DailyRoomRecord::whereIn('id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
         ProductSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
+
+         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice->invoice_no]);
     }
 
     public function getInvoiceNo()

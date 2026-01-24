@@ -141,7 +141,7 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
+        </div> <br>
         <x-filament::button wire:click="goToCheckBill" color="primary" class="mt-1" :disabled="!$selectedRoomIdsForBill">
             Check Bill
         </x-filament::button>
@@ -173,7 +173,8 @@
                 <div class="my-3 font-medium">Start : {{ date('h:i A', strtotime($selectedStartTime)) ?? '—' }}</div>
                 <div class="my-3 font-medium">End : {{ date('h:i A', strtotime($selectedEndTime)) ?? '—' }}</div>
 
-                <div class="my-3 ">
+                <div class="my-3 mt-2">
+                    <br>
                     <x-filament::button wire:click="removeTherapist" color="danger" size="sm"
                         wire:confirm="Are you sure you want to unassign room and therapist?">
                         Unassign room and therapist
