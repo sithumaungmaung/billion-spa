@@ -31,5 +31,10 @@ class DailyRoomRecord extends Model
         return $this->belongsTo(TherapistType::class, 'service_type');
     }
 
+    public function serviceType()
+    {
+        return $this->hasOne(TherapistType::class, 'id', 'service_type');
+    }
+
 
 }

@@ -4,17 +4,18 @@ namespace App\Filament\Pages;
 
 use Carbon\Carbon;
 use App\Models\Invoice;
-use App\Models\Product;
 use Filament\Pages\Page;
 use App\Models\ProductSale;
-use Ramsey\Uuid\Type\Integer;
 use App\Models\DailyRoomRecord;
+use App\Traits\BillTraits;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
 
 class CheckBill extends Page
 {
+    use BillTraits;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected string $view = 'filament.pages.check-bill';
@@ -38,26 +39,23 @@ class CheckBill extends Page
         ];
     }
 
-
-
     public array $roomIds = [];
-    public $billItems, $billRooms = [];
+    public $billItems, $billRooms, $systemDailyRecords = [];
     public $total;
     public $onePlusone = 1;
 
 
     public function mount(): void
     {
-
         $this->roomIds = array_map(
             'intval',
             explode(',', $this->bill_for)
         );
         // $this->getBill();
         $this->billItems = $this->getBillItems();
-        $this->billRooms = $this->getBillRooms();
+        $this->billRooms = $this->getBillRooms($this->roomIds, $this->onePlusone);
         $this->total = $this->totalBill();
-
+        $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
 
     public function getBillItems()
@@ -79,53 +77,9 @@ class CheckBill extends Page
         return $total;
     }
 
-    public function getBillRooms()
-    {
+    public function getSystemDailyRecords() {
         $dailyRooms = DailyRoomRecord::whereIn('id', $this->roomIds)->with('room')->get();
-
-        $grouped = $dailyRooms->groupBy(fn ($item) =>
-            $item->room_id . '-' . $item->service_type
-        );
-
-        $items = [];
-
-        foreach ($grouped as $group) {
-            $first = $group->first();
-
-            $totalSlots = $group->count();
-            $paidSlots  = (int) ceil($totalSlots / $this->onePlusone);
-            $freeSlots  = $totalSlots - $paidSlots;
-
-            $price = $first->price + $first->service_type_price;
-
-            $serviceType = $first->service_type > 0 ? 'By Name' : 'Normal';
-
-            $items[] = [
-                'branch_id' => 1,
-                'room_id'     => $first->room_id,
-                'service_type' =>  $first->service_type,
-                'service_type_price' =>  $first->service_type_price,
-                'room_name'   => "{$first->room->name} – {$serviceType}",
-                'quantity'    => $paidSlots,
-                'unit_price'  => $price,
-                'total_price' => $paidSlots * $price,
-            ];
-
-            if($freeSlots > 0) {
-                $items[] = [
-                    'branch_id' => 1,
-                    'room_id'     => $first->room_id,
-                    'room_name'   => "{$first->room->name} – {$serviceType}",
-                    'service_type' =>  $first->service_type,
-                    'service_type_price' =>  0,
-                    'quantity'    => $freeSlots,
-                    'unit_price'  => 0,
-                    'total_price' => 0,
-                ];
-            }
-        }
-
-        return $items;
+        return $dailyRooms;
     }
 
     public function applyOnePlusOne() {
@@ -167,9 +121,9 @@ class CheckBill extends Page
         DailyRoomRecord::whereIn('id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
         ProductSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
 
-         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice->invoice_no]);
+        return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice->invoice_no]);
     }
-
+    
     public function getInvoiceNo()
     {
         $today = date("mY");
