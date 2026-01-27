@@ -1,14 +1,16 @@
 <?php
 namespace App\Traits;
 
+use App\Models\ProductSale;
 use App\Models\DailyRoomRecord;
 
 trait BillTraits
 {
-    public function getBillRooms($roomIds, $onePlusone)
+    public function getBillRooms($ids, $onePlusone)
     {
-        $dailyRooms = DailyRoomRecord::whereIn('id', $roomIds)->with('room')->get();
-        
+
+        $dailyRooms = DailyRoomRecord::whereIn('id', $ids)->with('room')->get();
+
         $grouped = $dailyRooms->groupBy(fn ($item) =>
             $item->room_id . '-' . $item->service_type
         );
@@ -53,4 +55,25 @@ trait BillTraits
 
         return $items;
     }
+
+    public function getBillItems($roomIds)
+    {
+        $billItems = ProductSale::whereIn('daily_room_record_id', $roomIds)->with('product')->get();
+        return $billItems;
+    }
+
+
+    public function totalBill($getBillItems, $getBillRooms) {
+        $total = 0;
+        foreach ($getBillItems as $item) {
+            $total += $item->quantity * $item->unit_price;
+        }
+
+        foreach ($getBillRooms as $billRoom) {
+            $total += $billRoom['total_price'];
+        }
+
+        return $total;
+    }
+
 }

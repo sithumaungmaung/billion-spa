@@ -52,17 +52,17 @@ class CheckBill extends Page
             explode(',', $this->bill_for)
         );
         // $this->getBill();
-        $this->billItems = $this->getBillItems();
+        $this->billItems = $this->getBillItems($this->roomIds);
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->onePlusone);
         $this->total = $this->totalBill();
         $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
 
-    public function getBillItems()
-    {
-        $billItems = ProductSale::whereIn('daily_room_record_id', $this->roomIds)->with('product')->get();
-        return $billItems;
-    }
+    // public function getBillItems()
+    // {
+    //     $billItems = ProductSale::whereIn('daily_room_record_id', $this->roomIds)->with('product')->get();
+    //     return $billItems;
+    // }
 
     public function totalBill() {
         $total = 0;
@@ -83,7 +83,7 @@ class CheckBill extends Page
     }
 
     public function applyOnePlusOne() {
-        $this->billRooms = $this->getBillRooms();
+        $this->billRooms = $this->getBillRooms($this->roomIds, $this->onePlusone);
         $this->total = $this->totalBill();
     }
 
@@ -123,7 +123,7 @@ class CheckBill extends Page
 
         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice->invoice_no]);
     }
-    
+
     public function getInvoiceNo()
     {
         $today = date("mY");
@@ -154,26 +154,30 @@ class CheckBill extends Page
         return $items;
     }
 
-    public function assign() {
+    // public function assign() {
 
-        $this->billItems = $this->getBillItems();
-        $this->billRooms = $this->getBillRooms();
-        $this->total = $this->totalBill();
+    //     $this->billItems = $this->getBillItems();
+    //     $this->billRooms = $this->getBillRooms();
+    //     $this->total = $this->totalBill();
 
-        $invoice = ['rooms' => $this->billRooms, 'items' => $this->billItems->toArray(), 'total' => $this->total];
+    //     $invoice = ['rooms' => $this->billRooms, 'items' => $this->billItems->toArray(), 'total' => $this->total];
 
-        $pdf = Pdf::loadView('pdf.bill', ['invoice' => $invoice]);
+    //     $pdf = Pdf::loadView('pdf.bill', ['invoice' => $invoice]);
 
-        return $pdf->stream("invoice-{$invoice['rooms'][0]['room_id']}.pdf");
-    }
+    //     return $pdf->stream("invoice-{$invoice['rooms'][0]['room_id']}.pdf");
+    // }
 
-    public function printPreview() {
-        $this->billItems = $this->getBillItems();
-        $this->billRooms = $this->getBillRooms();
-        $this->total = $this->totalBill();
+    public function printPreview()
+    {
 
-        return redirect()->rounte('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusOne]);
+        $url = route('invoice.preview', [
+            'ids' => implode(',', $this->roomIds),
+            'onePlusOne' => $this->onePlusone
+        ]);
 
+        $this->dispatch('open-new-tab', url: $url);
+
+        // return redirect()->away()->route('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusone]);
     }
 
 }

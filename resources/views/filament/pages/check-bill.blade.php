@@ -111,7 +111,8 @@
     <!-- system over view -->
     <x-filament::section>
         <h3>Room Information</h3>
-        <table class="w-full text-sm text-left border-collapse
+        <table
+            class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10 mt-2">
             <thead class="bg-gray-100 text-gray-700
                    dark:bg-white/5 dark:text-gray-300">
@@ -139,19 +140,19 @@
                         </td>
 
                         <td class="px-4 py-3 font-medium">
-                            {{ $systemDailyRecord->room ? $systemDailyRecord->room->name : "" }}
+                            {{ $systemDailyRecord->room ? $systemDailyRecord->room->name : '' }}
                         </td>
 
                         <td class="px-4 py-3 font-medium">
-                            {{ $systemDailyRecord->timeslot ? \Carbon\Carbon::parse($systemDailyRecord->timeslot->start_time)->format('H:i') . " - " . \Carbon\Carbon::parse($systemDailyRecord->timeslot->end_time)->format('H:i')  : "" }}
+                            {{ $systemDailyRecord->timeslot ? \Carbon\Carbon::parse($systemDailyRecord->timeslot->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($systemDailyRecord->timeslot->end_time)->format('H:i') : '' }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            {{ $systemDailyRecord->therapist ? $systemDailyRecord->therapist->name : "" }}
+                            {{ $systemDailyRecord->therapist ? $systemDailyRecord->therapist->name : '' }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            {{ $systemDailyRecord->serviceType ? $systemDailyRecord->serviceType->title : "" }}
+                            {{ $systemDailyRecord->serviceType ? $systemDailyRecord->serviceType->title : '' }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
@@ -171,3 +172,10 @@
         </table>
     </x-filament::section>
 </x-filament-panels::page>
+
+
+<script>
+    window.addEventListener('open-new-tab', event => {
+        window.open(event.detail.url, '_blank');
+    });
+</script>
