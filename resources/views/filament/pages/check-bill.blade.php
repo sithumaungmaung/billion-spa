@@ -98,7 +98,7 @@
 
         <div class="flex mt-3">
             <div class="col mr-1">
-                <x-filament::button wire:click="assign">
+                <x-filament::button wire:click="printPreview" target="_blank">
                     Print Preview
                 </x-filament::button>
             </div>

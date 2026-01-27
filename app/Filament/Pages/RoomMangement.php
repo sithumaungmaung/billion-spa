@@ -42,8 +42,10 @@ class RoomMangement extends Page implements HasForms
     public ?int $selectedProductId = null;
     public ?int $searchRoomId = 0;
     public ?int $selectedType = null;
-    public ?int $selectedProductQty = null;
+    public ?int $selectedProductQty = 1;
     public $therapistTypes;
+
+    public $isExistingRecord = null;
 
     // for detail section view
     public string $selectedRoomName = '';
@@ -85,6 +87,10 @@ class RoomMangement extends Page implements HasForms
         $this->selectedEndTime =  TimeSlot::find($slotId)->end_time;
         $this->selectedTimeSection = $this->selectedStartTime . ' - ' . $this->selectedEndTime;
 
+        $this->isExistingRecord = DailyRoomRecord::where('record_date', $this->date)
+        ->where('room_id', $this->selectedRoomId)
+        ->where('time_slot_id', $this->selectedSlotId)
+        ->first();
 
         // $this->mountAction('cellModal'); {{ to show up the modal box }}
         //  $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
@@ -111,10 +117,14 @@ class RoomMangement extends Page implements HasForms
         $this->selectedTherapistId = $this->data['therapist_id'] ?? null;
         $room = Room::find($this->selectedRoomId);
 
+        $therapistType = TherapistType::find($this->selectedType);
+
         $alreadyAssigned = DailyRoomRecord::where([
             'record_date' => $this->date,
             'time_slot_id' => $this->selectedSlotId,
-            'therapist_id' => $this->selectedTherapistId
+            'therapist_id' => $this->selectedTherapistId,
+             'service_type' => $this->selectedType,
+             'service_type_price' => $therapistType ? $therapistType->price : 0,
         ])->first();
 
         if($alreadyAssigned) {
@@ -125,7 +135,7 @@ class RoomMangement extends Page implements HasForms
                 return;
 
         }
-        $therapistType = TherapistType::find($this->selectedType);
+
         DailyRoomRecord::updateOrCreate(
             [
                 'record_date' => $this->date,
@@ -135,7 +145,7 @@ class RoomMangement extends Page implements HasForms
             [
                 'therapist_id' => $this->selectedTherapistId,
                 'service_type' => $this->selectedType,
-                'price' => $room ? $room->price : 3333,
+                'price' => $room ? $room->price : 0,
                 'service_type_price' => $therapistType ? $therapistType->price : 0,
             ]
         );
@@ -199,10 +209,10 @@ class RoomMangement extends Page implements HasForms
 
         if ($productSale) {
             $productSale->update([
-                'quantity' => $productSale->quantity + $this->selectedProductQty ?? 1,
+                'quantity' => $productSale->quantity + $this->selectedProductQty,
                 'unit_price' => $product->price,
                 'branch_id' => 1,
-                'total_price' => ($productSale->quantity + $this->selectedProductQty ?? 1) * $product->price
+                'total_price' => ($productSale->quantity + $this->selectedProductQty ) * $product->price
             ]);
         } else {
 
@@ -212,7 +222,7 @@ class RoomMangement extends Page implements HasForms
                 'unit_price' => $product->price,
                 'quantity' => $this->selectedProductQty ?? 1,
                 'branch_id' => 1,
-                'total_price' =>( $this->selectedProductQty ?? 1) * $product->price
+                'total_price' => $this->selectedProductQty  * $product->price
             ]);
         }
 

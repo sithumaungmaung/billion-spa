@@ -45,7 +45,7 @@
                 </div>
 
             </div>
-            <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId">
+            <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedType">
                 Assign
             </x-filament::button>
 
@@ -147,122 +147,124 @@
         </x-filament::button>
     </x-filament::section>
 
+    @if ($isExistingRecord)
 
+        <x-filament::section>
+            @if ($selectedRoomId || $selectedSlotId)
+                <div class=" items-center justify-start ">
+                    <div class="my-3 font-medium">Room : {{ $selectedRoomName ?? '—' }}</div>
 
-    <x-filament::section>
-        @if ($selectedRoomId || $selectedSlotId)
-            <div class=" items-center justify-start ">
-                <div class="my-3 font-medium">Room : {{ $selectedRoomName ?? '—' }}</div>
+                    <div class="my-3 font-medium">
+                        Therapist :
+                        @if ($selectedTherapistName)
+                            <span class="text-primary-600">{{ $selectedTherapistName }}</span>
+                        @else
+                            <span class="text-gray-400 italic">Not Assigned</span>
+                        @endif
+                    </div>
+                    <div class="my-3 font-medium">
+                        Therapist Type :
 
-                <div class="my-3 font-medium">
-                    Therapist :
-                    @if ($selectedTherapistName)
-                        <span class="text-primary-600">{{ $selectedTherapistName }}</span>
-                    @else
-                        <span class="text-gray-400 italic">Not Assigned</span>
-                    @endif
+                        <span class="text-primary-600">{{ $selectedTherapistType }}</span>
+
+                    </div>
+
+                    {{-- <div class="my-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div> --}}
+                    <div class="my-3 font-medium">Start : {{ date('h:i A', strtotime($selectedStartTime)) ?? '—' }}
+                    </div>
+                    <div class="my-3 font-medium">End : {{ date('h:i A', strtotime($selectedEndTime)) ?? '—' }}</div>
+
+                    <div class="my-3 mt-2">
+                        <br>
+                        <x-filament::button wire:click="removeTherapist" color="danger" size="sm"
+                            wire:confirm="Are you sure you want to unassign room and therapist?">
+                            Unassign room and therapist
+                        </x-filament::button>
+                    </div>
                 </div>
-                <div class="my-3 font-medium">
-                    Therapist Type :
-
-                    <span class="text-primary-600">{{ $selectedTherapistType }}</span>
-
-                </div>
-
-                {{-- <div class="my-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div> --}}
-                <div class="my-3 font-medium">Start : {{ date('h:i A', strtotime($selectedStartTime)) ?? '—' }}</div>
-                <div class="my-3 font-medium">End : {{ date('h:i A', strtotime($selectedEndTime)) ?? '—' }}</div>
-
-                <div class="my-3 mt-2">
-                    <br>
-                    <x-filament::button wire:click="removeTherapist" color="danger" size="sm"
-                        wire:confirm="Are you sure you want to unassign room and therapist?">
-                        Unassign room and therapist
-                    </x-filament::button>
-                </div>
-            </div>
-        @endif
-    </x-filament::section>
+            @endif
+        </x-filament::section>
 
 
 
-    {{-- Ordered Items --}}
-    <x-filament::section>
-        <x-filament::card>
-            <div class="mb-4">Ordered Items</div>
-            <table
-                class="w-full text-sm text-left border-collapse
+        {{-- Ordered Items --}}
+        <x-filament::section>
+            <x-filament::card>
+                <div class="mb-4">Ordered Items</div>
+                <table
+                    class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">
-                <thead class="bg-gray-100 text-gray-700
+                    <thead class="bg-gray-100 text-gray-700
                    dark:bg-white/5 dark:text-gray-300">
-                    <tr class="border-b border-gray-200 dark:border-white/10">
-                        <th class="px-4 py-3 w-12 text-center">#</th>
-                        <th class="px-4 py-3">Title</th>
-                        <th class="px-4 py-3 text-right">Unit</th>
-                        <th class="px-4 py-3 text-right">Price</th>
-                        <th class="px-4 py-3 text-right">Total</th>
-                        <th class="px-4 py-3 text-right">Action</th>
-                    </tr>
-                </thead>
+                        <tr class="border-b border-gray-200 dark:border-white/10">
+                            <th class="px-4 py-3 w-12 text-center">#</th>
+                            <th class="px-4 py-3">Title</th>
+                            <th class="px-4 py-3 text-right">Unit</th>
+                            <th class="px-4 py-3 text-right">Price</th>
+                            <th class="px-4 py-3 text-right">Total</th>
+                            <th class="px-4 py-3 text-right">Action</th>
+                        </tr>
+                    </thead>
 
-                <tbody class="divide-y divide-gray-100
+                    <tbody class="divide-y divide-gray-100
                    dark:divide-white/10">
 
-                    @if (array_key_exists('productSales', $this->selectedRoomRecordProducts))
-                        @foreach ($this->selectedRoomRecordProducts['productSales'] as $key => $product)
-                            <tr
-                                class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                        @if (array_key_exists('productSales', $this->selectedRoomRecordProducts))
+                            @foreach ($this->selectedRoomRecordProducts['productSales'] as $key => $product)
+                                <tr
+                                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                                dark:hover:bg-white/5 transition">
-                                <td class="px-4 py-3 text-center text-gray-500">
-                                    {{ $key + 1 }}
-                                </td>
+                                    <td class="px-4 py-3 text-center text-gray-500">
+                                        {{ $key + 1 }}
+                                    </td>
 
-                                <td class="px-4 py-3 font-medium">
-                                    {{ $product->product->name }}
-                                </td>
+                                    <td class="px-4 py-3 font-medium">
+                                        {{ $product->product->name }}
+                                    </td>
 
-                                <td class="px-4 py-3 text-right">
-                                    {{ $product->quantity }}
-                                </td>
+                                    <td class="px-4 py-3 text-right">
+                                        {{ $product->quantity }}
+                                    </td>
 
-                                <td class="px-4 py-3 text-right font-mono">
-                                    {{ number_format($product->unit_price) }}
-                                </td>
+                                    <td class="px-4 py-3 text-right font-mono">
+                                        {{ number_format($product->unit_price) }}
+                                    </td>
 
-                                <td class="px-4 py-3 text-right font-mono font-semibold ">
-                                    {{-- {{ number_format($product->quantity * $product->unit_price) }} --}}
-                                    {{ number_format($product->total_price) }}
-                                </td>
+                                    <td class="px-4 py-3 text-right font-mono font-semibold ">
+                                        {{-- {{ number_format($product->quantity * $product->unit_price) }} --}}
+                                        {{ number_format($product->total_price) }}
+                                    </td>
 
-                                <td class="px-4 py-3 text-right font-mono w-[270px]">
-                                    <x-filament::button class="mr-1" wire:click="removeProduct({{ $product->id }})"
-                                        color="danger" size="sm">
-                                        Remove
-                                    </x-filament::button>
+                                    <td class="px-4 py-3 text-right font-mono w-[270px]">
+                                        <x-filament::button class="mr-1"
+                                            wire:click="removeProduct({{ $product->id }})" color="danger"
+                                            size="sm">
+                                            Remove
+                                        </x-filament::button>
 
-                                    <x-filament::button class="mr-1 text-white"
-                                        wire:click="reduceProduct({{ $product->id }})" :disabled="$product->quantity <= 1"
-                                        color="primary" size="sm">
-                                        Reduce
-                                    </x-filament::button>
+                                        <x-filament::button class="mr-1 text-white"
+                                            wire:click="reduceProduct({{ $product->id }})" :disabled="$product->quantity <= 1"
+                                            color="primary" size="sm">
+                                            Reduce
+                                        </x-filament::button>
 
-                                    <x-filament::button class="mr-1 text-white bg-green-900"
-                                        wire:click="addMoreProduct({{ $product->id }})" size="sm">
-                                        Add
-                                    </x-filament::button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endif
-                    <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
-                        Product Total Bill
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono font-semibold ">
-                        {{ number_format($this->selectedRoomRecordProducts['productSaleTotal'] ?? 0) }}
-                    </td>
-                </tbody>
-            </table>
-        </x-filament::card>
-    </x-filament::section>
-
+                                        <x-filament::button class="mr-1 text-white bg-green-900"
+                                            wire:click="addMoreProduct({{ $product->id }})" size="sm">
+                                            Add
+                                        </x-filament::button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                        <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
+                            Product Total Bill
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono font-semibold ">
+                            {{ number_format($this->selectedRoomRecordProducts['productSaleTotal'] ?? 0) }}
+                        </td>
+                    </tbody>
+                </table>
+            </x-filament::card>
+        </x-filament::section>
+    @endif
 </x-filament-panels::page>

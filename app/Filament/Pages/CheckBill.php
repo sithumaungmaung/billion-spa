@@ -12,6 +12,7 @@ use App\Models\DailyRoomRecord;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
+
 class CheckBill extends Page
 {
     protected static bool $shouldRegisterNavigation = false;
@@ -198,4 +199,27 @@ class CheckBill extends Page
         }
         return $items;
     }
+
+    public function assign() {
+
+        $this->billItems = $this->getBillItems();
+        $this->billRooms = $this->getBillRooms();
+        $this->total = $this->totalBill();
+
+        $invoice = ['rooms' => $this->billRooms, 'items' => $this->billItems->toArray(), 'total' => $this->total];
+
+        $pdf = Pdf::loadView('pdf.bill', ['invoice' => $invoice]);
+
+        return $pdf->stream("invoice-{$invoice['rooms'][0]['room_id']}.pdf");
+    }
+
+    public function printPreview() {
+        $this->billItems = $this->getBillItems();
+        $this->billRooms = $this->getBillRooms();
+        $this->total = $this->totalBill();
+
+        return redirect()->rounte('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusOne]);
+
+    }
+
 }
