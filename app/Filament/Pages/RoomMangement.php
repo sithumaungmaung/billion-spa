@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Pages\Page;
 use App\Models\Therapist;
 use App\Models\ProductSale;
+use App\Models\ExtraService;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\TherapistType;
@@ -44,6 +45,8 @@ class RoomMangement extends Page implements HasForms
     public ?int $selectedType = null;
     public ?int $selectedProductQty = 1;
     public $therapistTypes;
+    public $extraServices;
+    public $selectedExtraServices = [];
 
     public $isExistingRecord = null;
 
@@ -70,6 +73,7 @@ class RoomMangement extends Page implements HasForms
         $this->form->fill();
 
         $this->products = Product::get();
+        $this->extraServices = ExtraService::get();
     }
 
 
@@ -272,6 +276,16 @@ class RoomMangement extends Page implements HasForms
         return;
     }
 
+
+    public function addExtraService()
+    {
+        $this->notifySuccess(
+            'Success: Add Success',
+            'Extra service added successfully.'
+        );
+    }
+
+
     // public function updatedSelectedType(): void {
     //     $room = DailyRoomRecord::where('room_id', $this->selectedRoomId)->first();
     //     $room->service_type = $this->selectedType;
@@ -390,6 +404,10 @@ class RoomMangement extends Page implements HasForms
         return TherapistType::all();
     }
 
+    // public function getExtraServices()
+    // {
+    //     return ExtraService::all();
+    // }
 
     public function form(Schema $schema): Schema
     {

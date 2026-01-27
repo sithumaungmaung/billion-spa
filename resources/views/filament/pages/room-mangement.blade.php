@@ -66,7 +66,14 @@
                 Assign
             </x-filament::button> --}}
 
-            <div class="flex-1">
+
+
+        </div>
+
+
+        <div class="flex items-end gap-4 mt-5">
+
+            <div class="col-6">
                 <x-filament::input.wrapper label="Select Product">
                     <x-filament::input.select wire:model.live="selectedProductId">
                         <option value="" class="text-gray-400" selected>Choose Product</option>
@@ -82,8 +89,7 @@
                 </x-filament::input.wrapper>
             </div>
 
-
-            <div class="flex gap-2 w-[170px]">
+            <div class="flex  gap-2 w-[150px]">
                 <x-filament::input.wrapper>
                     <x-filament::input wire:model="selectedProductQty" placeholder="Enter Qty" type="number"
                         :disabled="!$selectedProductId" />
@@ -94,7 +100,31 @@
                 </x-filament::button>
             </div>
 
+
+            <div class="col-6">
+                <x-filament::input.wrapper label="Select Extra Service">
+                    <x-filament::input.select wire:model.live="selectedExtraServiceId">
+                        <option value="" class="text-gray-400" selected>Choose Extra Service</option>
+                        @foreach ($extraServices as $service)
+                            <option value="{{ $service->id }}">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span> {{ $service->title }}</span>
+                                    <span class="text-red-600"> ({{ $product->price }})</span>
+                                </div>
+                            </option>
+                        @endforeach
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
+            </div>
+
+            <x-filament::button wire:click="addExtraService" size="lg" :disabled="$this->selectedExtraServices">
+                Add
+            </x-filament::button>
+
+
         </div>
+
+
 
         <div class="mt-5 overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg">
 
