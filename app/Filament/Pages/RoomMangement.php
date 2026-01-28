@@ -356,8 +356,7 @@ class RoomMangement extends Page implements HasForms
             'room_id' => $roomId,
             'time_slot_id' => $slotId,
         ])->with('extraServices')->first();
-        // dump($schedule?->extraServices);
-        // return;
+
         return $schedule?->extraServices->toArray() ?? [];
     }
 

@@ -5,9 +5,11 @@ namespace App\Filament\Pages;
 use Carbon\Carbon;
 use App\Models\Invoice;
 use Filament\Pages\Page;
+use App\Traits\BillTraits;
 use App\Models\ProductSale;
 use App\Models\DailyRoomRecord;
-use App\Traits\BillTraits;
+use App\Models\ExtraServiceSale;
+use App\Models\InvoiceExtraService;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
@@ -40,7 +42,7 @@ class CheckBill extends Page
     }
 
     public array $roomIds = [];
-    public $billItems, $billRooms, $systemDailyRecords = [];
+    public $billItems, $billExtraServices, $billRooms, $systemDailyRecords = [];
     public $total;
     public $onePlusone = 1;
 
@@ -53,16 +55,11 @@ class CheckBill extends Page
         );
         // $this->getBill();
         $this->billItems = $this->getBillItems($this->roomIds);
+        $this->billExtraServices = $this->getBillExtraServices($this->roomIds);
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->onePlusone);
         $this->total = $this->totalBill();
         $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
-
-    // public function getBillItems()
-    // {
-    //     $billItems = ProductSale::whereIn('daily_room_record_id', $this->roomIds)->with('product')->get();
-    //     return $billItems;
-    // }
 
     public function totalBill() {
         $total = 0;
@@ -72,6 +69,10 @@ class CheckBill extends Page
 
         foreach ($this->billRooms as $billRoom) {
             $total += $billRoom['total_price'];
+        }
+
+        foreach ($this->billExtraServices as $extraService) {
+            $total +=  $extraService->unit_price;
         }
 
         return $total;
@@ -102,7 +103,7 @@ class CheckBill extends Page
 
 
         $billRooms = collect($this->billRooms)->map(function ($r) {
-            $r['service_type'] = (int)$r['service_type']->id;
+           $r['service_type'] = (int) data_get($r['service_type'], 'id', $r['service_type']);
             return $r;
         })->toArray();
 
@@ -120,7 +121,20 @@ class CheckBill extends Page
 
         $invoice->invoiceRooms()->createMany($billRooms);
         $billItems = $this->getBillItemsForSave();
+        $billExtraServices = $this->getBillExtraServicesForSave();
 
+
+        if($this->billExtraServices->count() > 0) {
+          foreach($this->billExtraServices as $extraService) {
+            $invoice->invoiceExtraServices()->create([
+                'branch_id' => 1,
+                'quantity'    => 1,
+                'extra_service_id'  => $extraService->extra_service_id,
+                'unit_price'  => $extraService->unit_price,
+                'total_price' => $extraService->total_price,
+            ]);
+          }
+        }
 
         if($billItems){
             $invoice->invoiceProducts()->createMany($this->billItems->toArray());
@@ -128,6 +142,7 @@ class CheckBill extends Page
 
         DailyRoomRecord::whereIn('id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
         ProductSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
+        ExtraServiceSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
 
         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice->invoice_no]);
     }
@@ -162,18 +177,20 @@ class CheckBill extends Page
         return $items;
     }
 
-    // public function assign() {
-
-    //     $this->billItems = $this->getBillItems();
-    //     $this->billRooms = $this->getBillRooms();
-    //     $this->total = $this->totalBill();
-
-    //     $invoice = ['rooms' => $this->billRooms, 'items' => $this->billItems->toArray(), 'total' => $this->total];
-
-    //     $pdf = Pdf::loadView('pdf.bill', ['invoice' => $invoice]);
-
-    //     return $pdf->stream("invoice-{$invoice['rooms'][0]['room_id']}.pdf");
-    // }
+    public function getBillExtraServicesForSave()
+    {
+        $items = [];
+        foreach ($this->billExtraServices as $key => $service) {
+            $items[] = [
+                'branch_id' => 1,
+                'quantity'    => 1,
+                'extra_service_id'  => $service->extra_service_id,
+                'unit_price'  => $service->unit_price,
+                'total_price' => $service->total_price,
+            ];
+        }
+        return $items;
+    }
 
     public function printPreview()
     {

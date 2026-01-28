@@ -141,6 +141,19 @@
                     </tr>
                 @endforeach
             @endif
+
+
+            @if (count($invoice['extraServices']) > 0)
+                @foreach ($invoice['extraServices'] as $service)
+                    <tr>
+                        <td class="text-center">{{ count($invoice['items']) + $loop->iteration }}</td>
+                        <td>{{ $service['extra_service']['title'] ?? 'Extra Service' }}</td>
+                        <td class="text-center">1 </td>
+                        <td class="text-right">{{ number_format($service['unit_price']) }}</td>
+                        <td class="text-right">{{ number_format($service['total_price']) }}</td>
+                    </tr>
+                @endforeach
+            @endif
         </tbody>
     </table>
 

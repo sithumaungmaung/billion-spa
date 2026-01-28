@@ -84,7 +84,38 @@
                         </td>
                     </tr>
                 @endforeach
-                <!-- bill for product -->
+                <!-- bill for product End -->
+
+
+                <!-- bill for Extra Service -->
+
+                @foreach ($this->billExtraServices as $service)
+                    <tr
+                        class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                        <td class="px-4 py-3 text-center text-gray-500">
+                            {{ $key + 1 }}
+                        </td>
+
+                        <td class="px-4 py-3 font-medium">
+                            {{ $service->extraService->title }}
+                        </td>
+
+                        <td class="px-4 py-3 text-right">
+                            1
+                        </td>
+
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($service->unit_price) }}
+                        </td>
+
+                        <td class="px-4 py-3 text-right font-mono font-semibold ">
+                            {{ number_format($service->unit_price) }}
+                        </td>
+                    </tr>
+                @endforeach
+                <!--  bill for Extra Service End-->
+
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">

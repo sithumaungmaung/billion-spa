@@ -3,6 +3,7 @@ namespace App\Traits;
 
 use App\Models\ProductSale;
 use App\Models\DailyRoomRecord;
+use App\Models\ExtraServiceSale;
 
 trait BillTraits
 {
@@ -62,8 +63,13 @@ trait BillTraits
         return $billItems;
     }
 
+    public function getBillExtraServices($roomIds)
+    {
+        return ExtraServiceSale::whereIn('daily_room_record_id', $roomIds)->with('extraService')->get();
+    }
 
-    public function totalBill($getBillItems, $getBillRooms) {
+
+    public function totalBill($getBillItems, $getBillRooms, $getBillExtraServices) {
         $total = 0;
         foreach ($getBillItems as $item) {
             $total += $item->quantity * $item->unit_price;
@@ -71,6 +77,10 @@ trait BillTraits
 
         foreach ($getBillRooms as $billRoom) {
             $total += $billRoom['total_price'];
+        }
+
+        foreach ($getBillExtraServices as $extraService) {
+            $total +=  $extraService->unit_price;
         }
 
         return $total;
