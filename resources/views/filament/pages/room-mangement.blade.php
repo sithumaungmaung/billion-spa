@@ -109,12 +109,14 @@
         </div>
 
 
-        <div class="mt-5 overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg">
+        <div class="mt-5 overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg relative">
 
             <table class="w-full text-sm text-left table-fixed">
                 <thead class="bg-gray-50 dark:bg-white/5 uppercase text-xs">
                     <tr>
-                        <th class="p-3 border-b dark:border-white/10 w-[100px]">Room</th>
+                        <th
+                            class="p-3 border-b dark:border-white/10 w-[100px] sticky left-0 z-20  bg-gray-50 dark:bg-gray-700">
+                            Room</th>
                         @foreach ($timeSlots as $slot)
                             <th class="p-3 border-b border-l dark:border-white/10 text-center w-[200px]">
                                 {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} -
@@ -126,7 +128,11 @@
                 <tbody class="divide-y dark:divide-white/10">
                     @foreach ($rooms as $room)
                         <tr @if (!($room->id == $searchRoomId || $searchRoomId == 0)) style="display: none;" @endif>
-                            <td class="p-3 font-bold bg-gray-50/30 dark:bg-white/5">
+                            <td
+                                class="sticky left-0 z-20 p-3 font-bold border-b border-l
+                                bg-gray-50 dark:bg-gray-900
+                                border-gray-400 dark:border-white/10
+                                shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                                 {{ $room->name }}
                             </td>
                             @foreach ($timeSlots as $slot)
