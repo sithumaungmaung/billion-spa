@@ -2,9 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use App\Models\Invoice;
 use Filament\Pages\Page;
-use BackedEnum;
+use Livewire\WithPagination;
 
 class InvoiceList extends Page
 {
@@ -14,6 +15,7 @@ class InvoiceList extends Page
     protected string $view = 'filament.pages.invoice-list';
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-text'; // Replace 'heroicon-o-document-text' with your desired icon
 
+    use WithPagination;
 
     public static function getNavigationLabel(): string
     {
@@ -28,14 +30,22 @@ class InvoiceList extends Page
     public $invoices;
     public $invoice_no;
 
-    public function mount(): void
-    {
-        $this->invoices = Invoice::orderBy('id', 'desc')->get();
-    }
+    // public function mount(): void
+    // {
+    //     $this->invoices = Invoice::orderBy('id', 'desc')->paginate(10);
+    // }
 
     public function showInvoiceDetail($invoice_no)
     {
         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice_no]);
 
     }
+
+
+
+    public function getInvoices()
+    {
+        return Invoice::orderBy('id', 'desc')->paginate(10);
+    }
+
 }

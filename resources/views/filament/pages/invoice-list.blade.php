@@ -20,12 +20,12 @@
             <tbody class="divide-y divide-gray-100
                    dark:divide-white/10">
 
-                @foreach ($this->invoices as $key => $invoice)
+                @foreach ($this->getInvoices() as $key => $invoice)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
                         <td class="px-4 py-3 text-center text-gray-500">
-                            {{ $key + 1 }}
+                            {{ $this->getInvoices()->firstItem() + $key }}
                         </td>
 
                         <td class="px-4 py-3 font-medium">
@@ -92,6 +92,9 @@
             </tbody>
         </table>
 
+        <div class="mt-2">
+            <x-filament::pagination :paginator="$this->getInvoices()" />
+        </div>
     </x-filament::section>
 
 </x-filament-panels::page>
