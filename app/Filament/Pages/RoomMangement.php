@@ -16,6 +16,7 @@ use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use App\Models\TherapistType;
 use App\Models\DailyRoomRecord;
+use App\Models\ExtraServiceSale;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
@@ -45,18 +46,19 @@ class RoomMangement extends Page implements HasForms
     public ?int $selectedType = null;
     public ?int $selectedProductQty = 1;
     public $therapistTypes;
-    public $extraServices;
-    public $selectedExtraServices = [];
+    public $extraServices; // for dropdown (mount action)
+    public ?int $selectedExtraServiceId = null; // for dropdown
 
     public $isExistingRecord = null;
 
-    // for detail section view
+    // for detail section view (Mini Info)
     public string $selectedRoomName = '';
     public string $selectedTherapistName = '';
     public string $selectedTherapistType = '';
     public string $selectedTimeSection = '';
     public string $selectedStartTime = '';
     public string $selectedEndTime = '';
+    public ?array $selectedExtraServicesList = [];
 
     public ?string $selectedProductSaleId = null;
 
@@ -86,6 +88,7 @@ class RoomMangement extends Page implements HasForms
         $this->selectedRoomName = Room::find($roomId)->name;
         $this->selectedTherapistName = $this->getThapistName($roomId, $slotId);
         $this->selectedTherapistType = $this->getTherapistType($roomId, $slotId);
+        $this->selectedExtraServicesList = $this->getExtraServices($roomId, $slotId);
 
         $this->selectedStartTime = TimeSlot::find($slotId)->start_time;
         $this->selectedEndTime =  TimeSlot::find($slotId)->end_time;
@@ -279,10 +282,32 @@ class RoomMangement extends Page implements HasForms
 
     public function addExtraService()
     {
-        $this->notifySuccess(
-            'Success: Add Success',
-            'Extra service added successfully.'
-        );
+        $alreadyExists = ExtraServiceSale::where('extra_service_id', $this->selectedExtraServiceId)->where('daily_room_record_id', $this->isExistingRecord->id)->first();
+
+        if($this->isExistingRecord && !$alreadyExists){
+            $price = ExtraService::where('id', $this->selectedExtraServiceId)->first()->price;
+            ExtraServiceSale::create([
+                'extra_service_id' => $this->selectedExtraServiceId,
+                'daily_room_record_id' => $this->isExistingRecord->id,
+                'branch_id' => 1,
+                'unit_price' => $price,
+                'total_price' => $price
+            ]);
+            $this->selectedExtraServicesList = $this->getExtraServices($this->selectedRoomId, $this->selectedSlotId);
+
+            $this->notifySuccess(
+                'Success: Add Success',
+                'Extra service added successfully.'
+            );
+        }else{
+            $this->notifyError(
+                'Error: Add Error',
+                'You cannot add the same extra service more than once.'
+            );
+            return;
+        }
+
+
     }
 
 
@@ -322,6 +347,18 @@ class RoomMangement extends Page implements HasForms
         ])->with('therapistType')->first();
 
         return $schedule?->therapistType?->title ?? "";
+    }
+
+    public function getExtraServices($roomId, $slotId): array
+    {
+        $schedule = DailyRoomRecord::where([
+            'record_date' => $this->date,
+            'room_id' => $roomId,
+            'time_slot_id' => $slotId,
+        ])->with('extraServices')->first();
+        // dump($schedule?->extraServices);
+        // return;
+        return $schedule?->extraServices->toArray() ?? [];
     }
 
     public function checkBill($roomId, $slotId): bool
@@ -404,10 +441,6 @@ class RoomMangement extends Page implements HasForms
         return TherapistType::all();
     }
 
-    // public function getExtraServices()
-    // {
-    //     return ExtraService::all();
-    // }
 
     public function form(Schema $schema): Schema
     {

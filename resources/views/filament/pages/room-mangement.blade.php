@@ -1,5 +1,5 @@
 <x-filament-panels::page>
-    <x-filament::section>
+    <x-filament::section collapsible>
         <x-slot name="heading">
             Daily Room Service Schedule
         </x-slot>
@@ -22,108 +22,91 @@
 
         </x-filament::input.wrapper> <br>
 
-        <div class="flex items-end gap-4">
 
+        <div class="flex flex-wrap items-end gap-6">
 
-            <div class="flex-1">
+            <div class="flex-1 min-w-[300px]">
                 <x-filament::input.wrapper label="Select Type">
                     <x-filament::input.select wire:model.live="selectedType">
                         <option value="" selected>Select Therapist Type</option>
-                        @foreach ($therapistTypes as $label => $type)
-                            <option value="{{ $type->id }}">{{ $type->title }} -
-                                ({{ $type->price == 0 ? 'No added fees' : $type->price }})
+                        @foreach ($therapistTypes as $type)
+                            <option value="{{ $type->id }}">
+                                {{ $type->title }} -
+                                ({{ $type->price == 0 ? 'No added fees' : number_format($type->price) }})
                             </option>
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
             </div>
 
+            <div class="flex-1 min-w-[300px]">
+                <div class="flex items-end gap-4">
+                    <div class="flex-1 filament-form-container">
+                        {{ $this->form }}
+                    </div>
 
-            <div class="flex-1 items-end gap-4">
-                <div class="flex-1">
-                    {{ $this->form }}
+                    <x-filament::button wire:click="assign" size="md" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedType">
+                        Assign
+                    </x-filament::button>
                 </div>
-
             </div>
-            <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedType">
-                Assign
-            </x-filament::button>
-
-
-            {{-- <div class="flex-1">
-                <x-filament::input.wrapper label="Select Therapist">
-                    <x-filament::input.select wire:model.live="selectedTherapistId">
-                        <option value="">Select a therapist...</option>
-                        @foreach ($therapists as $person)
-                            <option value="{{ $person->id }}">
-                                {{ $person->name }}
-                            </option>
-                        @endforeach
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-            </div> --}}
-            {{-- <x-filament::button wire:click="assign" size="lg" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedTherapistId">
-                Assign
-            </x-filament::button> --}}
-
-
 
         </div>
 
 
-        <div class="flex items-end gap-4 mt-5">
+        <div class="flex flex-wrap items-end gap-6 mt-5">
 
-            <div class="col-6">
-                <x-filament::input.wrapper label="Select Product">
-                    <x-filament::input.select wire:model.live="selectedProductId">
-                        <option value="" class="text-gray-400" selected>Choose Product</option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span> {{ $product->name }}</span>
-                                    <span class="text-red-600"> ({{ $product->price }})</span>
-                                </div>
-                            </option>
-                        @endforeach
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
+            <div class="flex-1 min-w-[300px]">
+                <div class="flex items-end gap-2">
+                    <div class="flex-1">
+                        <x-filament::input.wrapper label="Select Product">
+                            <x-filament::input.select wire:model.live="selectedProductId">
+                                <option value="" class="text-gray-400" selected>Choose Product</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}">
+                                        {{ $product->name }} ({{ number_format($product->price) }})
+                                    </option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </div>
+
+                    <div class="w-[60px]">
+                        <x-filament::input.wrapper>
+                            <x-filament::input wire:model="selectedProductQty" placeholder="Qty" type="number"
+                                :disabled="!$selectedProductId" />
+                        </x-filament::input.wrapper>
+                    </div>
+
+                    <x-filament::button wire:click="addProduct" size="md" :disabled="$this->canAddProduct">
+                        Add
+                    </x-filament::button>
+                </div>
             </div>
 
-            <div class="flex  gap-2 w-[150px]">
-                <x-filament::input.wrapper>
-                    <x-filament::input wire:model="selectedProductQty" placeholder="Enter Qty" type="number"
-                        :disabled="!$selectedProductId" />
-                </x-filament::input.wrapper>
+            <div class="flex-1 min-w-[300px]">
+                <div class="flex items-end gap-2">
+                    <div class="flex-1">
+                        <x-filament::input.wrapper label="Select Extra Service">
+                            <x-filament::input.select wire:model.live="selectedExtraServiceId">
+                                <option value="" class="text-gray-400" selected>Choose Extra Service</option>
+                                @foreach ($extraServices as $service)
+                                    <option value="{{ $service->id }}">
+                                        {{ $service->title }} ({{ number_format($service->price ?? 0) }})
+                                    </option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </div>
 
-                <x-filament::button wire:click="addProduct" size="lg" :disabled="$this->canAddProduct">
-                    Add
-                </x-filament::button>
+                    <x-filament::button wire:click="addExtraService" class="w-[50px] ml-2" size="md"
+                        :disabled="!$selectedExtraServiceId || !$selectedRoomId || !$selectedSlotId">
+                        Add
+                    </x-filament::button>
+                </div>
             </div>
-
-
-            <div class="col-6">
-                <x-filament::input.wrapper label="Select Extra Service">
-                    <x-filament::input.select wire:model.live="selectedExtraServiceId">
-                        <option value="" class="text-gray-400" selected>Choose Extra Service</option>
-                        @foreach ($extraServices as $service)
-                            <option value="{{ $service->id }}">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span> {{ $service->title }}</span>
-                                    <span class="text-red-600"> ({{ $product->price }})</span>
-                                </div>
-                            </option>
-                        @endforeach
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-            </div>
-
-            <x-filament::button wire:click="addExtraService" size="lg" :disabled="$this->selectedExtraServices">
-                Add
-            </x-filament::button>
-
 
         </div>
-
 
 
         <div class="mt-5 overflow-x-auto border border-gray-200 dark:border-white/10 rounded-lg">
@@ -177,12 +160,19 @@
         </x-filament::button>
     </x-filament::section>
 
+
+    {{-- Mini Info --}}
     @if ($isExistingRecord)
 
-        <x-filament::section>
+        <x-filament::section heading="Room Info" collapsible collapsed>
             @if ($selectedRoomId || $selectedSlotId)
                 <div class=" items-center justify-start ">
-                    <div class="my-3 font-medium">Room : {{ $selectedRoomName ?? '—' }}</div>
+                    <div class="my-3 font-medium ">Room :
+                        <span class="text-primary-600">
+                            {{ $selectedRoomName ?? '—' }}
+                        </span>
+
+                    </div>
 
                     <div class="my-3 font-medium">
                         Therapist :
@@ -198,6 +188,19 @@
                         <span class="text-primary-600">{{ $selectedTherapistType }}</span>
 
                     </div>
+
+                    @if (count($selectedExtraServicesList) > 0)
+                        <div class="my-3 font-medium">
+                            Extra Services :
+                            @foreach ($selectedExtraServicesList as $extraService)
+                                <span class="text-primary-600">{{ $extraService['title'] }}</span>
+                                @if (count($selectedExtraServicesList) > 1 && collect($selectedExtraServicesList)->last() !== $extraService)
+                                    ,
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
+
 
                     {{-- <div class="my-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div> --}}
                     <div class="my-3 font-medium">Start : {{ date('h:i A', strtotime($selectedStartTime)) ?? '—' }}
@@ -218,9 +221,9 @@
 
 
         {{-- Ordered Items --}}
-        <x-filament::section>
+        <x-filament::section heading="Ordered Items" collapsible collapsed>
             <x-filament::card>
-                <div class="mb-4">Ordered Items</div>
+
                 <table
                     class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">

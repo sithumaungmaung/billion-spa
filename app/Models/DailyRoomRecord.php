@@ -36,5 +36,9 @@ class DailyRoomRecord extends Model
         return $this->hasOne(TherapistType::class, 'id', 'service_type');
     }
 
+    public function extraServices()
+    {
+        return $this->belongsToMany(ExtraService::class,'extra_service_sales','daily_room_record_id','extra_service_id');
+    }
 
 }

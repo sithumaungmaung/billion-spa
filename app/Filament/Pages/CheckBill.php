@@ -100,6 +100,13 @@ class CheckBill extends Page
             return;
         }
 
+
+        $billRooms = collect($this->billRooms)->map(function ($r) {
+            $r['service_type'] = (int)$r['service_type']->id;
+            return $r;
+        })->toArray();
+
+
         $invoice = new Invoice();
         $invoice->branch_id = 1;
         $invoice->user_id = Auth::id();
@@ -111,11 +118,12 @@ class CheckBill extends Page
         $invoice->grand_total = $this->total;
         $invoice->save();
 
-        $invoice->invoiceRooms()->createMany($this->billRooms);
+        $invoice->invoiceRooms()->createMany($billRooms);
         $billItems = $this->getBillItemsForSave();
 
+
         if($billItems){
-            $invoice->invoiceProducts()->createMany($billItems);
+            $invoice->invoiceProducts()->createMany($this->billItems->toArray());
         }
 
         DailyRoomRecord::whereIn('id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
