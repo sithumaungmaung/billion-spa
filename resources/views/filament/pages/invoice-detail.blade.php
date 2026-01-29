@@ -130,10 +130,16 @@
             </tbody>
         </table>
         <div class="my-2">
-            {{-- <x-filament::button wire:click="printPreview" target="_blank">
-                Print Preview
-            </x-filament::button> --}}
+            <x-filament::button wire:click="previewInvoice" target="_blank">
+                Preview Invoice
+            </x-filament::button>
         </div>
 
     </x-filament::section>
 </x-filament-panels::page>
+
+<script>
+    window.addEventListener('invoice.detail.preview', event => {
+        window.open(event.detail.url, '_blank');
+    });
+</script>
