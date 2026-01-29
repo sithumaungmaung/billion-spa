@@ -8,5 +8,5 @@ Route::get('/', function () {
 });
 
 
-Route::get('/invoice/preview/{ids}/{onePlusOne}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
+Route::get('/invoice/preview/{ids}/{buy}/{free}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
 Route::get('/invoice/detail/{invoice_id}/preview', [InvoiceController::class, 'detailPDF'])->name('invoice.detail.pdf');

@@ -18,14 +18,14 @@ class InvoiceController extends Controller
 
     protected $roomIds;
 
-    public function previewInvoice($ids, $onePlusOne) {
+    public function previewInvoice($ids, $buy, $free) {
 
         $roomIds = array_map(
             'intval',
             explode(',', $ids)
         );
 
-        $billRooms = $this->getBillRooms($roomIds, $onePlusOne);
+        $billRooms = $this->getBillRooms($roomIds, $buy, $free);
         $billItems = $this->getBillItems($roomIds);
         $billExtraServices = $this->getBillExtraServices($roomIds);
 

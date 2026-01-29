@@ -44,7 +44,8 @@ class CheckBill extends Page
     public array $roomIds = [];
     public $billItems, $billExtraServices, $billRooms, $systemDailyRecords = [];
     public $total;
-    public $onePlusone = 1;
+    public $buy = 1;
+    public $free = 0;
 
 
     public function mount(): void
@@ -56,7 +57,7 @@ class CheckBill extends Page
         // $this->getBill();
         $this->billItems = $this->getBillItems($this->roomIds);
         $this->billExtraServices = $this->getBillExtraServices($this->roomIds);
-        $this->billRooms = $this->getBillRooms($this->roomIds, $this->onePlusone);
+        $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
         $this->total = $this->totalBill();
         $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
@@ -83,8 +84,8 @@ class CheckBill extends Page
         return $dailyRooms;
     }
 
-    public function applyOnePlusOne() {
-        $this->billRooms = $this->getBillRooms($this->roomIds, $this->onePlusone);
+    public function applyPromotion() {
+        $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
         $this->total = $this->totalBill();
     }
 
@@ -113,8 +114,10 @@ class CheckBill extends Page
         $invoice->user_id = Auth::id();
         $invoice->invoice_no = $this->getInvoiceNo();
         $invoice->invoice_datetime = Carbon::now();
+        $invoice->buy = $this->buy;
+        $invoice->free = $this->free;
         $invoice->sub_total = $this->total;
-        $invoice->discount = $this->total;
+        $invoice->discount = 0;
         $invoice->tax = $this->total;
         $invoice->grand_total = $this->total;
         $invoice->save();
@@ -197,7 +200,8 @@ class CheckBill extends Page
 
         $url = route('invoice.preview', [
             'ids' => implode(',', $this->roomIds),
-            'onePlusOne' => $this->onePlusone
+            'buy' => $this->buy,
+            'free' => $this->free,
         ]);
 
         $this->dispatch('open-new-tab', url: $url);

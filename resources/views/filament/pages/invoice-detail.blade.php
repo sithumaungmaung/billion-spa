@@ -13,6 +13,15 @@
                 <div class="h1">
                     Confirm Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
                 </div>
+                
+                @if ($invoiceDetail->free > 0)
+                <div class="h1">
+                    Promotion : <span class="text-gray-500">
+                        {{ $invoiceDetail->buy }} + {{ $invoiceDetail->free }}
+                    </span>
+                </div>
+                @endif
+                
                 <div class="h1">
                     Confirm By: <span class="text-gray-500">
                         {{ $invoiceDetail->users->name ?? '-' }}
@@ -131,7 +140,7 @@
         </table>
         <div class="my-2">
             <x-filament::button wire:click="previewInvoice" target="_blank">
-                Preview Invoice
+                Download Invoice
             </x-filament::button>
         </div>
 
