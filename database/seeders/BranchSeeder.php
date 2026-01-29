@@ -18,7 +18,7 @@ class BranchSeeder extends Seeder
 
         $branches = [
             // ['name' => 'KyoutTaDar', 'description' => Str::random(5)],
-            ['name' => 'Tamwe', 'description' => Str::random(3)],
+            ['name' => 'Billion Spa', 'description' => "The very first spa that you will ever satisfy with the best services."],
             // ['name' => 'ThuWaNa', 'description' => Str::random(3)],
             // ['name' => 'ThanLyin', 'description' => Str::random(2)],
             // ['name' => 'North Dagon', 'description' => Str::random(2)],
