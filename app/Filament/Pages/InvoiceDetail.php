@@ -26,22 +26,14 @@ class InvoiceDetail extends Page
         $this->invoiceDetail = Invoice::where('invoice_no', $this->invoice_no)
         ->with('invoiceRooms', 'invoiceProducts', 'invoiceExtraServices','users')->first();
 
-        // $this->invoiceRooms = DailyRoomRecord::where('invoice_id', $this->invoiceDetail->id)->get();
-
     }
 
+    public function previewInvoice() {
 
-    // public function printPreview()
-    // {
-
-    //     $url = route('invoice.preview', [
-    //         'ids' => implode(',', $this->roomIds),
-    //         'onePlusOne' => $this->onePlusone
-    //     ]);
-
-    //     $this->dispatch('open-new-tab', url: $url);
-
-    //     // return redirect()->away()->route('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusone]);
-    // }
+        $url = route('invoice.detail.pdf', [
+            'invoice_id' => $this->invoiceDetail->id
+        ]);
+        $this->dispatch('invoice.detail.preview', url: $url);
+    }
 
 }

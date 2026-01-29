@@ -28,15 +28,16 @@ class RoomForm
                     ->numeric()
                     ->required(),
 
-                TextInput::make('room_number')
-                    ->label('Room Number')
-                    ->numeric()
-                    ->unique(
-                        modifyRuleUsing: fn ($rule, $get) =>
-                            $rule->where('branch_id', $get('branch_id')),
-                            ignoreRecord: true,
-                        )
-                    ->required(),
+                // TextInput::make('room_number')
+                //     ->label('Room Number')
+                //     ->numeric()
+                //     ->unique(
+                //         modifyRuleUsing: fn ($rule, $get) =>
+                //             $rule->where('branch_id', $get('branch_id')),
+                //             ignoreRecord: true,
+                //         )
+                //     ->required()
+                //     ->disabled(fn (string $operation) => $operation === 'edit'),
 
                 Select::make('branch_id')
                     ->label('Branch')

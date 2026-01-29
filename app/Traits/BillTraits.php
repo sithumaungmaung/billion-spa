@@ -7,10 +7,11 @@ use App\Models\ExtraServiceSale;
 
 trait BillTraits
 {
-    public function getBillRooms($ids, $onePlusone)
+    public function getBillRooms($ids, int $buy = 1, int $free = 1)
     {
-
-        $dailyRooms = DailyRoomRecord::whereIn('id', $ids)->with('room')->get();
+        $dailyRooms = DailyRoomRecord::whereIn('id', $ids)
+            ->with(['room', 'serviceType'])
+            ->get();
 
         $grouped = $dailyRooms->groupBy(fn ($item) =>
             $item->room_id . '-' . $item->service_type
@@ -19,36 +20,42 @@ trait BillTraits
         $items = [];
 
         foreach ($grouped as $group) {
-            $first = $group->first();
 
+            $first = $group->first();
             $totalSlots = $group->count();
-            $paidSlots  = (int) ceil($totalSlots / $onePlusone);
-            $freeSlots  = $totalSlots - $paidSlots;
+
+            $setSize   = $buy + $free;
+            $fullSets  = intdiv($totalSlots, $setSize);
+            $remainder = $totalSlots % $setSize;
+
+            $paidSlots = ($fullSets * $buy) + min($remainder, $buy);
+            $freeSlots = $totalSlots - $paidSlots;
 
             $price = $first->price + $first->service_type_price;
+            $serviceTypeTitle = optional($first->serviceType)->title;
 
-            $serviceType =  $first->serviceType ?  $first->serviceType->title : "";
-
+            // Paid item
             $items[] = [
                 'branch_id' => 1,
-                'room_id'     => $first->room_id,
-                'service_type' =>  $first->serviceType,
-                'service_type_price' =>  $first->service_type_price,
-                'room_name'   => "{$first->room->name} – {$serviceType}",
-                'quantity'    => $paidSlots,
-                'unit_price'  => $price,
+                'room_id'   => $first->room_id,
+                'room_name' => "{$first->room->name} – {$serviceTypeTitle}",
+                'service_type' => $first->serviceType,
+                'service_type_price' => $first->service_type_price,
+                'quantity'  => $paidSlots,
+                'unit_price'=> $price,
                 'total_price' => $paidSlots * $price,
             ];
 
-            if($freeSlots > 0) {
+            // Free item
+            if ($freeSlots > 0) {
                 $items[] = [
                     'branch_id' => 1,
-                    'room_id'     => $first->room_id,
-                    'room_name'   => "{$first->room->name} – {$serviceType}",
-                    'service_type' =>  $first->service_type,
-                    'service_type_price' =>  0,
-                    'quantity'    => $freeSlots,
-                    'unit_price'  => 0,
+                    'room_id'   => $first->room_id,
+                    'room_name' => "{$first->room->name} – {$serviceTypeTitle} (Free)",
+                    'service_type' => $first->serviceType,
+                    'service_type_price' => 0,
+                    'quantity'  => $freeSlots,
+                    'unit_price'=> 0,
                     'total_price' => 0,
                 ];
             }

@@ -3,21 +3,36 @@
         <div class="flex items-end gap-4 mb-3">
             <div class="flex-1">
                 <x-filament::input.wrapper label="Select Type">
-                    <x-filament::input.select wire:model.live="onePlusone">
-                        <option value="1">Normal</option>
-                        <option value="2">1+1</option>
+                    <x-filament::input.select wire:model.live="buy" wire:change="applyPromotion">
+                        <option value="1">Buy 1</option>
+                        <option value="2">Buy 2</option>
+                        <option value="3">Buy 3</option>
+                        <option value="4">Buy 4</option>
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
             </div>
             <div class="flex-1">
-                <x-filament::button wire:click="applyOnePlusOne">
-                    Apply
-                </x-filament::button>
+                <x-filament::input.wrapper label="Select Type">
+                    <x-filament::input.select wire:model.live="free" wire:change="applyPromotion">
+                        <option value="0">Get 0</option>
+                        <option value="1">Get 1</option>
+                        <!-- <option value="2">Get 2</option> -->
+                        <!-- <option value="3">Get 3</option> -->
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
             </div>
+            <div class="flex-1"></div>
         </div>
+        
+        @if($this->free > 0) 
+        <div class="flex mt-1 mb-1">
+            <br> Promotion - {{ $this->buy }} + {{ $this->free }}
+        </div>
+        
+        @endif
 
         <table class="w-full text-sm text-left border-collapse
-           border border-gray-200 dark:border-white/10">
+           border border-gray-200 dark:border-white/10 mt-2">
             <thead class="bg-gray-100 text-gray-700
                    dark:bg-white/5 dark:text-gray-300">
                 <tr class="border-b border-gray-200 dark:border-white/10">

@@ -138,7 +138,7 @@
         <div class="title">BILLION SPA</div>
 
         <div class="header-info">
-            {{-- Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br> --}}
+            Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br>
             {{ date('d-M-Y H:i') }}
         </div>
 

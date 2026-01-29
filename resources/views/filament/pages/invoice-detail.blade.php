@@ -13,6 +13,15 @@
                 <div class="h1">
                     Confirm Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
                 </div>
+                
+                @if ($invoiceDetail->free > 0)
+                <div class="h1">
+                    Promotion : <span class="text-gray-500">
+                        {{ $invoiceDetail->buy }} + {{ $invoiceDetail->free }}
+                    </span>
+                </div>
+                @endif
+                
                 <div class="h1">
                     Confirm By: <span class="text-gray-500">
                         {{ $invoiceDetail->users->name ?? '-' }}
@@ -130,10 +139,16 @@
             </tbody>
         </table>
         <div class="my-2">
-            {{-- <x-filament::button wire:click="printPreview" target="_blank">
-                Print Preview
-            </x-filament::button> --}}
+            <x-filament::button wire:click="previewInvoice" target="_blank">
+                Download Invoice
+            </x-filament::button>
         </div>
 
     </x-filament::section>
 </x-filament-panels::page>
+
+<script>
+    window.addEventListener('invoice.detail.preview', event => {
+        window.open(event.detail.url, '_blank');
+    });
+</script>
