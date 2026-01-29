@@ -152,6 +152,7 @@
                                         <span class="text-green-600 font-medium">(Paid)</span>
                                     @elseif($this->getThapistName($room->id, $slot->id))
                                         <input type="checkbox" wire:model.live="selectedRoomIdsForBill"
+                                            style="width: 20px; height: 20px; font-size:16px;"
                                             value="{{ $this->getDailyRoomRecordId($room->id, $slot->id) }}">
                                     @endif
                                 </td>
