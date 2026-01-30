@@ -147,9 +147,12 @@
                 </x-filament::button>
             </div>
             <div class="col">
-                <x-filament::button wire:click="confirmBill">
+                <x-filament::button wire:click="confirmBill"
+                    wire:confirm="Are you sure you want to generate this invoice?">
                     Confirm Bill
                 </x-filament::button>
+
+
             </div>
         </div>
     </x-filament::section>
