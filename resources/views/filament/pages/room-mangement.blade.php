@@ -1,5 +1,7 @@
 <x-filament-panels::page>
-    <x-filament::section collapsible>
+
+    {{-- <x-filament::loading-indicator class="h-5 w-5" /> --}}
+    <x-filament::section>
         <x-slot name="heading">
             Daily Room Service Schedule
         </x-slot>
@@ -12,7 +14,7 @@
         </x-slot>
 
 
-        <x-filament::input.wrapper label="Select Therapist">
+        {{-- <x-filament::input.wrapper label="Select Room">
             <x-filament::input.select wire:model.live="searchRoomId">
                 <option value="0">Find Room</option>
                 @foreach ($rooms as $room)
@@ -20,7 +22,21 @@
                 @endforeach
             </x-filament::input.select>
 
-        </x-filament::input.wrapper> <br>
+        </x-filament::input.wrapper> <br> --}}
+
+        <div class="py-4 gap-6 sticky left-0 z-25">
+            <div class="flex items-end gap-4">
+                <div class="flex-1 filament-form-container sticky left-0 z-25">
+                    {{ $this->room_form }}
+                </div>
+
+                <x-filament::button wire:click="pickRoom" size="md">
+                    Select
+                </x-filament::button>
+
+            </div>
+        </div>
+
 
 
         <div class="flex flex-wrap items-end gap-6">
@@ -37,12 +53,13 @@
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
+
             </div>
 
             <div class="flex-1 min-w-[300px]">
                 <div class="flex items-end gap-4">
                     <div class="flex-1 filament-form-container">
-                        {{ $this->form }}
+                        {{ $this->therapist_form }}
                     </div>
 
                     <x-filament::button wire:click="assign" size="md" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedType">
@@ -57,9 +74,9 @@
         <div class="flex flex-wrap items-end gap-6 mt-5">
 
             <div class="flex-1 min-w-[300px]">
-                <div class="flex items-end gap-2">
+                <div class="flex items-end gap-4">
                     <div class="flex-1">
-                        <x-filament::input.wrapper label="Select Product">
+                        {{-- <x-filament::input.wrapper label="Select Product">
                             <x-filament::input.select wire:model.live="selectedProductId">
                                 <option value="" class="text-gray-400" selected>Choose Product</option>
                                 @foreach ($products as $product)
@@ -68,17 +85,20 @@
                                     </option>
                                 @endforeach
                             </x-filament::input.select>
-                        </x-filament::input.wrapper>
+                        </x-filament::input.wrapper> --}}
+                        <div class="flex-1 filament-form-container sticky left-0 z-22">
+                            {{ $this->product_form }}
+                        </div>
                     </div>
 
                     <div class="w-[60px]">
                         <x-filament::input.wrapper>
                             <x-filament::input wire:model="selectedProductQty" placeholder="Qty" type="number"
-                                :disabled="!$selectedProductId" />
+                                min="1" :disabled="!$selectedRoomId || !$selectedSlotId" />
                         </x-filament::input.wrapper>
                     </div>
 
-                    <x-filament::button wire:click="addProduct" size="md" :disabled="$this->canAddProduct">
+                    <x-filament::button wire:click="addProduct" size="md" {{-- :disabled="$this->canAddProduct" --}} :disabled="!$selectedRoomId || !$selectedSlotId">
                         Add
                     </x-filament::button>
                 </div>
@@ -99,7 +119,7 @@
                         </x-filament::input.wrapper>
                     </div>
 
-                    <x-filament::button wire:click="addExtraService" class="w-[50px] ml-2" size="md"
+                    <x-filament::button wire:click="addExtraService" class="w-[65px] ml-2" size="md"
                         :disabled="!$selectedExtraServiceId || !$selectedRoomId || !$selectedSlotId">
                         Add
                     </x-filament::button>
@@ -152,6 +172,7 @@
                                         <span class="text-green-600 font-medium">(Paid)</span>
                                     @elseif($this->getThapistName($room->id, $slot->id))
                                         <input type="checkbox" wire:model.live="selectedRoomIdsForBill"
+                                            style="width:20px; height:20px"
                                             value="{{ $this->getDailyRoomRecordId($room->id, $slot->id) }}">
                                     @endif
                                 </td>
@@ -195,7 +216,7 @@
 
                     </div>
 
-                    @if (count($selectedExtraServicesList) > 0)
+                    {{-- @if (count($selectedExtraServicesList) > 0)
                         <div class="my-3 font-medium">
                             Extra Services :
                             @foreach ($selectedExtraServicesList as $extraService)
@@ -205,7 +226,7 @@
                                 @endif
                             @endforeach
                         </div>
-                    @endif
+                    @endif --}}
 
 
                     {{-- <div class="my-3 font-medium">Time : {{ $selectedTimeSection ?? '—' }}</div> --}}
@@ -305,5 +326,85 @@
                 </table>
             </x-filament::card>
         </x-filament::section>
+
+
+        {{-- Extra Services --}}
+        {{-- @dd($selectedExtraServicesList); --}}
+        <x-filament::section heading="Extra Services" collapsible collapsed>
+            <x-filament::card>
+
+                <table
+                    class="w-full text-sm text-left border-collapse
+           border border-gray-200 dark:border-white/10">
+                    <thead class="bg-gray-100 text-gray-700
+                   dark:bg-white/5 dark:text-gray-300">
+                        <tr class="border-b border-gray-200 dark:border-white/10">
+                            <th class="px-4 py-3 w-12 text-center">#</th>
+                            <th class="px-4 py-3">Title</th>
+                            <th class="px-4 py-3 text-right">Price</th>
+                            <th class="px-4 py-3 text-right">Total</th>
+                            <th class="px-4 py-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-100
+                   dark:divide-white/10">
+
+
+                        @foreach ($this->selectedExtraServicesList['extraServices'] as $key => $service)
+                            <tr
+                                class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                               dark:hover:bg-white/5 transition">
+                                <td class="px-4 py-3 text-center text-gray-500">
+                                    {{ $key + 1 }}
+                                </td>
+
+                                <td class="px-4 py-3 font-medium">
+                                    {{ $service['extra_service']['title'] }}
+                                </td>
+
+                                <td class="px-4 py-3 text-right font-mono">
+                                    {{ number_format($service['unit_price']) }}
+
+                                </td>
+
+                                <td class="px-4 py-3 text-right font-mono font-semibold ">
+
+                                    {{ number_format($service['total_price']) }}
+                                </td>
+
+                                <td class="px-4 py-3 text-right font-mono w-[270px]">
+                                    <x-filament::button class="mr-1"
+                                        wire:click="removeExtraService({{ $service['id'] }})" color="danger"
+                                        size="sm">
+                                        Remove
+                                    </x-filament::button>
+
+
+                                    {{-- <x-filament::button class="mr-1 text-white bg-green-900"
+                                        wire:click="addMoreProduct({{ $service['id'] }})" size="sm">
+                                        Add
+                                    </x-filament::button> --}}
+                                </td>
+                            </tr>
+                        @endforeach
+
+                        <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
+                            Extra Service Total Bill
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono font-semibold ">
+                            {{ number_format($selectedExtraServicesList['total']) }}
+                        </td>
+                    </tbody>
+                </table>
+            </x-filament::card>
+        </x-filament::section>
+
+
+
     @endif
+
+    <div wire:loading.flex class="fixed inset-0 bg-black/30 z-50 items-center justify-center">
+        <x-filament::loading-indicator class="h-10 w-10 text-white" />
+    </div>
 </x-filament-panels::page>

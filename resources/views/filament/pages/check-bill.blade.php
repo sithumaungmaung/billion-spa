@@ -23,15 +23,15 @@
             </div>
             <div class="flex-1"></div>
         </div>
-        
-        @if($this->free > 0) 
-        <div class="flex mt-1 mb-1">
-            <br> Promotion - {{ $this->buy }} + {{ $this->free }}
-        </div>
-        
+
+        @if ($this->free > 0)
+            <div class="flex mt-1 mb-1">
+                <br> Promotion - {{ $this->buy }} + {{ $this->free }}
+            </div>
         @endif
 
-        <table class="w-full text-sm text-left border-collapse
+        <table
+            class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10 mt-2">
             <thead class="bg-gray-100 text-gray-700
                    dark:bg-white/5 dark:text-gray-300">

@@ -72,7 +72,10 @@ class RoomMangement extends Page implements HasForms
         $this->therapists = $this->getFreeTherapists();
         $this->therapistTypes = $this->getTherapistTypes();
 
-        $this->form->fill();
+        $this->therapist_form->fill();
+        $this->room_form->fill();
+        $this->product_form->fill();
+
 
         $this->products = Product::get();
         $this->extraServices = ExtraService::get();
@@ -88,7 +91,7 @@ class RoomMangement extends Page implements HasForms
         $this->selectedRoomName = Room::find($roomId)->name;
         $this->selectedTherapistName = $this->getThapistName($roomId, $slotId);
         $this->selectedTherapistType = $this->getTherapistType($roomId, $slotId);
-        $this->selectedExtraServicesList = $this->getExtraServices($roomId, $slotId);
+        $this->selectedExtraServicesList = $this->getRoomExtraServices($roomId, $slotId);
 
         $this->selectedStartTime = TimeSlot::find($slotId)->start_time;
         $this->selectedEndTime =  TimeSlot::find($slotId)->end_time;
@@ -160,7 +163,7 @@ class RoomMangement extends Page implements HasForms
         $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
 
         $this->data['therapist_id'] = null;
-        $this->form->fill();
+        $this->therapist_form->fill();
 
     }
 
@@ -192,6 +195,8 @@ class RoomMangement extends Page implements HasForms
                                             ->where('time_slot_id', $this->selectedSlotId)
                                             ->whereNull('invoice_id')
                                             ->first();
+
+        $this->selectedProductId = $this->data['product_id'] ?? null;
 
         if (!$dailyRoomRecord) {
             Notification::make()
@@ -233,6 +238,11 @@ class RoomMangement extends Page implements HasForms
             ]);
         }
 
+        $this->notifySuccess(
+            'Success: Add Success',
+            'Product added successfully.'
+        );
+
         $this->reset(['selectedProductId']);
     }
 
@@ -246,6 +256,8 @@ class RoomMangement extends Page implements HasForms
         );
 
     }
+
+
 
     public function reduceProduct($saleProduct)
     {
@@ -293,7 +305,7 @@ class RoomMangement extends Page implements HasForms
                 'unit_price' => $price,
                 'total_price' => $price
             ]);
-            $this->selectedExtraServicesList = $this->getExtraServices($this->selectedRoomId, $this->selectedSlotId);
+            $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoomId, $this->selectedSlotId);
 
             $this->notifySuccess(
                 'Success: Add Success',
@@ -310,6 +322,16 @@ class RoomMangement extends Page implements HasForms
 
     }
 
+
+    public function removeExtraService($saleproduct): void
+    {
+        $productSale = ExtraServiceSale::where('id', $saleproduct)->delete();
+        $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoomId, $this->selectedSlotId);
+        $this->notifySuccess(
+            'Success: Remove Success',
+            'Extra service removed successfully.'
+        );
+    }
 
     // public function updatedSelectedType(): void {
     //     $room = DailyRoomRecord::where('room_id', $this->selectedRoomId)->first();
@@ -349,7 +371,7 @@ class RoomMangement extends Page implements HasForms
         return $schedule?->therapistType?->title ?? "";
     }
 
-    public function getExtraServices($roomId, $slotId): array
+    public function getRoomExtraServices($roomId, $slotId): array
     {
         $schedule = DailyRoomRecord::where([
             'record_date' => $this->date,
@@ -357,7 +379,21 @@ class RoomMangement extends Page implements HasForms
             'time_slot_id' => $slotId,
         ])->with('extraServices')->first();
 
-        return $schedule?->extraServices->toArray() ?? [];
+            if (!$schedule) {
+                return [];
+            }
+
+            $extraServiceAndSales = ExtraServiceSale::where('daily_room_record_id', $schedule->id)->with('extraService')->get();
+
+            $extraServiceAndSales = [
+                'extraServices' => $extraServiceAndSales->toArray(),
+                'total' => $extraServiceAndSales->sum('unit_price')
+            ];
+
+            return $extraServiceAndSales ?? [];
+
+
+
     }
 
     public function checkBill($roomId, $slotId): bool
@@ -441,7 +477,7 @@ class RoomMangement extends Page implements HasForms
     }
 
 
-    public function form(Schema $schema): Schema
+    public function therapist_form(Schema $schema): Schema
     {
 
         return $schema
@@ -458,6 +494,49 @@ class RoomMangement extends Page implements HasForms
                     ->native(false), // Forces the nice UI even on mobile
             ])
             ->statePath('data');
+    }
+
+    public function room_form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([ // In v4, we use ->components([]) instead of ->schema([])
+                Select::make('room_id')
+                    ->hiddenLabel()
+                    ->placeholder('Select Room')
+                    // Using a query makes it more efficient
+                    ->options(Room::all()->pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->live()
+                    ->native(false), // Forces the nice UI even on mobile
+            ])
+            ->statePath('data');
+    }
+
+    public function pickRoom()
+    {
+        $this->searchRoomId = $this->data['room_id'] ?? null;
+        // dump($this->selectedRoomId);
+        // return;
+    }
+
+
+    public function product_form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([ // In v4, we use ->components([]) instead of ->schema([])
+                Select::make('product_id')
+                    ->hiddenLabel()
+                    ->placeholder('Select Product')
+                    // Using a query makes it more efficient
+                    ->options(Product::all()->pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->live()
+                    ->native(false), // Forces the nice UI even on mobile
+            ])
+            ->statePath('data');
+            // $this->selectedProductId
     }
 
 
@@ -479,6 +558,8 @@ class RoomMangement extends Page implements HasForms
                 ->persistent() // Stays on screen until they click it
                 ->send();
     }
+
+
 
 
 
