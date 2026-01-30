@@ -73,6 +73,7 @@ class RoomMangement extends Page implements HasForms
         $this->timeSlots = TimeSlot::get();
         $this->therapists = $this->getFreeTherapists();
         $this->therapistTypes = $this->getTherapistTypes();
+        $this->selectedTherapistType = $this->therapistTypes->first()->id;
 
         $this->therapist_form->fill();
         $this->room_form->fill();

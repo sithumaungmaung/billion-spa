@@ -44,7 +44,6 @@
             <div class="flex-1 min-w-[300px]">
                 <x-filament::input.wrapper label="Select Type">
                     <x-filament::input.select wire:model.live="selectedType">
-                        <option value="" selected>Select Therapist Type</option>
                         @foreach ($therapistTypes as $type)
                             <option value="{{ $type->id }}">
                                 {{ $type->title }} -
@@ -404,7 +403,7 @@
 
     @endif
 
-    <div wire:loading.flex class="fixed inset-0 bg-black/30 z-50 items-center justify-center">
+    <!-- <div wire:loading.flex class="fixed inset-0 bg-black/30 z-50 items-center justify-center">
         <x-filament::loading-indicator class="h-10 w-10 text-white" />
-    </div>
+    </div> -->
 </x-filament-panels::page>
