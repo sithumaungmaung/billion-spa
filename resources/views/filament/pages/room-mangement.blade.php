@@ -30,7 +30,7 @@
                     {{ $this->room_form }}
                 </div>
 
-                <x-filament::button wire:click="pickRoom" size="md">
+                <x-filament::button wire:click="pickRoom" size="md" class="w-24">
                     Select
                 </x-filament::button>
 
@@ -62,7 +62,7 @@
                         {{ $this->therapist_form }}
                     </div>
 
-                    <x-filament::button wire:click="assign" size="md" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedType">
+                    <x-filament::button wire:click="assign" class="w-24" size="md" :disabled="!$selectedRoomId || !$selectedSlotId || !$selectedType">
                         Assign
                     </x-filament::button>
                 </div>
@@ -98,7 +98,8 @@
                         </x-filament::input.wrapper>
                     </div>
 
-                    <x-filament::button wire:click="addProduct" size="md" {{-- :disabled="$this->canAddProduct" --}} :disabled="!$selectedRoomId || !$selectedSlotId">
+                    <x-filament::button wire:click="addProduct" class="w-24" size="md" {{-- :disabled="$this->canAddProduct" --}}
+                        :disabled="!$selectedRoomId || !$selectedSlotId">
                         Add
                     </x-filament::button>
                 </div>
@@ -119,8 +120,7 @@
                         </x-filament::input.wrapper>
                     </div>
 
-                    <x-filament::button wire:click="addExtraService" class="w-[65px] ml-2" size="md"
-                        :disabled="!$selectedExtraServiceId || !$selectedRoomId || !$selectedSlotId">
+                    <x-filament::button wire:click="addExtraService" class="w-24 ml-2" size="md" :disabled="!$selectedExtraServiceId || !$selectedRoomId || !$selectedSlotId">
                         Add
                     </x-filament::button>
                 </div>

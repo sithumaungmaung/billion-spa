@@ -51,6 +51,8 @@ class RoomMangement extends Page implements HasForms
 
     public $isExistingRecord = null;
 
+    public $sameTimeSlotForTherapist = [];
+
     // for detail section view (Mini Info)
     public string $selectedRoomName = '';
     public string $selectedTherapistName = '';
@@ -101,6 +103,8 @@ class RoomMangement extends Page implements HasForms
         ->where('room_id', $this->selectedRoomId)
         ->where('time_slot_id', $this->selectedSlotId)
         ->first();
+
+        $this->sameTimeSlotForTherapist = $this->getSameTimeSlotTherapist($roomId, $slotId);
 
         // $this->mountAction('cellModal'); {{ to show up the modal box }}
         //  $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
@@ -463,12 +467,14 @@ class RoomMangement extends Page implements HasForms
                 $q->where('start_time', '<=', $now)
                 ->where('end_time', '>=', $now);
             })
+            // ->where(['time_slot_id' => $this->selectedSlotId])
+            // ->where('record_date', $this->date)
+            ->with('therapist')
             ->pluck('therapist_id')
             ->unique()
             ->toArray();
 
-        return $allStaffs->whereNotIn('id', $busyStaffIds)->values();
-
+            return $allStaffs->whereNotIn('id', collect($busyStaffIds)->merge($this->sameTimeSlotForTherapist)->unique())->values();
     }
 
     public function getTherapistTypes()
@@ -536,7 +542,13 @@ class RoomMangement extends Page implements HasForms
                     ->native(false), // Forces the nice UI even on mobile
             ])
             ->statePath('data');
-            // $this->selectedProductId
+    }
+
+
+    public function getSameTimeSlotTherapist($roomId, $slotId)
+    {
+        return DailyRoomRecord::where(['time_slot_id' => $this->selectedSlotId])
+        ->where('record_date', $this->date)->with('therapist')->pluck('therapist_id');
     }
 
 
