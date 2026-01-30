@@ -165,7 +165,7 @@ class RoomMangement extends Page implements HasForms
             ]
         );
 
-        $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
+        $this->reset(['selectedRoomId', 'selectedSlotId']);
 
         $this->data['therapist_id'] = null;
         $this->therapist_form->fill();
