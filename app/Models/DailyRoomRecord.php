@@ -3,19 +3,56 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class DailyRoomRecord extends Model
 {
-    protected $fillable = ['record_date', 'room_id', 'time_slot_id', 'therapist_id', 'user_id', 'service_type', 'price', 'service_type_price'];
+    protected $fillable = ['record_date', 'room_id', 'start_time', 'end_time', 'therapist_id', 'user_id', 'service_type', 'room_price', 'service_type_price'];
     public function therapist()
     {
         return $this->belongsTo(Therapist::class);
+    }
+
+    public function scopeAvailableTherapists(Builder $query): Builder
+    {
+            $date = $date ?? now()->toDateString();
+            $time = $time ?? now()->format('H:i:s');
+
+            return $query->whereNotIn('id', function ($subQuery) use ($date, $time) {
+                $subQuery->select('therapist_id')
+                    ->from('daily_room_records')
+                    ->where('record_date', $date)
+                    ->where(function ($q) use ($time) {
+                        $q->whereNull('start_time')
+                        ->orWhere('start_time', '<=', $time);
+                    })
+                    ->where(function ($q) use ($time) {
+                        $q->whereNull('end_time')
+                        ->orWhere('end_time', '>=', $time);
+                    });
+            });
     }
 
     public function room()
     {
         return $this->belongsTo(Room::class);
     }
+
+    public function scopeAvailableRooms(Builder $query): Builder
+    {
+        $now = now()->format('H:i:s');
+
+        return $query->where('record_date', now()->toDateString())
+            ->where(function ($q) use ($now) {
+                $q->whereNull('start_time')
+                  ->orWhere('start_time', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_time')
+                  ->orWhere('end_time', '>=', $now);
+            });
+    }
+
     public function timeSlot()
     {
         return $this->belongsTo(TimeSlot::class);
@@ -31,10 +68,10 @@ class DailyRoomRecord extends Model
         return $this->belongsTo(TherapistType::class, 'service_type');
     }
 
-    public function serviceType()
-    {
-        return $this->hasOne(TherapistType::class, 'id', 'service_type');
-    }
+    // public function serviceType()
+    // {
+    //     return $this->hasOne(TherapistType::class, 'id', 'service_type');
+    // }
 
     public function extraServices()
     {

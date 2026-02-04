@@ -13,5 +13,9 @@ class ExtraService extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function extraServiceSales()
+    {
+        return $this->hasMany(ExtraServiceSale::class);
+    }
 
 }

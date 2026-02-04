@@ -17,6 +17,13 @@ class Therapist extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function dailyRoomRecords()
+    {
+        return $this->hasMany(DailyRoomRecord::class);
+    }
+
+    // public function room/
+
 
 
 }
