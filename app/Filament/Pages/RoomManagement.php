@@ -36,7 +36,7 @@ class RoomManagement extends Page implements HasForms
 
     public string $date;
     public $rooms;
-    public ?int $selectRoomId = 0;
+    public ?int $selectedRoomId = 0;
     public  $selectedRoom = null;
     public ?array $checkRoomIds = [];
 
@@ -95,6 +95,8 @@ class RoomManagement extends Page implements HasForms
         $this->avaliableRooms = $this->avaliavleRooms();
         $this->activeRooms = $this->activeRooms();
         $this->rooms =  $this->activeRooms;
+
+        // dump($this->activeRooms->toArray());
         // $this->rooms =  $this->avaliableRooms;
         // dump($this->avaliableRooms->toArray());
         // dump($this->rooms->toArray());
@@ -122,11 +124,15 @@ class RoomManagement extends Page implements HasForms
     {
         $selectedRoom = DailyRoomRecord::with('room', 'therapist', 'therapistType', 'saleProducts')->where('id', $roomId)->first();
         $this->selectedRoom = $selectedRoom;
+        $this->selectedRoomId = $selectedRoom->id;
         // $this->rooms = $this->selectedRoom ? [$selectedRoom] : $this->activeRooms;
-        $this->rooms =  $this->activeRooms;
+        $this->selectedRoom = DailyRoomRecord::where('id', $selectedRoom->id)->first();
+        $this->rooms =  $this->activeRooms();
+
 
         $this->data['therapist_id'] = $selectedRoom->therapist->id;
-        $this->extraServiceAndProductSales = $this->getSalesForDailyRoomRecord($roomId);
+
+        $this->getSalesForDailyRoomRecord();
 
     }
 
@@ -199,7 +205,7 @@ class RoomManagement extends Page implements HasForms
     protected function getTherapistOptions(): array
     {
 
-    $therapists = $this->getFreeTherapists();
+        $therapists = $this->getFreeTherapists();
 
         if ($this->selectedRoom?->therapist) {
             $therapists = $therapists->concat(collect([$this->selectedRoom->therapist]));
@@ -215,10 +221,31 @@ class RoomManagement extends Page implements HasForms
                     ->hiddenLabel()
                     ->placeholder('Select Room')
                     // Using a query makes it more efficient
-                    ->options(Room::whereIn('id', $this->activeRooms->pluck('room_id')->toArray())->pluck('name', 'id'))
+                    ->options(Room::whereIn('id', $this->activeRooms()->pluck('room_id')->toArray())->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
                     ->live()
+                    ->afterStateUpdated(function ($state) {
+                        // $state === selected room_id
+
+
+                        if($state){
+                            $this->selectedRoomId = DailyRoomRecord::where('room_id', $state)->first()->id;
+                            $this->getSalesForDailyRoomRecord();
+                            $this->selectedRoom = DailyRoomRecord::where('room_id', $state)->first();
+                            // dump(DailyRoomRecord::where('id', $this->selectedRoomId)->get());
+                            $this->rooms =  DailyRoomRecord::where('id', $this->selectedRoomId)->get();
+                            $this->data['therapist_id'] = $this->selectedRoom->therapist->id;
+                            // dump($this->data['therapist_id']);
+
+                        }else{
+                            $this->rooms =  $this->activeRooms();
+                            $this->selectedRoom = null;
+                            $this->selectedRoomId = 0;
+                            $this->extraServiceAndProductSales = [];
+                             $this->data['therapist_id'] = null;
+                        }
+                    })
                     ->native(true), // Forces the nice UI even on mobile
             ])
             ->statePath('data');
@@ -281,18 +308,20 @@ class RoomManagement extends Page implements HasForms
 
     public function switchTherapistAndTherapistType()
     {
-        $therapistTypeId = TherapistType::find($this->selectedTherapistTypeId)->id;
         $room = DailyRoomRecord::find($this->selectedRoom->id);
         $room->update([
             'therapist_id' => $this->data['therapist_id'] ?? $room->therapist_id,
-            'service_type' => $therapistTypeId ?? $room->service_type
+            'service_type' => TherapistType::find($this->selectedTherapistTypeId)->id ?? $room->service_type
         ]);
-
     }
 
     public function checkBill()
     {
-        dump($this->checkRoomIds);
+        // dump($this->checkRoomIds);
+
+        return redirect()->route('filament.admin.pages.check-bill', [
+            'bill_for' => implode(',', $this->checkRoomIds)
+        ]);
     }
 
 
@@ -445,7 +474,7 @@ class RoomManagement extends Page implements HasForms
                 'total_price' => $this->selectedProductQty  * $product->price
             ]);
         }
-
+        $this->getSalesForDailyRoomRecord();
         $this->notifySuccess(
             'Success: Add Success',
             'Product added successfully.'
@@ -454,50 +483,56 @@ class RoomManagement extends Page implements HasForms
         $this->reset(['selectedProductId']);
     }
 
-    // public function removeProduct($saleproduct): void
-    // {
-    //     $productSale = ProductSale::where('id', $saleproduct)->delete();
+    public function removeProduct($saleproduct): void
+    {
+        $productSale = ProductSale::where('id', $saleproduct)->delete();
 
-    //     $this->notifySuccess(
-    //         'Success: Remove Success',
-    //         'Product removed successfully.'
-    //     );
+        $this->getSalesForDailyRoomRecord();
 
-    // }
+        $this->notifySuccess(
+            'Success: Remove Success',
+            'Product removed successfully.'
+        );
+
+    }
 
 
 
-    // public function reduceProduct($saleProduct)
-    // {
-    //     $productSale = ProductSale::where('id', $saleProduct)->first();
-    //     $totalQty = $productSale->quantity - 1;
-    //     $productSale->update([
-    //         'quantity' => $totalQty,
-    //         'total_price' => $totalQty * $productSale->unit_price
-    //     ]);
+    public function reduceProduct($saleProduct)
+    {
+        $productSale = ProductSale::where('id', $saleProduct)->first();
+        $totalQty = $productSale->quantity - 1;
+        $productSale->update([
+            'quantity' => $totalQty,
+            'total_price' => $totalQty * $productSale->unit_price
+        ]);
 
-    //     $this->notifySuccess(
-    //         'Success: Reduce Success',
-    //         'Product quantity reduced successfully.'
-    //     );
-    //     return;
-    // }
+        $this->getSalesForDailyRoomRecord();
 
-    // public function addMoreProduct($saleProduct)
-    // {
-    //     $productSale = ProductSale::where('id', $saleProduct)->first();
-    //     $toalQty = $productSale->quantity + 1;
-    //     $productSale->update([
-    //         'quantity' => $toalQty,
-    //         'total_price' => $toalQty * $productSale->unit_price
-    //     ]);
+        $this->notifySuccess(
+            'Success: Reduce Success',
+            'Product quantity reduced successfully.'
+        );
+        return;
+    }
 
-    //     $this->notifySuccess(
-    //         'Success: Add Success',
-    //         'Product quantity added successfully.'
-    //     );
-    //     return;
-    // }
+    public function addMoreProduct($saleProduct)
+    {
+        $productSale = ProductSale::where('id', $saleProduct)->first();
+        $toalQty = $productSale->quantity + 1;
+        $productSale->update([
+            'quantity' => $toalQty,
+            'total_price' => $toalQty * $productSale->unit_price
+        ]);
+
+        $this->getSalesForDailyRoomRecord();
+
+        $this->notifySuccess(
+            'Success: Add Success',
+            'Product quantity added successfully.'
+        );
+        return;
+    }
 
 
     public function updateExtraService()
@@ -521,6 +556,8 @@ class RoomManagement extends Page implements HasForms
             ]);
             $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoom->id);
 
+            $this->getSalesForDailyRoomRecord();
+
             $this->notifySuccess(
                 'Success: Add Success',
                 'Extra service added successfully.'
@@ -532,8 +569,19 @@ class RoomManagement extends Page implements HasForms
             );
             return;
         }
+    }
+
+    public function removeService($serviceId): void
+    {
 
 
+        $productSale = ExtraServiceSale::where('id', $serviceId)->delete();
+        $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoom->id);
+        $this->getSalesForDailyRoomRecord();
+        $this->notifySuccess(
+            'Success: Remove Success',
+            'Extra service removed successfully.'
+        );
     }
 
 
@@ -670,18 +718,21 @@ class RoomManagement extends Page implements HasForms
 
 
 
-    public function getSalesForDailyRoomRecord($roomId)
+    public function getSalesForDailyRoomRecord()
     {
-        $saleProducts = ProductSale::where('daily_room_record_id', $roomId)->with('product')->get();
-        $saleExtraServices = ExtraServiceSale::where('daily_room_record_id', $roomId)->with('extraService')->get();
 
-        return [
+        $saleProducts = ProductSale::where('daily_room_record_id', $this->selectedRoomId)->with('product')->get();
+        $saleExtraServices = ExtraServiceSale::where('daily_room_record_id', $this->selectedRoomId)->with('extraService')->get();
+
+        $data = [
             'saleProducts' => $saleProducts,
             'saleProductsTotal' => $saleProducts->sum('total_price'),
             'saleExtraServices' => $saleExtraServices,
             'saleExtraServicesTotal' => $saleExtraServices->sum('total_price'),
             'saleTotal' => $saleProducts->sum('total_price') + $saleExtraServices->sum('total_price'),
         ];
+        $this->extraServiceAndProductSales = $data;
+
     }
 
 
@@ -725,6 +776,7 @@ class RoomManagement extends Page implements HasForms
                 ->body($message)
                 ->danger() // Makes the notification red
                 ->persistent() // Stays on screen until they click it
+                ->duration(500)
                 ->send();
     }
     public function notifySuccess(string $type, string $message): void
@@ -734,6 +786,7 @@ class RoomManagement extends Page implements HasForms
                 ->body($message)
                 ->success() // Makes the notification red
                 ->persistent() // Stays on screen until they click it
+                ->duration(500)
                 ->send();
     }
 

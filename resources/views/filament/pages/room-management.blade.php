@@ -19,7 +19,7 @@
                     @endif
                 </div>
 
-                <x-filament::button wire:click="checkBill" size="md" class="min-w-[100px]">
+                <x-filament::button wire:click="checkBill" size="md" class="min-w-[100px]" :disabled="!$this->checkRoomIds">
                     Check Bill
                 </x-filament::button>
             </div>
@@ -41,7 +41,12 @@
                 </div>
 
                 <div class="mt-4">
-                    <div class="space-y-3">
+                    <div class="space-y-3 max-h-[50vh] overflow-y-auto">
+                        @if ($this->rooms->isEmpty())
+                            <div class="text-gray-600 dark:text-gray-400 text-center items-center">
+                                No active rooms found.
+                            </div>
+                        @endif
                         @foreach ($this->rooms as $room)
                             @php
                                 $isSelected = $this->selectedRoom && $this->selectedRoom->id == $room->id;
@@ -107,206 +112,210 @@
                 </div>
             </div>
 
-            <div class="flex-1">
-                <div class="border border-gray-300 dark:border-gray-700 rounded-2xl p-4 space-y-4">
-                    <div class="flex items-start gap-3">
-                        <div class="flex-1 grid grid-cols-2 gap-3">
-                            <div>
-                                {{ $this->therapist_form }}
+            <div class="flex-1 filament-form-container">
+                <div class="">
+                    <div class="border border-gray-300 dark:border-gray-700 rounded-2xl  top-4 p-4 space-y-4 ">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1 grid grid-cols-2 gap-3">
+                                <div>
+                                    {{ $this->therapist_form }}
+                                </div>
+                                <div>
+                                    <x-filament::input.wrapper>
+                                        <x-filament::input.select wire:model.live="selectedTherapistTypeId" required>
+                                            <option value="0">Choose Specialization</option>
+                                            @foreach ($therapistTypes as $type)
+                                                <option value="{{ $type->id }}" @disabled($this->selectedRoom && $this->selectedRoom->therapistType->id == $type->id)>
+                                                    {{ $type->title }}
+                                                    {{ $this->selectedRoom && $this->selectedRoom->therapistType->id == $type->id ? '(Selected)' : '' }}
+                                                </option>
+                                            @endforeach
+                                        </x-filament::input.select>
+                                    </x-filament::input.wrapper>
+                                </div>
                             </div>
-                            <div>
+                            <x-filament::button wire:click="switchTherapistAndTherapistType" size="md"
+                                class="min-w-[100px]" :disabled="!$selectedRoom">
+                                Switch
+                            </x-filament::button>
+                        </div>
+
+                        <hr class="border-gray-200 dark:border-gray-800" />
+
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1 flex gap-3">
+                                <div class="flex-1">
+                                    {{ $this->product_form }}
+                                </div>
+                                <div class="w-20">
+                                    <x-filament::input.wrapper>
+                                        <x-filament::input wire:model="selectedProductQty" placeholder="Qty"
+                                            type="number" min="1" />
+                                    </x-filament::input.wrapper>
+                                </div>
+                            </div>
+                            <x-filament::button wire:click="addProduct" size="md" color="info"
+                                class="min-w-[100px]" :disabled="!$selectedRoom">
+                                Add
+                            </x-filament::button>
+                        </div>
+
+                        <hr class="border-gray-200 dark:border-gray-800" />
+
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1">
+
                                 <x-filament::input.wrapper>
-                                    <x-filament::input.select wire:model.live="selectedTherapistTypeId" required>
-                                        <option value="0">Choose Specialization</option>
-                                        @foreach ($therapistTypes as $type)
-                                            <option value="{{ $type->id }}" @disabled($this->selectedRoom && $this->selectedRoom->therapistType->id == $type->id)>
-                                                {{ $type->title }}
-                                                {{ $this->selectedRoom && $this->selectedRoom->therapistType->id == $type->id ? '(Selected)' : '' }}
+                                    <x-filament::input.select wire:model.live="selectedExtraServiceId" required>
+                                        <option value="0">Choose Extra Service</option>
+                                        @foreach ($extraServices as $service)
+                                            <option value="{{ $service->id }}" @disabled($this->selectedRoom && in_array($service->id, $this->selectedRoom->extraServices->pluck('id')->toArray()))>
+                                                {{ $service->title }}
+                                                {{ $this->selectedRoom && in_array($service->id, $this->selectedRoom->extraServices->pluck('id')->toArray()) ? '(included)' : '' }}
                                             </option>
                                         @endforeach
                                     </x-filament::input.select>
                                 </x-filament::input.wrapper>
                             </div>
+                            <x-filament::button wire:click="updateExtraService" size="md" color="gray" multiple
+                                class="min-w-[100px]" :disabled="!$selectedRoom">
+                                Update
+                            </x-filament::button>
                         </div>
-                        <x-filament::button wire:click="switchTherapistAndTherapistType" size="md"
-                            class="min-w-[100px]" :disabled="!$selectedRoom">
-                            Switch
-                        </x-filament::button>
                     </div>
 
-                    <hr class="border-gray-200 dark:border-gray-800" />
+                    {{-- // Sale Products // --}}
+                    <div class="mt-4">
 
-                    <div class="flex items-start gap-3">
-                        <div class="flex-1 flex gap-3">
-                            <div class="flex-1">
-                                {{ $this->product_form }}
-                            </div>
-                            <div class="w-20">
-                                <x-filament::input.wrapper>
-                                    <x-filament::input wire:model="selectedProductQty" placeholder="Qty" type="number"
-                                        min="1" />
-                                </x-filament::input.wrapper>
-                            </div>
-                        </div>
-                        <x-filament::button wire:click="addProduct" size="md" color="info" class="min-w-[100px]"
-                            :disabled="!$selectedRoom">
-                            Add
-                        </x-filament::button>
-                    </div>
+                        <x-filament::section heading="Ordered Products & Services" collapsible collapsed>
+                            {{-- <x-filament::card> --}}
 
-                    <hr class="border-gray-200 dark:border-gray-800" />
+                            <table
+                                class="w-full text-sm text-left border-collapse border border-gray-200 dark:border-white/10">
+                                <thead class="bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300">
+                                    <tr class="border-b border-gray-200 dark:border-white/10">
+                                        <th class="px-4 py-3 w-12 text-center">#</th>
+                                        <th class="px-4 py-3">Title</th>
+                                        <th class="px-4 py-3 text-right">Unit</th>
+                                        <th class="px-4 py-3 text-right">Price</th>
+                                        <th class="px-4 py-3 text-right">Total</th>
+                                        <th class="px-4 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
 
-                    <div class="flex items-start gap-3">
-                        <div class="flex-1">
+                                <tbody class="divide-y divide-gray-100 dark:divide-white/10">
 
-                            <x-filament::input.wrapper>
-                                <x-filament::input.select wire:model.live="selectedExtraServiceId" required>
-                                    <option value="0">Choose Extra Service</option>
-                                    @foreach ($extraServices as $service)
-                                        <option value="{{ $service->id }}" @disabled($this->selectedRoom && in_array($service->id, $this->selectedRoom->extraServices->pluck('id')->toArray()))>
-                                            {{ $service->title }}
-                                            {{ $this->selectedRoom && in_array($service->id, $this->selectedRoom->extraServices->pluck('id')->toArray()) ? '(included)' : '' }}
-                                        </option>
-                                    @endforeach
-                                </x-filament::input.select>
-                            </x-filament::input.wrapper>
-                        </div>
-                        <x-filament::button wire:click="updateExtraService" size="md" color="gray" multiple
-                            class="min-w-[100px]" :disabled="!$selectedRoom">
-                            Update
-                        </x-filament::button>
-                    </div>
-                </div>
+                                    @if ($this->selectedRoom)
+                                        {{-- @dd($this->extraServiceAndProductSales) --}}
+                                        @foreach ($this->extraServiceAndProductSales['saleProducts'] as $key => $product)
+                                            <tr
+                                                class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
+                                                <td class="px-4 py-3 text-center text-gray-500">
+                                                    {{ $key + 1 }}
+                                                </td>
 
-                {{-- // Sale Products // --}}
-                <div class="mt-4">
+                                                <td class="px-4 py-3 font-medium">
+                                                    {{ $product->product->name }}
+                                                </td>
 
-                    <x-filament::section heading="Ordered Products & Services" collapsible collapsed>
-                        {{-- <x-filament::card> --}}
+                                                <td class="px-4 py-3 text-right">
+                                                    {{ $product->quantity }}
+                                                </td>
 
-                        <table
-                            class="w-full text-sm text-left border-collapse border border-gray-200 dark:border-white/10">
-                            <thead class="bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300">
-                                <tr class="border-b border-gray-200 dark:border-white/10">
-                                    <th class="px-4 py-3 w-12 text-center">#</th>
-                                    <th class="px-4 py-3">Title</th>
-                                    <th class="px-4 py-3 text-right">Unit</th>
-                                    <th class="px-4 py-3 text-right">Price</th>
-                                    <th class="px-4 py-3 text-right">Total</th>
-                                    <th class="px-4 py-3 text-right">Action</th>
-                                </tr>
-                            </thead>
+                                                <td class="px-4 py-3 text-right font-mono">
+                                                    {{ number_format($product->unit_price) }}
+                                                </td>
 
-                            <tbody class="divide-y divide-gray-100 dark:divide-white/10">
+                                                <td class="px-4 py-3 text-right font-mono font-semibold ">
 
-                                @if ($this->selectedRoom)
+                                                    {{ number_format($product->total_price) }}
+                                                </td>
 
-                                    @foreach ($this->extraServiceAndProductSales['saleProducts'] as $key => $product)
-                                        <tr
-                                            class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
-                                            <td class="px-4 py-3 text-center text-gray-500">
-                                                {{ $key + 1 }}
-                                            </td>
+                                                <td class="px-4 py-3 text-right font-mono w-[180px]">
+                                                    <x-filament::button class="mr-1"
+                                                        wire:click="removeProduct({{ $product->id }})" color="danger"
+                                                        size="xs">
+                                                        Remove
+                                                    </x-filament::button>
 
-                                            <td class="px-4 py-3 font-medium">
-                                                {{ $product->product->name }}
-                                            </td>
+                                                    <x-filament::button class="mr-1 text-white"
+                                                        wire:click="reduceProduct({{ $product->id }})"
+                                                        :disabled="$product->quantity <= 1" color="primary" size="xs">
+                                                        -
+                                                    </x-filament::button>
 
-                                            <td class="px-4 py-3 text-right">
-                                                {{ $product->quantity }}
-                                            </td>
+                                                    <x-filament::button class="mr-1 text-white bg-green-900"
+                                                        wire:click="addMoreProduct({{ $product->id }})"
+                                                        size="xs">
+                                                        +
+                                                    </x-filament::button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        {{--  --}}
 
-                                            <td class="px-4 py-3 text-right font-mono">
-                                                {{ number_format($product->unit_price) }}
-                                            </td>
+                                        @foreach ($this->extraServiceAndProductSales['saleExtraServices'] as $key => $service)
+                                            <tr
+                                                class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
+                                                <td class="px-4 py-3 text-center text-gray-500">
+                                                    {{ $key + 1 }}
+                                                </td>
 
-                                            <td class="px-4 py-3 text-right font-mono font-semibold ">
+                                                <td class="px-4 py-3 font-medium">
+                                                    {{ $service->extraService->title }}
+                                                </td>
 
-                                                {{ number_format($product->total_price) }}
-                                            </td>
+                                                <td class="px-4 py-3 text-right">
+                                                    1
+                                                </td>
 
-                                            <td class="px-4 py-3 text-right font-mono w-[180px]">
-                                                <x-filament::button class="mr-1"
-                                                    wire:click="removeProduct({{ $product->id }})" color="danger"
-                                                    size="xs">
-                                                    Remove
-                                                </x-filament::button>
+                                                <td class="px-4 py-3 text-right font-mono">
+                                                    {{ number_format($service->unit_price) }}
+                                                </td>
 
-                                                <x-filament::button class="mr-1 text-white"
-                                                    wire:click="reduceProduct({{ $product->id }})" :disabled="$product->quantity <= 1"
-                                                    color="primary" size="xs">
-                                                    -
-                                                </x-filament::button>
+                                                <td class="px-4 py-3 text-right font-mono font-semibold ">
 
-                                                <x-filament::button class="mr-1 text-white bg-green-900"
-                                                    wire:click="addMoreProduct({{ $product->id }})" size="xs">
-                                                    +
-                                                </x-filament::button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    {{--  --}}
+                                                    {{ number_format($service->total_price) }}
+                                                </td>
 
-                                    @foreach ($this->extraServiceAndProductSales['saleExtraServices'] as $key => $service)
-                                        <tr
-                                            class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
-                                            <td class="px-4 py-3 text-center text-gray-500">
-                                                {{ $key + 1 }}
-                                            </td>
+                                                <td class="px-4 py-3 text-right font-mono w-[180px]">
+                                                    <x-filament::button class="mr-1"
+                                                        wire:click="removeService({{ $service->id }})"
+                                                        color="danger" size="xs">
+                                                        Remove
+                                                    </x-filament::button>
 
-                                            <td class="px-4 py-3 font-medium">
-                                                {{ $service->extraService->title }}
-                                            </td>
+                                                    <x-filament::button class="mr-1 text-white"
+                                                        wire:click="reduceProduct({{ $service->id }})"
+                                                        :disabled="true" color="primary" size="xs">
+                                                        -
+                                                    </x-filament::button>
 
-                                            <td class="px-4 py-3 text-right">
-                                                1
-                                            </td>
+                                                    <x-filament::button class="mr-1 text-white bg-green-900"
+                                                        wire:click="addMoreProduct({{ $service->id }})"
+                                                        size="xs" :disabled="true">
+                                                        +
+                                                    </x-filament::button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
+                                            Total Bill
+                                        </td>
+                                        <td class="px-4 py-3 text-right font-mono font-semibold ">
+                                            {{ number_format($this->extraServiceAndProductSales['saleTotal']) }}
+                                        </td>
+                                    @endif
 
-                                            <td class="px-4 py-3 text-right font-mono">
-                                                {{ number_format($service->unit_price) }}
-                                            </td>
 
-                                            <td class="px-4 py-3 text-right font-mono font-semibold ">
 
-                                                {{ number_format($service->total_price) }}
-                                            </td>
 
-                                            <td class="px-4 py-3 text-right font-mono w-[180px]">
-                                                <x-filament::button class="mr-1"
-                                                    wire:click="removeProduct({{ $service->id }})" color="danger"
-                                                    size="xs">
-                                                    Remove
-                                                </x-filament::button>
-
-                                                <x-filament::button class="mr-1 text-white"
-                                                    wire:click="reduceProduct({{ $service->id }})" color="primary"
-                                                    size="xs">
-                                                    -
-                                                </x-filament::button>
-
-                                                <x-filament::button class="mr-1 text-white bg-green-900"
-                                                    wire:click="addMoreProduct({{ $product->id }})" size="xs">
-                                                    +
-                                                </x-filament::button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
-                                        Total Bill
                                     </td>
-                                    <td class="px-4 py-3 text-right font-mono font-semibold ">
-                                        {{ number_format($this->extraServiceAndProductSales['saleTotal']) }}
-                                    </td>
-                                @endif
-
-
-
-
-                                </td>
-                            </tbody>
-                        </table>
-                        {{-- </x-filament::card> --}}
-                    </x-filament::section>
+                                </tbody>
+                            </table>
+                            {{-- </x-filament::card> --}}
+                        </x-filament::section>
+                    </div>
                 </div>
 
             </div>

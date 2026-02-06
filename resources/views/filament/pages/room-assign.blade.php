@@ -2,6 +2,37 @@
     <x-filament::section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+
+
+            {{-- Start Time --}}
+            <x-filament-forms::field-wrapper label="Start Time" id="startTime">
+                <x-filament::input.wrapper>
+                    <x-filament::input id="startTime" type="time" wire:model.live="startTime" />
+                    <x-slot name="suffix">
+                        <x-filament::button size="xs" wire:click="$set('startTime', '{{ now()->format('H:i') }}')">
+                            Now
+                        </x-filament::button>
+                    </x-slot>
+                </x-filament::input.wrapper>
+            </x-filament-forms::field-wrapper>
+
+            {{-- End Time --}}
+            <x-filament-forms::field-wrapper label="End Time" id="endTime">
+                <x-filament::input.wrapper>
+                    <x-filament::input id="endTime" type="time" wire:model.live="endTime" :disabled="!$startTime" />
+                    <x-slot name="suffix">
+                        <x-filament::button size="xs" :disabled="!$startTime"
+                            wire:click="$set('endTime', '{{ $this->endTime ? Carbon\Carbon::parse($this->endTime)->addHour()->format('H:i') : Carbon\Carbon::parse($this->startTime)->addHour()->format('H:i') }}')">
+                            Add one Hour
+                        </x-filament::button>
+                        <x-filament::button size="xs" :disabled="!$startTime || (!$endTime || $this->startTime === $this->endTime)"
+                            wire:click="$set('endTime', '{{ Carbon\Carbon::parse($this->endTime)->subHour()->format('H:i') }}')">
+                            Reduce one Hour
+                        </x-filament::button>
+                    </x-slot>
+                </x-filament::input.wrapper>
+            </x-filament-forms::field-wrapper>
+
             {{-- Date Input --}}
             <x-filament-forms::field-wrapper label="Selected Date" id="date">
                 <x-filament::input.wrapper>
@@ -12,7 +43,7 @@
             {{-- Room Select --}}
             <x-filament-forms::field-wrapper label="Room" id="room">
                 <x-filament::input.wrapper>
-                    <x-filament::input.select id="room" wire:model.live="selectedRoomId">
+                    <x-filament::input.select id="room" wire:model.live="selectedRoomId" :disabled="!$startTime || !$endTime">
                         <option value="0">Select a Room</option>
                         @foreach ($avaliableRooms as $room)
                             <option value="{{ $room->id }}">{{ $room->name }}</option>
@@ -45,30 +76,7 @@
                 </x-filament::input.wrapper>
             </x-filament-forms::field-wrapper>
 
-            {{-- Start Time --}}
-            <x-filament-forms::field-wrapper label="Start Time" id="startTime">
-                <x-filament::input.wrapper>
-                    <x-filament::input id="startTime" type="time" wire:model.live="startTime" />
-                    <x-slot name="suffix">
-                        <x-filament::button size="xs" wire:click="$set('startTime', '{{ now()->format('H:i') }}')">
-                            Now
-                        </x-filament::button>
-                    </x-slot>
-                </x-filament::input.wrapper>
-            </x-filament-forms::field-wrapper>
 
-            {{-- End Time --}}
-            <x-filament-forms::field-wrapper label="End Time" id="endTime">
-                <x-filament::input.wrapper>
-                    <x-filament::input id="endTime" type="time" wire:model.live="endTime" />
-                    <x-slot name="suffix">
-                        <x-filament::button size="xs"
-                            wire:click="$set('endTime', '{{ now()->addHour()->format('H:i') }}')">
-                            Add one Hour
-                        </x-filament::button>
-                    </x-slot>
-                </x-filament::input.wrapper>
-            </x-filament-forms::field-wrapper>
 
         </div>
 
