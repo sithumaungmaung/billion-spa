@@ -80,7 +80,7 @@ class CheckBill extends Page
     }
 
     public function getSystemDailyRecords() {
-        $dailyRooms = DailyRoomRecord::whereIn('id', $this->roomIds)->with('room')->get();
+        $dailyRooms = DailyRoomRecord::whereIn('id', $this->roomIds)->with('room', 'therapist', 'therapistType')->get();
         return $dailyRooms;
     }
 

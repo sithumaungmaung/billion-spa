@@ -38,6 +38,8 @@
                 <tr class="border-b border-gray-200 dark:border-white/10">
                     <th class="px-4 py-3 w-12 text-center">#</th>
                     <th class="px-4 py-3">Title</th>
+                    <th class="px-4 py-3">Time</th>
+                    <th class="px-4 py-3">Section</th>
                     <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Price</th>
                     <th class="px-4 py-3 text-right">Total</th>
@@ -57,6 +59,14 @@
 
                         <td class="px-4 py-3 font-medium">
                             {{ $billRoom['room_name'] }}
+                        </td>
+
+                        <td class="px-4 py-3 font-medium">
+                            {{ $billRoom['start_time'] }} - {{ $billRoom['end_time'] }}
+                        </td>
+
+                        <td class="px-4 py-3 font-medium">
+                            {{ $billRoom['total_time'] ?? '-' }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
@@ -84,6 +94,14 @@
 
                         <td class="px-4 py-3 font-medium">
                             {{ $product->product->name }}
+                        </td>
+
+                        <td class="px-4 py-3 font-medium text-center">
+                            -
+                        </td>
+
+                        <td class="px-4 py-3 font-medium text-center">
+                            -
                         </td>
 
                         <td class="px-4 py-3 text-right">
@@ -115,10 +133,17 @@
                         <td class="px-4 py-3 font-medium">
                             {{ $service->extraService->title }}
                         </td>
+                        <td class="px-4 py-3 text-center">
+                            -
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            -
+                        </td>
 
                         <td class="px-4 py-3 text-right">
                             1
                         </td>
+
 
                         <td class="px-4 py-3 text-right font-mono">
                             {{ number_format($service->unit_price) }}
@@ -181,6 +206,7 @@
                    dark:divide-white/10">
 
                 @foreach ($this->systemDailyRecords as $key => $systemDailyRecord)
+                    {{-- @dd($this->systemDailyRecords->toArray()) --}}
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
@@ -192,8 +218,9 @@
                             {{ $systemDailyRecord->room ? $systemDailyRecord->room->name : '' }}
                         </td>
 
-                        <td class="px-4 py-3 font-medium">
-                            {{ $systemDailyRecord->timeslot ? \Carbon\Carbon::parse($systemDailyRecord->timeslot->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($systemDailyRecord->timeslot->end_time)->format('H:i') : '' }}
+                        <td class="px-4 py-3 font-medium text-end">
+                            {{-- {{ $systemDailyRecord->timeslot ? \Carbon\Carbon::parse($systemDailyRecord->timeslot->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($systemDailyRecord->timeslot->end_time)->format('H:i') : '' }} --}}
+                            {{ $systemDailyRecord->start_time }} - {{ $systemDailyRecord->end_time }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
@@ -201,7 +228,7 @@
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            {{ $systemDailyRecord->serviceType ? $systemDailyRecord->serviceType->title : '' }}
+                            {{ $systemDailyRecord->therapistType ? $systemDailyRecord->therapistType->title : '' }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
@@ -209,11 +236,11 @@
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            {{ $systemDailyRecord->price }}
+                            {{ $systemDailyRecord->room_price }}
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            {{ $systemDailyRecord->service_type_price + $systemDailyRecord->price }}
+                            {{ $systemDailyRecord->service_type_price + $systemDailyRecord->room_price }}
                         </td>
                     </tr>
                 @endforeach

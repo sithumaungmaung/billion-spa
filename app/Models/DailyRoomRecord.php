@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class DailyRoomRecord extends Model
 {
@@ -77,5 +79,20 @@ class DailyRoomRecord extends Model
     {
         return $this->belongsToMany(ExtraService::class,'extra_service_sales','daily_room_record_id','extra_service_id');
     }
+
+
+    protected $appends = ['total_time'];
+
+
+    protected function getTotalTimeAttribute()
+    {
+        $startTime = Carbon::parse($this->start_time);
+        $endTime = Carbon::parse($this->end_time);
+
+        $totalMinutes = $startTime->diffInMinutes($endTime) / 60;
+        // return round($totalMinutes);
+        return ceil($totalMinutes);
+    }
+
 
 }

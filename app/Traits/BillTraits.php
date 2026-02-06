@@ -10,19 +10,24 @@ trait BillTraits
     public function getBillRooms($ids, int $buy = 1, int $free = 1)
     {
         $dailyRooms = DailyRoomRecord::whereIn('id', $ids)
-            ->with(['room', 'serviceType'])
+            ->with(['room', 'therapistType'])
             ->get();
 
-        $grouped = $dailyRooms->groupBy(fn ($item) =>
+            // dump($dailyRooms->toArray());
+
+            $grouped = $dailyRooms->groupBy(fn ($item) =>
             $item->room_id . '-' . $item->service_type
         );
-
+// 180 = 3
         $items = [];
 
         foreach ($grouped as $group) {
 
+
             $first = $group->first();
-            $totalSlots = $group->count();
+            // dump($group->toArray());
+            $totalSlots = $first->total_time;
+            // dump($first->toArray());
 
             $setSize   = $buy + $free;
             $fullSets  = intdiv($totalSlots, $setSize);
@@ -32,16 +37,19 @@ trait BillTraits
             $freeSlots = $totalSlots - $paidSlots;
 
             $price = $first->price + $first->service_type_price;
-            $serviceTypeTitle = optional($first->serviceType)->title;
+            $therapistTypeTitle = optional($first->therapistType)->title;
 
             // Paid item
             $items[] = [
                 'branch_id' => 1,
                 'room_id'   => $first->room_id,
-                'room_name' => "{$first->room->name} – {$serviceTypeTitle}",
-                'service_type' => $first->serviceType,
+                'room_name' => "{$first->room->name} – {$therapistTypeTitle}",
+                'service_type' => $first->therapistType,
                 'service_type_price' => $first->service_type_price,
                 'quantity'  => $paidSlots,
+                'start_time' => $first->start_time,
+                'end_time' => $first->end_time,
+                'total_time' => $first->total_time,
                 'unit_price'=> $price,
                 'total_price' => $paidSlots * $price,
             ];
@@ -51,10 +59,13 @@ trait BillTraits
                 $items[] = [
                     'branch_id' => 1,
                     'room_id'   => $first->room_id,
-                    'room_name' => "{$first->room->name} – {$serviceTypeTitle} (Free)",
-                    'service_type' => $first->serviceType,
+                    'room_name' => "{$first->room->name} – {$therapistTypeTitle} (Free)",
+                    'service_type' => $first->therapistType,
                     'service_type_price' => 0,
                     'quantity'  => $freeSlots,
+                    'start_time' => $first->start_time,
+                    'end_time' => $first->end_time,
+                    'total_time' => $freeSlots,
                     'unit_price'=> 0,
                     'total_price' => 0,
                 ];

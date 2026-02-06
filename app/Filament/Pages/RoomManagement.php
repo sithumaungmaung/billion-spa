@@ -311,7 +311,8 @@ class RoomManagement extends Page implements HasForms
         $room = DailyRoomRecord::find($this->selectedRoom->id);
         $room->update([
             'therapist_id' => $this->data['therapist_id'] ?? $room->therapist_id,
-            'service_type' => TherapistType::find($this->selectedTherapistTypeId)->id ?? $room->service_type
+            'service_type' => TherapistType::find($this->selectedTherapistTypeId)->id ?? $room->service_type,
+            'service_type_price' => TherapistType::find($this->selectedTherapistTypeId)->price ?? $room->service_type_price
         ]);
     }
 
