@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('quantity');
             $table->unsignedInteger('unit_price');
             $table->unsignedInteger('total_price');
+            $table->integer('invoice_id')->nullable();
             $table->tinyInteger('branch_id')->default(0);
             $table->timestamps();
         });

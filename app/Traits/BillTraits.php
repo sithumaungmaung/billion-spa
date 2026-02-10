@@ -36,7 +36,7 @@ trait BillTraits
             $paidSlots = ($fullSets * $buy) + min($remainder, $buy);
             $freeSlots = $totalSlots - $paidSlots;
 
-            $price = $first->price + $first->service_type_price;
+            $price = $first->room_price + $first->service_type_price;
             $therapistTypeTitle = optional($first->therapistType)->title;
 
             // Paid item

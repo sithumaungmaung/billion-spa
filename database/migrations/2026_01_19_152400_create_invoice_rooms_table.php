@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('invoice_id');
             $table->foreignId('branch_id');
             $table->foreignId('room_id');
-            
+
             $table->tinyInteger('service_type');
+            $table->integer('service_type_price')->default(0);
             $table->string('room_name')->nullable();          // Snapshot
             $table->string('room_code')->nullable();
 

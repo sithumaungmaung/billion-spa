@@ -15,14 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('invoice_no')->unique(); // INV-0001
             $table->integer('branch_id');
+            $table->foreignId('user_id')->nullable();
             $table->dateTime('invoice_datetime');
-            
-            
+
+
             // Totals
             $table->integer('sub_total')->default(0);
             $table->integer('discount')->default(0);
             $table->integer('tax')->default(0);
             $table->integer('grand_total')->default(0);
+
+            $table->unsignedTinyInteger('buy')->default(1);
+            $table->unsignedTinyInteger('free')->default(0);
 
             // Payment
             // $table->enum('payment_status', ['unpaid', 'partial', 'paid'])->default('unpaid');

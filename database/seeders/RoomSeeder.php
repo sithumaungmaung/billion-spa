@@ -26,7 +26,7 @@ class RoomSeeder extends Seeder
                     'branch_id' => Branch::all()->random()->id,
                     'floor' => rand(1,3),
                     'room_number' => Str::random(3), // unique num 1-100 if branch is same
-                    'price' => rand(1000, 5000),
+                    'price' => 9000,
                 ]
              );
         }
