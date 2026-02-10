@@ -7,9 +7,10 @@
             {{-- Start Time --}}
             <x-filament-forms::field-wrapper label="Start Time" id="startTime">
                 <x-filament::input.wrapper>
-                    <x-filament::input id="startTime" type="time" wire:model.live="startTime" />
+                    <x-filament::input id="startTime" type="datetime-local" wire:model.live="startTime" />
                     <x-slot name="suffix">
-                        <x-filament::button size="xs" wire:click="$set('startTime', '{{ now()->format('H:i') }}')">
+                        <x-filament::button size="xs"
+                            wire:click="$set('startTime', '{{ now()->format('Y-m-d\TH:i') }}')">
                             Now
                         </x-filament::button>
                     </x-slot>
@@ -19,14 +20,15 @@
             {{-- End Time --}}
             <x-filament-forms::field-wrapper label="End Time" id="endTime">
                 <x-filament::input.wrapper>
-                    <x-filament::input id="endTime" type="time" wire:model.live="endTime" :disabled="!$startTime" />
+                    <x-filament::input id="endTime" type="datetime-local" wire:model.live="endTime"
+                        :disabled="!$startTime" />
                     <x-slot name="suffix">
                         <x-filament::button size="xs" :disabled="!$startTime"
-                            wire:click="$set('endTime', '{{ $this->endTime ? Carbon\Carbon::parse($this->endTime)->addHour()->format('H:i') : Carbon\Carbon::parse($this->startTime)->addHour()->format('H:i') }}')">
+                            wire:click="$set('endTime', '{{ Carbon\Carbon::parse($this->endTime)->addHour()->format('Y-m-d\TH:i') }}')">
                             Add one Hour
                         </x-filament::button>
                         <x-filament::button size="xs" :disabled="!$startTime || (!$endTime || $this->startTime === $this->endTime)"
-                            wire:click="$set('endTime', '{{ Carbon\Carbon::parse($this->endTime)->subHour()->format('H:i') }}')">
+                            wire:click="$set('endTime', '{{ Carbon\Carbon::parse($this->endTime)->subHour()->format('Y-m-d\TH:i') }}')">
                             Reduce one Hour
                         </x-filament::button>
                     </x-slot>

@@ -176,7 +176,7 @@
                 @foreach ($invoice['extraServices'] as $service)
                     <tr>
                         <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td>
-                        <td class="col-qty">1</td>
+                        <td class="col-qty">{{ $service['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($service['total_price']) }}</td>
                     </tr>
                 @endforeach

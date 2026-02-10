@@ -26,6 +26,9 @@ class InvoiceDetail extends Page
         $this->invoiceDetail = Invoice::where('invoice_no', $this->invoice_no)
         ->with('invoiceRooms', 'invoiceProducts', 'invoiceExtraServices','users')->first();
 
+        // dump($this->invoiceDetail->toArray());
+        // return;
+
     }
 
     public function previewInvoice() {

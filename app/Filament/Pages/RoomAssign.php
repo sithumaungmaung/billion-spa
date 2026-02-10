@@ -102,8 +102,8 @@ class RoomAssign extends Page implements HasForms
             'room_id' => $this->selectedRoomId,
             'therapist_id' => $this->selectedTherapistId,
             'service_type' => $this->selectedTherapistTypeId,
-            'start_time' => Carbon::parse($this->startTime)->format('H:i:s'),
-            'end_time' => Carbon::parse($this->endTime)->format('H:i:s'),
+            'start_time' => Carbon::parse($this->startTime),
+            'end_time' => Carbon::parse($this->endTime),
             'room_price' => Room::find($this->selectedRoomId)->price,
             'service_type_price' => TherapistType::find($this->selectedTherapistTypeId)->price
         ]);
@@ -126,6 +126,7 @@ class RoomAssign extends Page implements HasForms
                 ->body($message)
                 ->danger() // Makes the notification red
                 ->persistent() // Stays on screen until they click it
+                ->duration(1500)
                 ->send();
     }
     public function notifySuccess(string $type, string $message): void
@@ -135,6 +136,7 @@ class RoomAssign extends Page implements HasForms
                 ->body($message)
                 ->success() // Makes the notification red
                 ->persistent() // Stays on screen until they click it
+                ->duration(1500)
                 ->send();
     }
 

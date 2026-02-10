@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('daily_room_records', function (Blueprint $table) {
             $table->renameColumn('price', 'room_price');
 
-            $table->time('start_time')->nullable()->after('invoice_id');
-            $table->time('end_time')->nullable()->after('start_time');
+            $table->timestamp('start_time')->nullable()->after('invoice_id');
+            $table->timestamp('end_time')->nullable()->after('start_time');
 
         });
     }

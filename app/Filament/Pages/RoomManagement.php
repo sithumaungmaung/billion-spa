@@ -50,8 +50,14 @@ class RoomManagement extends Page implements HasForms
     public ?int $selectedProductQty = 1;
 
     // Select for extra service
-     public ?int $selectedExtraServiceId = null; // for dropdown
-     public ?array $selectedExtraServicesList = [];
+    public ?int $selectedExtraServiceId = null; // for dropdown
+    public ?int $selectedExtraServiceQty = 1;
+    public ?array $selectedExtraServicesList = [];
+
+    // Select for time
+    public $selectedStartTime = '';
+    public $selectedEndTime = '';
+    // public $selectedRoomSections = 0;
 
 
     // Default
@@ -81,8 +87,7 @@ class RoomManagement extends Page implements HasForms
     // public string $selectedTherapistName = '';
     // public string $selectedTherapistType = '';
     // public string $selectedTimeSection = '';
-    // public string $selectedStartTime = '';
-    // public string $selectedEndTime = '';
+
 
 
     // public ?string $selectedProductSaleId = null;
@@ -111,7 +116,7 @@ class RoomManagement extends Page implements HasForms
         $this->room_form->fill();
         $this->product_form->fill();
 
-
+        // dump($this->getFreeTherapists()->toArray());
 
 
         // $this->products = Product::get();
@@ -129,8 +134,11 @@ class RoomManagement extends Page implements HasForms
         $this->selectedRoom = DailyRoomRecord::where('id', $selectedRoom->id)->first();
         $this->rooms =  $this->activeRooms();
 
-
         $this->data['therapist_id'] = $selectedRoom->therapist->id;
+
+        $this->selectedStartTime = $selectedRoom->start_time;
+        $this->selectedEndTime = $selectedRoom->end_time;
+
 
         $this->getSalesForDailyRoomRecord();
 
@@ -152,8 +160,8 @@ class RoomManagement extends Page implements HasForms
         $activeRooms = DailyRoomRecord::where('record_date', $this->date)
                 ->with('room', 'therapist', 'therapistType')
 
-                ->where('start_time' , '<=', now()->format('H:i:s'))
-                ->where('end_time', '>=', now()->format('H:i:s'))->get();
+                ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
+                ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))->get();
 
         $originalRooms = Room::whereNotIn('id', $activeRooms->pluck('room_id'))->get();
 
@@ -167,8 +175,10 @@ class RoomManagement extends Page implements HasForms
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
                         ->with('room', 'therapist', 'therapistType')
                         ->whereNull('invoice_id')
-                        ->where('start_time' , '<=', now()->format('H:i:s'))
-                        ->where('end_time', '>=', now()->format('H:i:s'))->get();
+                        ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
+                        ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))
+                        // ->orderBy('invoice_id', 'asc')
+                        ->get();
 
 
         return $roomRecords;
@@ -197,8 +207,9 @@ class RoomManagement extends Page implements HasForms
     public function getFreeTherapists()
     {
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
-                        ->where('start_time' , '<=', now()->format('H:i:s'))
-                        ->where('end_time', '>=', now()->format('H:i:s'))->get();
+                        ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
+                        ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))->get();
+
         return Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->get();
     }
 
@@ -228,7 +239,6 @@ class RoomManagement extends Page implements HasForms
                     ->afterStateUpdated(function ($state) {
                         // $state === selected room_id
 
-
                         if($state){
                             $this->selectedRoomId = DailyRoomRecord::where('room_id', $state)->first()->id;
                             $this->getSalesForDailyRoomRecord();
@@ -243,7 +253,7 @@ class RoomManagement extends Page implements HasForms
                             $this->selectedRoom = null;
                             $this->selectedRoomId = 0;
                             $this->extraServiceAndProductSales = [];
-                             $this->data['therapist_id'] = null;
+                            $this->data['therapist_id'] = null;
                         }
                     })
                     ->native(true), // Forces the nice UI even on mobile
@@ -314,6 +324,7 @@ class RoomManagement extends Page implements HasForms
             'service_type' => TherapistType::find($this->selectedTherapistTypeId)->id ?? $room->service_type,
             'service_type_price' => TherapistType::find($this->selectedTherapistTypeId)->price ?? $room->service_type_price
         ]);
+        $this->rooms =  $this->activeRooms();
     }
 
     public function checkBill()
@@ -552,24 +563,29 @@ class RoomManagement extends Page implements HasForms
                 'extra_service_id' => $this->selectedExtraServiceId,
                 'daily_room_record_id' => $dailyRoom->id,
                 'branch_id' => 1,
+                'quantity' => $this->selectedExtraServiceQty,
                 'unit_price' => $price,
-                'total_price' => $price
+                'total_price' => $price * $this->selectedExtraServiceQty
             ]);
             $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoom->id);
 
             $this->getSalesForDailyRoomRecord();
 
-            $this->notifySuccess(
-                'Success: Add Success',
-                'Extra service added successfully.'
-            );
         }else{
-            $this->notifyError(
-                'Error: Add Error',
-                'You cannot add the same extra service more than once.'
-            );
-            return;
+
+            $alreadyExists->update([
+                'total_price' => $alreadyExists->total_price + $alreadyExists->unit_price,
+                'unit_price' => $alreadyExists->unit_price,
+                'quantity' => $alreadyExists->quantity + $this->selectedExtraServiceQty
+            ]);
+
+            $this->getSalesForDailyRoomRecord();
         }
+
+        $this->notifySuccess(
+            'Success: Add Success',
+            'Extra service added successfully.'
+        );
     }
 
     public function removeService($serviceId): void
@@ -583,6 +599,80 @@ class RoomManagement extends Page implements HasForms
             'Success: Remove Success',
             'Extra service removed successfully.'
         );
+    }
+
+
+    public function reduceExtraService($saleExtraServiceId)
+    {
+        $productSale = ExtraServiceSale::where('id', $saleExtraServiceId)->first();
+        $totalQty = $productSale->quantity - 1;
+        $productSale->update([
+            'quantity' => $totalQty,
+            'total_price' => $totalQty * $productSale->unit_price
+        ]);
+
+        $this->getSalesForDailyRoomRecord();
+
+        $this->notifySuccess(
+            'Success: Reduce Success',
+            'Extra Service quantity reduced successfully.'
+        );
+        return;
+    }
+
+    public function addMoreExtraService($saleExtraServiceId)
+    {
+        $productSale = ExtraServiceSale::where('id', $saleExtraServiceId)->first();
+        $toalQty = $productSale->quantity + 1;
+        $productSale->update([
+            'quantity' => $toalQty,
+            'total_price' => $toalQty * $productSale->unit_price
+        ]);
+
+        $this->getSalesForDailyRoomRecord();
+
+        $this->notifySuccess(
+            'Success: Add Success',
+            'Extra Service quantity added successfully.'
+        );
+        return;
+    }
+
+
+
+
+    public function updateTime()
+    {
+        $dailyRoomRecord = DailyRoomRecord::where('id', $this->selectedRoom->id)->first();
+
+        $convertedStartTime = Carbon::parse($this->selectedStartTime)->format('Y-m-d\TH:i');
+        $convertedEndTime = Carbon::parse($this->selectedEndTime)->format('Y-m-d\TH:i');
+
+
+        if($convertedEndTime <= $dailyRoomRecord->start_time ||
+            $convertedEndTime <= $convertedStartTime ||
+
+            $convertedStartTime >= $convertedEndTime
+            // $convertedStartTime >= $dailyRoomRecord->end_time
+        ) {
+            $this->notifyError('Error', 'End time must be greater than start time');
+            $this->selectedStartTime = $dailyRoomRecord->start_time;
+            $this->selectedEndTime = $dailyRoomRecord->end_time;
+            return;
+        }
+
+        $dailyRoomRecord->update([
+            'start_time' => $this->selectedStartTime ? $convertedStartTime : $dailyRoomRecord->start_time,
+            'end_time' => $this->selectedEndTime ? $convertedEndTime : $dailyRoomRecord->end_time
+        ]);
+
+        $this->rooms =  $this->activeRooms();
+
+        $this->notifySuccess(
+            'Success: Update Success',
+            'Time updated successfully.'
+        );
+
     }
 
 
@@ -647,8 +737,6 @@ class RoomManagement extends Page implements HasForms
             ];
 
             return $extraServiceAndSales ?? [];
-
-
 
     }
 
@@ -777,7 +865,7 @@ class RoomManagement extends Page implements HasForms
                 ->body($message)
                 ->danger() // Makes the notification red
                 ->persistent() // Stays on screen until they click it
-                ->duration(500)
+                ->duration(1500)
                 ->send();
     }
     public function notifySuccess(string $type, string $message): void
@@ -787,7 +875,7 @@ class RoomManagement extends Page implements HasForms
                 ->body($message)
                 ->success() // Makes the notification red
                 ->persistent() // Stays on screen until they click it
-                ->duration(500)
+                ->duration(1500)
                 ->send();
     }
 

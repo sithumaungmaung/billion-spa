@@ -36,7 +36,7 @@ class CheckBill extends Page
     public function getBreadcrumbs(): array
     {
         return [
-            route('filament.admin.pages.room-mangement') => 'Room Management',
+            route('filament.admin.pages.room-management') => 'Room Management',
             route('filament.admin.pages.check-bill') => 'Check Bill'
         ];
     }
@@ -73,7 +73,7 @@ class CheckBill extends Page
         }
 
         foreach ($this->billExtraServices as $extraService) {
-            $total +=  $extraService->unit_price;
+            $total +=  $extraService->total_price;
         }
 
         return $total;
@@ -129,9 +129,10 @@ class CheckBill extends Page
 
         if($this->billExtraServices->count() > 0) {
           foreach($this->billExtraServices as $extraService) {
+
             $invoice->invoiceExtraServices()->create([
                 'branch_id' => 1,
-                'quantity'    => 1,
+                'quantity'    => $extraService->quantity,
                 'extra_service_id'  => $extraService->extra_service_id,
                 'unit_price'  => $extraService->unit_price,
                 'total_price' => $extraService->total_price,

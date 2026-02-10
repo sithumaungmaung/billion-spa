@@ -98,7 +98,7 @@ trait BillTraits
         }
 
         foreach ($getBillExtraServices as $extraService) {
-            $total +=  $extraService->unit_price;
+            $total +=  $extraService->total_price;
         }
 
         return $total;

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('extra_service_id');
             $table->unsignedInteger('invoice_id')->nullable();
             $table->unsignedInteger('branch_id')->nullable();
+            $table->unsignedInteger('quantity')->default(1);
             $table->unsignedInteger('unit_price')->default(0);
             $table->unsignedInteger('total_price')->default(0);
             $table->timestamps();

@@ -31,6 +31,12 @@ class RoomMangement extends Page implements HasForms
     protected string $view = 'filament.pages.room-mangement';
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-text'; // Replace 'heroicon-o-document-text' with your desired icon
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+
     public string $date;
     public $rooms;
     public $timeSlots;
@@ -65,6 +71,8 @@ class RoomMangement extends Page implements HasForms
     public ?string $selectedProductSaleId = null;
 
     public ?array $data = [];
+
+
 
     public function mount(): void
     {

@@ -1,7 +1,6 @@
 <x-filament-panels::page>
     <x-filament::section>
 
-
         <div class="flex items-end gap-4 mb-3">
             <div class="flex-1">
                 <div class="h1 ">
@@ -13,15 +12,15 @@
                 <div class="h1">
                     Confirm Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
                 </div>
-                
+
                 @if ($invoiceDetail->free > 0)
-                <div class="h1">
-                    Promotion : <span class="text-gray-500">
-                        {{ $invoiceDetail->buy }} + {{ $invoiceDetail->free }}
-                    </span>
-                </div>
+                    <div class="h1">
+                        Promotion : <span class="text-gray-500">
+                            {{ $invoiceDetail->buy }} + {{ $invoiceDetail->free }}
+                        </span>
+                    </div>
                 @endif
-                
+
                 <div class="h1">
                     Confirm By: <span class="text-gray-500">
                         {{ $invoiceDetail->users->name ?? '-' }}
@@ -116,7 +115,7 @@
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            1
+                            {{ $service->quantity }}
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono">
@@ -124,7 +123,7 @@
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono font-semibold ">
-                            {{ number_format($service->unit_price) }}
+                            {{ number_format($service->total_price) }}
                         </td>
                     </tr>
                 @endforeach

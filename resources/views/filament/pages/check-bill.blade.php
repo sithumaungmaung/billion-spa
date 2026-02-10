@@ -38,7 +38,7 @@
                 <tr class="border-b border-gray-200 dark:border-white/10">
                     <th class="px-4 py-3 w-12 text-center">#</th>
                     <th class="px-4 py-3">Title</th>
-                    <th class="px-4 py-3">Time</th>
+                    <th class="px-4 py-3">Date & Time</th>
                     <th class="px-4 py-3">Section</th>
                     <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Price</th>
@@ -141,7 +141,7 @@
                         </td>
 
                         <td class="px-4 py-3 text-right">
-                            1
+                            {{ $service->quantity }}
                         </td>
 
 
@@ -150,7 +150,7 @@
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono font-semibold ">
-                            {{ number_format($service->unit_price) }}
+                            {{ number_format($service->total_price) }}
                         </td>
                     </tr>
                 @endforeach
@@ -161,6 +161,7 @@
                             dark:hover:bg-white/5 transition">
                     <td class="px-4 py-3 text-right font-mono" colspan="4"> <b>Total</b> </td>
                     <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->total) }} </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
                 </tr>
             </tbody>
         </table>
