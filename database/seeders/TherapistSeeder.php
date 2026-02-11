@@ -15,9 +15,11 @@ class TherapistSeeder extends Seeder
     public function run(): void
     {
         $staffs = [
-            ['name' => 'Therapist 1', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
-            ['name' => 'Therapist 2', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
-            ['name' => 'Therapist 3', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
+            ['name' => 'Thida', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
+            ['name' => 'Sandar', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
+            ['name' => 'Thaw tar', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
+            ['name' => 'La Pyae', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
+            ['name' => 'Yamin', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
         ];
 
         foreach ($staffs as $staff) {
