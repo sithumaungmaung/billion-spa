@@ -2,26 +2,33 @@
 
     {{-- <x-filament::loading-indicator class="h-5 w-5" /> --}}
     <x-filament::section>
-        <x-slot name="heading">
+        {{-- <x-slot name="heading">
             Daily Room Service Schedule
-        </x-slot>
+        </x-slot> --}}
 
         <x-slot name="description">
             <div class="flex items-center justify-between w-full">
                 <div class="flex items-center gap-3">
-                    <input type="date" wire:model.live="date" name="date"
+                    {{-- <input type="date" wire:model.live="date" name="date"
                         class="rounded-lg border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-primary-500">
 
                     @if ($date === now()->toDateString())
                         <span class="text-green-600 font-medium px-2 py-1 bg-green-50 dark:bg-green-500/10 rounded-md">
                             Today
                         </span>
-                    @endif
+                    @endif --}}
+                    <x-filament::button wire:click="checkBill" size="md" class="min-w-[100px]" :disabled="!$this->checkRoomIds">
+                        Check Bill
+                    </x-filament::button>
+
+                    <x-filament::button wire:click="unassigRoom" size="md" color="danger" class="min-w-[100px]"
+                        wire:confirm="Are you sure you want to unassign room and therapist?" :disabled="!$this->selectedRoom">
+                        Unassign @if ($this->selectedRoom)
+                            - {{ $this->selectedRoom->room->name }}
+                        @endif
+                    </x-filament::button>
                 </div>
 
-                <x-filament::button wire:click="checkBill" size="md" class="min-w-[100px]" :disabled="!$this->checkRoomIds">
-                    Check Bill
-                </x-filament::button>
             </div>
         </x-slot>
 
@@ -299,135 +306,137 @@
 
                     {{-- // Sale Products // --}}
                     <div class="mt-4">
+                        @if (count($this->extraServiceAndProductSales['saleProducts'] ?? []) > 0 ||
+                                count($this->extraServiceAndProductSales['saleExtraServices'] ?? []) > 0)
+                            <x-filament::section heading="Ordered Products & Services" collapsible collapsed>
+                                {{-- <x-filament::card> --}}
 
-                        <x-filament::section heading="Ordered Products & Services" collapsible collapsed>
-                            {{-- <x-filament::card> --}}
+                                <table
+                                    class="w-full text-sm text-left border-collapse border border-gray-200 dark:border-white/10">
+                                    <thead class="bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300">
+                                        <tr class="border-b border-gray-200 dark:border-white/10">
+                                            <th class="px-4 py-3 w-12 text-center">#</th>
+                                            <th class="px-4 py-3">Title</th>
+                                            <th class="px-4 py-3 text-right">Unit</th>
+                                            <th class="px-4 py-3 text-right">Price</th>
+                                            <th class="px-4 py-3 text-right">Total</th>
+                                            <th class="px-4 py-3 text-right">Action</th>
+                                        </tr>
+                                    </thead>
 
-                            <table
-                                class="w-full text-sm text-left border-collapse border border-gray-200 dark:border-white/10">
-                                <thead class="bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-300">
-                                    <tr class="border-b border-gray-200 dark:border-white/10">
-                                        <th class="px-4 py-3 w-12 text-center">#</th>
-                                        <th class="px-4 py-3">Title</th>
-                                        <th class="px-4 py-3 text-right">Unit</th>
-                                        <th class="px-4 py-3 text-right">Price</th>
-                                        <th class="px-4 py-3 text-right">Total</th>
-                                        <th class="px-4 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-white/10">
 
-                                <tbody class="divide-y divide-gray-100 dark:divide-white/10">
+                                        @if ($this->selectedRoom)
+                                            {{-- @dd($this->extraServiceAndProductSales) --}}
+                                            @foreach ($this->extraServiceAndProductSales['saleProducts'] as $key => $product)
+                                                <tr
+                                                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
+                                                    <td class="px-4 py-3 text-center text-gray-500">
+                                                        {{ $key + 1 }}
+                                                    </td>
 
-                                    @if ($this->selectedRoom)
-                                        {{-- @dd($this->extraServiceAndProductSales) --}}
-                                        @foreach ($this->extraServiceAndProductSales['saleProducts'] as $key => $product)
-                                            <tr
-                                                class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
-                                                <td class="px-4 py-3 text-center text-gray-500">
-                                                    {{ $key + 1 }}
-                                                </td>
+                                                    <td class="px-4 py-3 font-medium">
+                                                        {{ $product->product->name }}
+                                                    </td>
 
-                                                <td class="px-4 py-3 font-medium">
-                                                    {{ $product->product->name }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right">
+                                                        {{ $product->quantity }}
+                                                    </td>
 
-                                                <td class="px-4 py-3 text-right">
-                                                    {{ $product->quantity }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right font-mono">
+                                                        {{ number_format($product->unit_price) }}
+                                                    </td>
 
-                                                <td class="px-4 py-3 text-right font-mono">
-                                                    {{ number_format($product->unit_price) }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right font-mono font-semibold ">
 
-                                                <td class="px-4 py-3 text-right font-mono font-semibold ">
+                                                        {{ number_format($product->total_price) }}
+                                                    </td>
 
-                                                    {{ number_format($product->total_price) }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right font-mono w-[180px]">
+                                                        <x-filament::button class="mr-1"
+                                                            wire:click="removeProduct({{ $product->id }})"
+                                                            color="danger" size="xs">
+                                                            Remove
+                                                        </x-filament::button>
 
-                                                <td class="px-4 py-3 text-right font-mono w-[180px]">
-                                                    <x-filament::button class="mr-1"
-                                                        wire:click="removeProduct({{ $product->id }})"
-                                                        color="danger" size="xs">
-                                                        Remove
-                                                    </x-filament::button>
+                                                        <x-filament::button class="mr-1 text-white"
+                                                            wire:click="reduceProduct({{ $product->id }})"
+                                                            :disabled="$product->quantity <= 1" color="primary" size="xs">
+                                                            -
+                                                        </x-filament::button>
 
-                                                    <x-filament::button class="mr-1 text-white"
-                                                        wire:click="reduceProduct({{ $product->id }})"
-                                                        :disabled="$product->quantity <= 1" color="primary" size="xs">
-                                                        -
-                                                    </x-filament::button>
+                                                        <x-filament::button class="mr-1 text-white bg-green-900"
+                                                            wire:click="addMoreProduct({{ $product->id }})"
+                                                            size="xs">
+                                                            +
+                                                        </x-filament::button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            {{--  --}}
 
-                                                    <x-filament::button class="mr-1 text-white bg-green-900"
-                                                        wire:click="addMoreProduct({{ $product->id }})"
-                                                        size="xs">
-                                                        +
-                                                    </x-filament::button>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        {{--  --}}
+                                            @foreach ($this->extraServiceAndProductSales['saleExtraServices'] as $key => $service)
+                                                <tr
+                                                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
+                                                    <td class="px-4 py-3 text-center text-gray-500">
+                                                        {{ $key + 1 }}
+                                                    </td>
 
-                                        @foreach ($this->extraServiceAndProductSales['saleExtraServices'] as $key => $service)
-                                            <tr
-                                                class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y dark:hover:bg-white/5 transition">
-                                                <td class="px-4 py-3 text-center text-gray-500">
-                                                    {{ $key + 1 }}
-                                                </td>
+                                                    <td class="px-4 py-3 font-medium">
+                                                        {{ $service->extraService->title }}
+                                                    </td>
 
-                                                <td class="px-4 py-3 font-medium">
-                                                    {{ $service->extraService->title }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right">
+                                                        {{ $service->quantity }}
+                                                    </td>
 
-                                                <td class="px-4 py-3 text-right">
-                                                    {{ $service->quantity }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right font-mono">
+                                                        {{ number_format($service->unit_price) }}
+                                                    </td>
 
-                                                <td class="px-4 py-3 text-right font-mono">
-                                                    {{ number_format($service->unit_price) }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right font-mono font-semibold ">
 
-                                                <td class="px-4 py-3 text-right font-mono font-semibold ">
+                                                        {{ number_format($service->total_price) }}
+                                                    </td>
 
-                                                    {{ number_format($service->total_price) }}
-                                                </td>
+                                                    <td class="px-4 py-3 text-right font-mono w-[180px]">
+                                                        <x-filament::button class="mr-1"
+                                                            wire:click="removeService({{ $service->id }})"
+                                                            color="danger" size="xs">
+                                                            Remove
+                                                        </x-filament::button>
 
-                                                <td class="px-4 py-3 text-right font-mono w-[180px]">
-                                                    <x-filament::button class="mr-1"
-                                                        wire:click="removeService({{ $service->id }})"
-                                                        color="danger" size="xs">
-                                                        Remove
-                                                    </x-filament::button>
+                                                        <x-filament::button class="mr-1 text-white"
+                                                            wire:click="reduceExtraService({{ $service->id }})"
+                                                            color="primary" size="xs">
+                                                            -
+                                                        </x-filament::button>
 
-                                                    <x-filament::button class="mr-1 text-white"
-                                                        wire:click="reduceExtraService({{ $service->id }})"
-                                                        color="primary" size="xs">
-                                                        -
-                                                    </x-filament::button>
+                                                        <x-filament::button class="mr-1 text-white bg-green-900"
+                                                            wire:click="addMoreExtraService({{ $service->id }})"
+                                                            size="xs">
+                                                            +
+                                                        </x-filament::button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
+                                                Total Bill
+                                            </td>
+                                            <td class="px-4 py-3 text-right font-mono font-semibold ">
+                                                {{ number_format($this->extraServiceAndProductSales['saleTotal']) }}
+                                            </td>
+                                        @endif
 
-                                                    <x-filament::button class="mr-1 text-white bg-green-900"
-                                                        wire:click="addMoreExtraService({{ $service->id }})"
-                                                        size="xs">
-                                                        +
-                                                    </x-filament::button>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        <td class="px-4 py-3 text-right font-mono font-semibold " colspan="4">
-                                            Total Bill
+
+
+
                                         </td>
-                                        <td class="px-4 py-3 text-right font-mono font-semibold ">
-                                            {{ number_format($this->extraServiceAndProductSales['saleTotal']) }}
-                                        </td>
-                                    @endif
-
-
-
-
-                                    </td>
-                                </tbody>
-                            </table>
-                            {{-- </x-filament::card> --}}
-                        </x-filament::section>
+                                    </tbody>
+                                </table>
+                                {{-- </x-filament::card> --}}
+                            </x-filament::section>
+                        @endif
                     </div>
                 </div>
 

@@ -51,8 +51,8 @@ class RoomAssign extends Page implements HasForms
     public function getFreeTherapists()
     {
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
-                        ->where('start_time' , '<=', now()->format('H:i:s'))
-                        ->where('end_time', '>=', now()->format('H:i:s'))->get();
+                        ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
+                        ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))->get();
         return Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->get();
     }
 
@@ -60,8 +60,8 @@ class RoomAssign extends Page implements HasForms
     public function avaliavleRooms ()
     {
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
-                        ->where('start_time' , '<', $this->endTime ?? now()->format('H:i:s'))
-                        ->where('end_time', '>', $this->startTime ?? now()->format('H:i:s'))
+                        ->where('start_time' , '<', $this->endTime ?? now()->format('Y-m-d\TH:i'))
+                        ->where('end_time', '>', $this->startTime ?? now()->format('Y-m-d\TH:i'))
                         ->get();
         return Room::whereNotIn('id', $roomRecords->pluck('room_id'))->get();
     }
@@ -90,13 +90,20 @@ class RoomAssign extends Page implements HasForms
                             ->where('room_id', $this->selectedRoomId)
                             ->where('start_time' , '<=', $this->startTime)
                             ->where('end_time', '>=', $this->endTime)
-                            ->where('therapist_id', $this->selectedTherapistId)
                             ->first();
 
+
         if ($alreadyAssigned) {
-            $this->notifyError('Error', 'Room or Therapist already assigned');
+            $this->notifyError('Error', 'Room is already assigned');
             return;
         }
+
+
+         if(!in_array((int)$this->selectedTherapistId, $this->avaliableTherapists->pluck('id')->toArray())) {
+            $this->notifyError('Error', 'Therapist is already assigned');
+            return;
+        }
+
         $record = DailyRoomRecord::create([
             'record_date' => $this->date,
             'room_id' => $this->selectedRoomId,

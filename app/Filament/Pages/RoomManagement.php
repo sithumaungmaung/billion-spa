@@ -189,12 +189,15 @@ class RoomManagement extends Page implements HasForms
     {
 
         return $schema
-            ->components([ // In v4, we use ->components([]) instead of ->schema([])
+            ->components([
                 Select::make('therapist_id')
                     ->hiddenLabel()
                     ->placeholder('Select Therapist')
                     // Using a query makes it more efficient
                     ->options(fn () => $this->getTherapistOptions())
+                    ->disableOptionWhen(fn ($value) =>
+                        $this->selectedRoom?->therapist_id === $value
+                    )
                     ->searchable()
                     ->preload()
                     ->live()
@@ -329,11 +332,43 @@ class RoomManagement extends Page implements HasForms
 
     public function checkBill()
     {
-        // dump($this->checkRoomIds);
-
         return redirect()->route('filament.admin.pages.check-bill', [
             'bill_for' => implode(',', $this->checkRoomIds)
         ]);
+    }
+
+
+    public function unassigRoom()
+    {
+        $room = DailyRoomRecord::where('id', $this->selectedRoom->id)
+        ->with('therapist', 'extraServices','therapistType')->whereNull('invoice_id')->first();
+
+        if($room->saleProducts()->count() > 0){
+            $this->notifyError(
+                'Error', 'You cannot unassign a therapist with products. Please remove the products first.'
+            );
+            return;
+        }
+
+        if($room->extraServices()->count() > 0){
+            $this->notifyError(
+                'Error', 'You cannot unassign a therapist with extra services. Please remove the extra services first.'
+            );
+            return;
+        }
+
+
+        $room->delete();
+
+        $this->selectedRoom = null;
+
+        $this->activeRooms = $this->activeRooms();
+        $this->rooms =  $this->activeRooms;
+
+
+        $this->notifySuccess(
+            'Success', 'Unassigned successfully.'
+        );
     }
 
 
@@ -424,27 +459,27 @@ class RoomManagement extends Page implements HasForms
 
     // }
 
-    // public function removeTherapist(): void
-    // {
-    //     $therapist = DailyRoomRecord::where([
-    //         'record_date' => $this->date,
-    //         'room_id' => $this->selectedRoomId,
-    //         'time_slot_id' => $this->selectedSlotId
-    //     ])->first();
+    public function removeTherapist(): void
+    {
+        $therapist = DailyRoomRecord::where([
+            'record_date' => $this->date,
+            'room_id' => $this->selectedRoomId,
+            'time_slot_id' => $this->selectedSlotId
+        ])->first();
 
-    //     if($therapist->saleProducts->count() > 0) {
-    //         $this->notifyError(
-    //             'Error: Remove Error',
-    //             'You cannot unassign a therapist with products. Please remove the products first.'
-    //         );return;
-    //     }else{
-    //         $therapist->delete();
-    //         $this->notifySuccess(
-    //             'Success: Remove Success',
-    //             'Unassigned successfully.'
-    //         );return;
-    //     }
-    // }
+        if($therapist->saleProducts->count() > 0) {
+            $this->notifyError(
+                'Error: Remove Error',
+                'You cannot unassign a therapist with products. Please remove the products first.'
+            );return;
+        }else{
+            $therapist->delete();
+            $this->notifySuccess(
+                'Success: Remove Success',
+                'Unassigned successfully.'
+            );return;
+        }
+    }
 
     public function addProduct(): void
     {
@@ -591,8 +626,7 @@ class RoomManagement extends Page implements HasForms
     public function removeService($serviceId): void
     {
 
-
-        $productSale = ExtraServiceSale::where('id', $serviceId)->delete();
+        $extraService = ExtraServiceSale::where('id', $serviceId)->delete();
         $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoom->id);
         $this->getSalesForDailyRoomRecord();
         $this->notifySuccess(
