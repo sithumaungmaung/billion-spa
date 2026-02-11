@@ -205,7 +205,7 @@ class CheckBill extends Page
             'free' => $this->free,
         ]);
 
-        $this->dispatch('open-new-tab', url: $url);
+        $this->dispatch('invoice.preview', url: $url);
 
         // return redirect()->away()->route('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusone]);
     }

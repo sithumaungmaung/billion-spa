@@ -1,6 +1,23 @@
 <x-filament-panels::page>
 
+
+
     <x-filament::section>
+
+        <div class="flex my-4 gap-2">
+            <x-filament::input.wrapper>
+                <x-filament::input wire:model.live="searchKeyword" placeholder="Search invoice number" />
+            </x-filament::input.wrapper>
+
+            <x-filament::input.wrapper>
+                <x-filament::input wire:model.live="startDate" value="{{ $this->startDate }}" type="date" />
+            </x-filament::input.wrapper>
+
+            <x-filament::input.wrapper>
+                <x-filament::input wire:model.live="endDate" value="{{ $this->endDate }}" type="date" />
+            </x-filament::input.wrapper>
+
+        </div>
 
         <table class="w-full text-sm text-left border-collapse
            border border-gray-200 dark:border-white/10">

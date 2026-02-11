@@ -252,7 +252,7 @@
 
 
 <script>
-    window.addEventListener('open-new-tab', event => {
+    window.addEventListener('invoice.preview', event => {
         window.open(event.detail.url, '_blank');
     });
 </script>
