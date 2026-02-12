@@ -19,7 +19,7 @@ class ExtraServiceResource extends Resource
 {
     protected static ?string $model = ExtraService::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquaresPlus ;
 
     protected static ?string $recordTitleAttribute = 'Extra Service';
 

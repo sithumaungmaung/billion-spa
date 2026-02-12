@@ -14,14 +14,12 @@ class TherapistSeeder extends Seeder
      */
     public function run(): void
     {
-        $staffs = [
-            ['name' => 'Therapist 1', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
-            ['name' => 'Therapist 2', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
-            ['name' => 'Therapist 3', 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id],
-        ];
+        $staffs = range(1, 10);
 
-        foreach ($staffs as $staff) {
-            Therapist::create($staff);
+        foreach ($staffs as $i => $staff) {
+            Therapist::create(
+                ['name' => "Therapist $staff", 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id]
+            );
         }
 
     }

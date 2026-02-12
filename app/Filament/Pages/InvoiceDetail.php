@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Invoice;
 use Filament\Pages\Page;
+use App\Models\InvoiceRoom;
 use App\Models\DailyRoomRecord;
 
 class InvoiceDetail extends Page
@@ -13,7 +14,7 @@ class InvoiceDetail extends Page
 
     public ?string $invoice_no = null;
     public $invoiceDetail;
-    public $invoiceRooms;
+    public $dailyRoomRecords = [];
     public array $roomIds = [];
 
     protected array $queryString = [
@@ -24,11 +25,9 @@ class InvoiceDetail extends Page
     {
 
         $this->invoiceDetail = Invoice::where('invoice_no', $this->invoice_no)
-        ->with('invoiceRooms', 'invoiceProducts', 'invoiceExtraServices','users')->first();
+        ->with('invoiceRooms', 'invoiceProducts', 'invoiceExtraServices', 'users', 'dailyRoomRecord.therapist')->first();
 
-        // dump($this->invoiceDetail->toArray());
-        // return;
-
+        $this->dailyRoomRecords = DailyRoomRecord::where('invoice_id', $this->invoiceDetail->id)->with('room', 'therapist', 'therapistType')->get();
     }
 
     public function previewInvoice() {

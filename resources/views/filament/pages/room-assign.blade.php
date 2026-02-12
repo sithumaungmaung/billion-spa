@@ -36,23 +36,12 @@
             </x-filament-forms::field-wrapper>
 
             {{-- Date Input --}}
-            <x-filament-forms::field-wrapper label="Selected Date" id="date">
+            {{-- <x-filament-forms::field-wrapper label="Selected Date" id="date">
                 <x-filament::input.wrapper>
                     <x-filament::input id="date" type="date" wire:model.live="date" readonly />
                 </x-filament::input.wrapper>
-            </x-filament-forms::field-wrapper>
+            </x-filament-forms::field-wrapper> --}}
 
-            {{-- Room Select --}}
-            <x-filament-forms::field-wrapper label="Room" id="room">
-                <x-filament::input.wrapper>
-                    <x-filament::input.select id="room" wire:model.live="selectedRoomId" :disabled="!$startTime || !$endTime">
-                        <option value="0">Select a Room</option>
-                        @foreach ($avaliableRooms as $room)
-                            <option value="{{ $room->id }}">{{ $room->name }}</option>
-                        @endforeach
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-            </x-filament-forms::field-wrapper>
 
             {{-- Therapist Select --}}
             <x-filament-forms::field-wrapper label="Therapist" id="therapist">
@@ -70,9 +59,22 @@
             <x-filament-forms::field-wrapper label="Specialization / Type" id="type">
                 <x-filament::input.wrapper>
                     <x-filament::input.select id="type" wire:model.live="selectedTherapistTypeId" required>
-                        <option value="0">Choice Specialization</option>
+                        <option value="0" disabled>Choice Specialization</option>
                         @foreach ($therapistTypes as $type)
                             <option value="{{ $type->id }}">{{ $type->title }}</option>
+                        @endforeach
+                    </x-filament::input.select>
+                </x-filament::input.wrapper>
+            </x-filament-forms::field-wrapper>
+
+
+            {{-- Room Select --}}
+            <x-filament-forms::field-wrapper label="Room" id="room">
+                <x-filament::input.wrapper>
+                    <x-filament::input.select id="room" wire:model.live="selectedRoomId" :disabled="!$startTime || !$endTime">
+                        <option value="0">Select a Room</option>
+                        @foreach ($avaliableRooms as $room)
+                            <option value="{{ $room->id }}">{{ $room->name }}</option>
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>

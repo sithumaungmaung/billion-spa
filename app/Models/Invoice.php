@@ -37,4 +37,10 @@ class Invoice extends Model
         return $this->hasMany(InvoiceExtraService::class);
     }
 
+    public function dailyRoomRecord()
+    {
+        return $this->hasOne(DailyRoomRecord::class, 'invoice_id', 'id');
+    }
+
+
 }
