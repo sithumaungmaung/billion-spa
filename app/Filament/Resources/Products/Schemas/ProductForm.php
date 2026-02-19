@@ -15,6 +15,11 @@ class ProductForm
                 TextInput::make('name')
                     ->unique()
                     ->required(),
+                TextInput::make('product_code')
+                    ->label('Product Code')
+                    // ->placeholder('Enter product code')
+                    ->unique()
+                    ->required(),
                 TextInput::make('price')
                     ->label('Price')
                     ->numeric()

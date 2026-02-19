@@ -132,7 +132,10 @@ class RoomManagement extends Page implements HasForms
         $this->selectedRoomId = $selectedRoom->id;
         // $this->rooms = $this->selectedRoom ? [$selectedRoom] : $this->activeRooms;
         $this->selectedRoom = DailyRoomRecord::where('id', $selectedRoom->id)->first();
-        $this->rooms =  $this->activeRooms();
+
+        if(!$this->data['room_id']){
+            $this->rooms =  $this->activeRooms();
+        }
 
         $this->data['therapist_id'] = $selectedRoom->therapist->id;
 
@@ -175,8 +178,8 @@ class RoomManagement extends Page implements HasForms
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
                         ->with('room', 'therapist', 'therapistType')
                         ->whereNull('invoice_id')
-                        ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
-                        ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))
+                        // ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
+                        // ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))
                         // ->orderBy('invoice_id', 'asc')
                         ->get();
 
@@ -243,13 +246,16 @@ class RoomManagement extends Page implements HasForms
                         // $state === selected room_id
 
                         if($state){
+                            // Room Record Schedule // Not Physical Room
                             $this->selectedRoomId = DailyRoomRecord::where('room_id', $state)->first()->id;
-                            $this->getSalesForDailyRoomRecord();
                             $this->selectedRoom = DailyRoomRecord::where('room_id', $state)->first();
+                            $this->getSalesForDailyRoomRecord();
                             // dump(DailyRoomRecord::where('id', $this->selectedRoomId)->get());
-                            $this->rooms =  DailyRoomRecord::where('id', $this->selectedRoomId)->get();
+
+                            // $this->rooms =  DailyRoomRecord::where('id', $this->selectedRoomId)->get();
+                            $this->rooms =  DailyRoomRecord::whereIn('room_id', [$state])->get();
                             $this->data['therapist_id'] = $this->selectedRoom->therapist->id;
-                            // dump($this->data['therapist_id']);
+                            // dump($this->rooms);
 
                         }else{
                             $this->rooms =  $this->activeRooms();

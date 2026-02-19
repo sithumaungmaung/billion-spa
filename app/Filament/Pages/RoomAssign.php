@@ -45,6 +45,7 @@ class RoomAssign extends Page implements HasForms
 
     public function loadData()
     {
+
         $this->date = now()->toDateString();
         $this->rooms = Room::get();
         $this->avaliableRooms = $this->avaliavleRooms();
@@ -56,9 +57,10 @@ class RoomAssign extends Page implements HasForms
     public function getFreeTherapists()
     {
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
-                        ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
-                        ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))->get();
-        return Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->get();
+                        ->where('start_time' , '<', $this->endTime ?? now()->format('Y-m-d\TH:i'))
+                        ->where('end_time', '>', $this->startTime ?? now()->format('Y-m-d\TH:i'))
+                        ->get();
+       return  Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->get();
     }
 
 
@@ -68,18 +70,23 @@ class RoomAssign extends Page implements HasForms
                         ->where('start_time' , '<', $this->endTime ?? now()->format('Y-m-d\TH:i'))
                         ->where('end_time', '>', $this->startTime ?? now()->format('Y-m-d\TH:i'))
                         ->get();
+
         return Room::whereNotIn('id', $roomRecords->pluck('room_id'))->get();
     }
 
 
     public function updatedStartTime($startTime)
     {
+        $this->avaliableTherapists = $this->getFreeTherapists();
         $this->avaliableRooms = $this->avaliavleRooms();
+
     }
 
-    public function updatedEndTime($startTime)
+    public function updatedEndTime($endTime)
     {
+        $this->avaliableTherapists = $this->getFreeTherapists();
         $this->avaliableRooms = $this->avaliavleRooms();
+        // dump($this->avaliableTherapists->toArray());
     }
 
 

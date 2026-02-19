@@ -25,6 +25,8 @@ class BranchResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'Branch & Rooms';
 
+    protected static ?string $navigationLabel = 'Branches';
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'Branch';
