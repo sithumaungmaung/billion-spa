@@ -21,5 +21,9 @@ class TherapistSeeder extends Seeder
             ['name' => 'La Pyae', 'phone' => '123456789','price' => 5000, 'branch_id' => Branch::all()->random()->id],
             ['name' => 'Yamin', 'phone' => '123456789','price' => 5000, 'branch_id' => Branch::all()->random()->id],
         ];
+
+        foreach ($staffs as $item) {
+            Therapist::create($item);
+        }
     }
 }
