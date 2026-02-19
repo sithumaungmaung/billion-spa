@@ -13,31 +13,34 @@ trait BillTraits
             ->with(['room', 'therapistType'])
             ->get();
 
-            // dump($dailyRooms->toArray());
 
             $grouped = $dailyRooms->groupBy(fn ($item) =>
-            $item->room_id . '-' . $item->service_type
-        );
+                $item->room_id . '-' . $item->service_type
+            );
 // 180 = 3
         $items = [];
 
         foreach ($grouped as $group) {
 
+            // dump($group->first()->toArray());
 
             $first = $group->first();
-            // dump($group->toArray());
+
             $totalSlots = $first->total_time;
-            // dump($first->toArray());
 
-            $setSize   = $buy + $free;
-            $fullSets  = intdiv($totalSlots, $setSize);
-            $remainder = $totalSlots % $setSize;
 
-            $paidSlots = ($fullSets * $buy) + min($remainder, $buy);
-            $freeSlots = $totalSlots - $paidSlots;
+            $setSize   = $buy + $free; //1 + 1 = 2
+            $fullSets  = intdiv($totalSlots, $setSize); // 1
+            $remainder = $totalSlots % $setSize; // 3 % 2 = 1
 
-            $price = $first->room_price + $first->service_type_price;
+            $paidSlots = ($fullSets * $buy) + min($remainder, $buy); //  (1 * 1) + 1 = 2
+
+            $freeSlots = $totalSlots - $paidSlots;  // 3 - 2 = 1
+
+            $price = $first->room_price + $first->service_type_price;  // 10000 + 5000 = 15000
             $therapistTypeTitle = optional($first->therapistType)->title;
+
+            $therapistPrice = $first->therapist->price;
 
             // Paid item
             $items[] = [
@@ -49,9 +52,10 @@ trait BillTraits
                 'quantity'  => $paidSlots,
                 'start_time' => $first->start_time,
                 'end_time' => $first->end_time,
-                'total_time' => $first->total_time,
+                'total_time' => $first->total_time - $freeSlots,
                 'unit_price'=> $price,
-                'total_price' => $paidSlots * $price,
+                'therapist_price' => $therapistPrice,
+                'total_price' => ($paidSlots * $price ) + ($paidSlots * $therapistPrice) ,  // 2 * 15000 = 30000
             ];
 
             // Free item
@@ -62,12 +66,13 @@ trait BillTraits
                     'room_name' => "{$first->room->name} – {$therapistTypeTitle} (Free)",
                     'service_type' => $first->therapistType,
                     'service_type_price' => 0,
-                    'quantity'  => $freeSlots,
+                    'quantity'  => $freeSlots, // 1
                     'start_time' => $first->start_time,
                     'end_time' => $first->end_time,
-                    'total_time' => $freeSlots,
+                    'total_time' => $freeSlots, // 1
                     'unit_price'=> 0,
-                    'total_price' => 0,
+                    'therapist_price' => $therapistPrice,
+                    'total_price' => $freeSlots * $first->therapist->price,
                 ];
             }
         }

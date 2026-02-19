@@ -40,6 +40,11 @@ class RoomAssign extends Page implements HasForms
 
     public function mount(): void
     {
+        $this->loadData();
+    }
+
+    public function loadData()
+    {
         $this->date = now()->toDateString();
         $this->rooms = Room::get();
         $this->avaliableRooms = $this->avaliavleRooms();
@@ -118,11 +123,21 @@ class RoomAssign extends Page implements HasForms
         if ($record) {
             $this->avaliableRooms = $this->avaliavleRooms();
             $this->avaliableTherapists = $this->getFreeTherapists();
+            $this->resetForm();
             $this->notifySuccess('Success', 'Room assigned successfully');
         }
 
     }
 
+    public function resetForm()
+    {
+        $this->startTime = null;
+        $this->endTime = null;
+        $this->selectedRoomId = null;
+        $this->selectedTherapistId = null;
+        $this->selectedTherapistTypeId = null;
+
+    }
 
     //  Notification
 

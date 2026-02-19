@@ -21,13 +21,13 @@ class TherapistTypeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Tag;
 
-    protected static ?string $recordTitleAttribute = 'Therapist Type';
+    protected static ?string $recordTitleAttribute = 'Therapist/Service Type';
 
 
 
     protected static ?string $navigationLabel = "Therapist Types";
 
-    protected static ?string $modelLabel = "Therapist Types";
+    protected static ?string $modelLabel = "Therapist / Service Types";
 
     protected static string | UnitEnum | null $navigationGroup = 'Categories & Types';
 

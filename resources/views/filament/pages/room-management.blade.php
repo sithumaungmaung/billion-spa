@@ -275,7 +275,7 @@
                             </div>
                             <x-filament::button wire:click="updateExtraService" size="md" multiple
                                 class="min-w-[100px]" :disabled="!$selectedRoom || !$this->selectedExtraServiceId">
-                                Update
+                                Add
                             </x-filament::button>
                         </div>
 
@@ -308,7 +308,7 @@
                     <div class="mt-4">
                         @if (count($this->extraServiceAndProductSales['saleProducts'] ?? []) > 0 ||
                                 count($this->extraServiceAndProductSales['saleExtraServices'] ?? []) > 0)
-                            <x-filament::section heading="Ordered Products & Services" collapsible collapsed>
+                            <x-filament::section heading="Ordered Products & Services" collapsible>
                                 {{-- <x-filament::card> --}}
 
                                 <table

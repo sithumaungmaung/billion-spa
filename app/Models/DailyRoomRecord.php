@@ -80,7 +80,14 @@ class DailyRoomRecord extends Model
         return $this->belongsToMany(ExtraService::class,'extra_service_sales','daily_room_record_id','extra_service_id');
     }
 
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
+    }
 
+
+
+    // Append
     protected $appends = ['total_time'];
 
 
