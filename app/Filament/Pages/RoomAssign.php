@@ -34,7 +34,7 @@ class RoomAssign extends Page implements HasForms
 
     public $selectedRoomId;
     public $selectedTherapistId;
-    public $selectedTherapistTypeId;
+    public $selectedTherapistTypeId = 1;
 
     // -------------------------------- //
 
