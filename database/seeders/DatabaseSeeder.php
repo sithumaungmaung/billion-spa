@@ -3,14 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Seeder;
-use Database\Seeders\RoomSeeder;
 use Database\Seeders\BranchSeeder;
-use Database\Seeders\ProductSeeder;
-use Illuminate\Support\Facades\Hash;
-use Database\Seeders\TherapistSeeder;
 use Database\Seeders\ExtraServiceSeeder;
+use Database\Seeders\ProductSeeder;
+use Database\Seeders\RoomSeeder;
+use Database\Seeders\TherapistSeeder;
+use Database\Seeders\TherapistTypeSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -39,8 +40,9 @@ class DatabaseSeeder extends Seeder
         $this->call(BranchSeeder::class);
         $this->call(RoomSeeder::class);
         $this->call(TherapistSeeder::class);
+        $this->call(TherapistTypeSeeder::class);
         $this->call(ExtraServiceSeeder::class);
         $this->call(ProductSeeder::class);
-        $this->call(TimeSlotSeeder::class);
+
     }
 }

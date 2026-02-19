@@ -18,7 +18,7 @@ class TherapistSeeder extends Seeder
 
         foreach ($staffs as $i => $staff) {
             Therapist::create(
-                ['name' => "Therapist $staff", 'phone' => '123456789', 'branch_id' => Branch::all()->random()->id]
+                ['name' => "Therapist $staff", 'phone' => '123456789', 'price' => 5000, 'branch_id' => Branch::all()->random()->id]
             );
         }
 

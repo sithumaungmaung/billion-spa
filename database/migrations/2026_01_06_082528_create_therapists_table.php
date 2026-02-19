@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             // $table->string('email')->unique();
             $table->string('phone');
+            $table->unsignedInteger('price')->nullable();
             $table->foreignId('branch_id')->nullable()->constrained();
             $table->string('profile_photo_path')->nullable();
             $table->timestamps();

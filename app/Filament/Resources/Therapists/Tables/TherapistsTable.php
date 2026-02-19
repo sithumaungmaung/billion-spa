@@ -26,6 +26,9 @@ class TherapistsTable
                 TextColumn::make('phone')
                     ->label('Phone number')
                     ->searchable(),
+                TextColumn::make('price')
+                    ->label('Price')
+                    ->searchable(),
 
                 TextColumn::make('created_at')
                     ->dateTime()

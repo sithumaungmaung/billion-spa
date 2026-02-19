@@ -13,6 +13,10 @@
                             wire:click="$set('startTime', '{{ now()->format('Y-m-d\TH:i') }}')">
                             Now
                         </x-filament::button>
+                        <x-filament::button size="xs" :disabled="!$startTime"
+                            wire:click="$set('startTime', '{{ Carbon\Carbon::parse($this->startTime)->addHour()->format('Y-m-d\TH:i') }}')">
+                            Add one Hour
+                        </x-filament::button>
                     </x-slot>
                 </x-filament::input.wrapper>
             </x-filament-forms::field-wrapper>
@@ -46,7 +50,7 @@
             {{-- Therapist Select --}}
             <x-filament-forms::field-wrapper label="Therapist" id="therapist">
                 <x-filament::input.wrapper>
-                    <x-filament::input.select id="therapist" wire:model.live="selectedTherapistId">
+                    <x-filament::input.select id="therapist" wire:model.live="selectedTherapistId" :disabled="!$startTime || !$endTime">
                         <option value="0">Choose Therapist</option>
                         @foreach ($avaliableTherapists as $therapist)
                             <option value="{{ $therapist->id }}">{{ $therapist->name }}</option>

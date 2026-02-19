@@ -18,6 +18,11 @@ class TherapistForm
                     ->label('Phone number')
                     ->numeric()
                     ->required(),
+                TextInput::make('price')
+                    ->label('Price')
+
+                    ->numeric()
+                    ->required(),
                 Select::make('branch_id')
                     ->label('Branch')
                     ->preload()

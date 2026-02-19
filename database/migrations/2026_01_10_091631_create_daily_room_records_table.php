@@ -28,7 +28,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Composite unique constraint to prevent duplicate entries
-            $table->unique(['record_date', 'room_id'], 'unique_record');
+            // $table->unique(['record_date', 'room_id'], 'unique_record');
 
             // Indexes for better performance
             $table->index('record_date');
