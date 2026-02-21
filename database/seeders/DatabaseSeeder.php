@@ -38,11 +38,11 @@ class DatabaseSeeder extends Seeder
 
 
         $this->call(BranchSeeder::class);
-        $this->call(RoomSeeder::class);
-        $this->call(TherapistSeeder::class);
-        $this->call(TherapistTypeSeeder::class);
-        $this->call(ExtraServiceSeeder::class);
-        $this->call(ProductSeeder::class);
+        // $this->call(RoomSeeder::class);
+        // $this->call(TherapistSeeder::class);
+        // $this->call(TherapistTypeSeeder::class);
+        // $this->call(ExtraServiceSeeder::class);
+        // $this->call(ProductSeeder::class);
 
     }
 }
