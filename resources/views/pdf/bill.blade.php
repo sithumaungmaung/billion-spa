@@ -201,12 +201,12 @@
                 <tr>
                     <td class="col-item">Discount</td>
                     <td class="col-qty">{{ $invoice['disPercentage'] }} %</td>
-                    <td class="col-amt">{{ $invoice['disAmount'] }}</td>
+                    <td class="col-amt"> - {{ $invoice['disAmount'] }}</td>
                 </tr>
                 <tr>
                     <td class="col-item">service Charge</td>
                     <td class="col-qty">{{ $invoice['serviceChargePercentage'] }} %</td>
-                    <td class="col-amt">{{ $invoice['serviceChargeAmount'] }}</td>
+                    <td class="col-amt">{{ $invoice['serviceCharge'] }}</td>
                 </tr>
             </tbody>
         </table>

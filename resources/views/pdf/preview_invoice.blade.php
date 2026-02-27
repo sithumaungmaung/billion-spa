@@ -135,7 +135,7 @@
 
 <body>
     <div class="receipt">
-        <div class="title">BILLION SPA</div>
+        {{-- <div class="title">BILLION SPA</div> --}}
 
         <div class="header-info">
             Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br>
@@ -183,9 +183,31 @@
             </tbody>
         </table>
 
+        <hr>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="col-item">Sub Total</td>
+                    <td class="col-qty"> </td>
+                    <td class="col-amt">{{ number_format($invoice['total']) }}</td>
+                </tr>
+
+                <tr>
+                    <td class="col-item">Discount</td>
+                    <td class="col-qty">{{ $invoice['disPercentage'] }} %</td>
+                    <td class="col-amt"> - {{ $invoice['disAmount'] }}</td>
+                </tr>
+                <tr>
+                    <td class="col-item">service Charge</td>
+                    <td class="col-qty">{{ $invoice['serviceChargePercentage'] }} %</td>
+                    <td class="col-amt">{{ $invoice['serviceCharge'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+
         <div class="total-section">
             <div class="total-row">
-                TOTAL: {{ number_format($invoice['total']) }}
+                TOTAL: {{ number_format($invoice['grandTotal']) }}
             </div>
         </div>
 

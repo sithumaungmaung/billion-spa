@@ -49,8 +49,9 @@ class InvoiceController extends Controller
             'disPercentage' => $disPercentage,
             'disAmount' => $disAmount,
             'serviceChargePercentage' => $serviceChargePercentage,
-            'serviceChargeAmount' => $serviceChargeAmount
+            'serviceCharge' => $serviceChargeAmount
         ];
+
 
         $pdf = PDF::loadView('pdf.bill', compact('invoice'))
                 ->setPaper([0, 0, 300, 1000], 'portrait');
@@ -69,12 +70,25 @@ class InvoiceController extends Controller
         $billItems = $this->getBillItems($roomIds);
         $billExtraServices = $this->getBillExtraServices($roomIds);
 
+
+        $disPercentage = $invoiceDetail->discount_percent;
+        $disAmount = $invoiceDetail->discount_amount;
+
+        $serviceChargePercentage = $invoiceDetail->service_charge_percent;
+        $serviceCharge = $invoiceDetail->service_charge;
+
         $invoice = [
             'invoiceDetail' => $invoiceDetail,
             'items' => $billItems->toArray(),
             'rooms' => $billRooms->toArray(),
             'extraServices' => $billExtraServices->toArray(),
-            'total' => $this->totalBill($billItems, $billRooms, $billExtraServices),
+            // 'total' => $this->totalBill($billItems, $billRooms, $billExtraServices),
+            'total' => $invoiceDetail->sub_total,
+            'grandTotal' => $invoiceDetail->grand_total,
+            'disPercentage' => $disPercentage,
+            'disAmount' => $disAmount,
+            'serviceChargePercentage' => $serviceChargePercentage,
+            'serviceCharge' => $serviceCharge
         ];
 
         // $pdf = PDF::loadView('pdf.preview_invoice', compact('invoice'));

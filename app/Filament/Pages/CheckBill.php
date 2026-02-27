@@ -124,10 +124,14 @@ class CheckBill extends Page
         $invoice->invoice_datetime = Carbon::now();
         $invoice->buy = $this->buy;
         $invoice->free = $this->free;
-        $invoice->sub_total = $this->total;
+        $invoice->sub_total = $this->total + $this->discountAmount - $this->serviceChargeAmount;
         $invoice->discount = 0;
-        $invoice->tax = $this->total;
+        $invoice->tax = 0 ;
         $invoice->grand_total = $this->total;
+        $invoice->discount_percent = $this->discountPercentage;
+        $invoice->discount_amount = $this->discountAmount;
+        $invoice->service_charge_percent = $this->serviceChargePercentage;
+        $invoice->service_charge = $this->serviceChargeAmount;
         $invoice->save();
 
         $invoice->invoiceRooms()->createMany($billRooms);

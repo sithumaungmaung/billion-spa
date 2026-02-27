@@ -15,8 +15,8 @@ return new class extends Migration
             $table->tinyInteger('discount_percent')->default(0)->after('free');
             $table->unsignedInteger('discount_amount')->default(0)->after('discount_percent');
 
-            $table->tinyInteger('tax_percent')->default(0)->after('discount_amount');
-            $table->unsignedInteger('tax_amount')->default(0)->after('tax_percent');
+            $table->tinyInteger('service_charge_percent')->default(0)->after('discount_amount');
+            $table->unsignedInteger('service_charge')->default(0)->after('service_charge_percent');
         });
     }
 

@@ -261,6 +261,7 @@
                                         @foreach ($extraServices as $service)
                                             <option value="{{ $service->id }}">
                                                 {{ $service->title }}
+                                                - {{ number_format($service->price) }}
                                                 {{ $this->selectedRoom && in_array($service->id, $this->selectedRoom->extraServices->pluck('id')->toArray()) ? '(included)' : '' }}
                                             </option>
                                         @endforeach

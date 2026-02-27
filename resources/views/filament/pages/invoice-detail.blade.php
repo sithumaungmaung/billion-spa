@@ -3,29 +3,55 @@
 
         <div class="flex items-end gap-4 mb-3">
             <div class="flex-1">
-                <div class="h1 ">
+                <div class="h1 text-gray-500 ">
                     Invoice No:
-                    <span class="text-gray-500">
+                    <span class="text-gray-100">
                         {{ $invoiceDetail->invoice_no }}
                     </span>
                 </div>
-                <div class="h1">
-                    Confirm Date & Time: <span class="text-gray-500">{{ $invoiceDetail->invoice_datetime }}</span>
+                <div class="h1 text-gray-500">
+                    Confirm Date & Time: <span class="text-gray-100">{{ $invoiceDetail->invoice_datetime }}</span>
                 </div>
 
                 @if ($invoiceDetail->free > 0)
-                    <div class="h1">
-                        Promotion : <span class="text-gray-500">
+                    <div class="h1 text-gray-500">
+                        Promotion : <span class="text-gray-100">
                             {{ $invoiceDetail->buy }} + {{ $invoiceDetail->free }}
                         </span>
                     </div>
                 @endif
 
-                <div class="h1">
-                    Confirm By: <span class="text-gray-500">
+                <div class="h1 text-gray-500">
+                    Confirm By: <span class="text-gray-100">
                         {{ $invoiceDetail->users->name ?? '-' }}
                     </span>
                 </div>
+
+                @if ($invoiceDetail->discount_percent > 0)
+                    <div class="h1 text-gray-500">
+                        Discount %: <span class="text-gray-100">
+                            {{ $invoiceDetail->discount_percent }}
+                        </span>
+                    </div>
+                    <div class="h1 text-gray-500">
+                        Discount Amount: <span class="text-gray-100">
+                            {{ $invoiceDetail->discount_amount }}
+                        </span>
+                    </div>
+                @endif
+
+                @if ($invoiceDetail->service_charge_percent > 0)
+                    <div class="h1 text-gray-500">
+                        Service Charge %:<span class="text-gray-100">
+                            {{ $invoiceDetail->service_charge_percent }}
+                        </span>
+                    </div>
+                    <div class="h1 text-gray-500">
+                        Service Charge Amount: <span class="text-gray-100">
+                            {{ $invoiceDetail->service_charge }}
+                        </span>
+                    </div>
+                @endif
             </div>
 
         </div>
@@ -141,11 +167,38 @@
                         </td>
                     </tr>
                 @endforeach
+                {{-- <hr> --}}
+                {{-- <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-center text-gray-500">
+                        #
+                    </td>
+                    <td class="px-4 py-3 font-medium">
+                        Discount Percent
+                    </td>
+
+                    <td class="px-4 py-3 font-medium">
+                    </td>
+                    <td class="px-4 py-3 font-medium">
+                    </td>
+                    <td class="px-4 py-3 font-medium">
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        {{ $invoiceDetail->discount_percent }} -> {{ $invoiceDetail->discount_amount }}
+                    </td>
+
+                </tr> --}}
                 <!--  bill for Extra Service End-->
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
-                    <td class="px-4 py-3 text-right font-mono" colspan="5"> <b>Total</b> </td>
+                    <td class="px-4 py-3 text-right font-mono" colspan="5">
+                        @if ($invoiceDetail->discount_percent || $invoiceDetail->service_charge_percent)
+                            (Included Discount & Service Charge)
+                        @endif
+                        <b>Total</b>
+                    </td>
                     <td class="px-4 py-3 text-right font-mono font-semibold">
                         {{ number_format($this->invoiceDetail->grand_total) }} </td>
                 </tr>
