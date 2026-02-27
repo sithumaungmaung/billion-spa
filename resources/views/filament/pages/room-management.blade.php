@@ -456,3 +456,10 @@
         <x-filament::loading-indicator class="h-10 w-10 text-white" />
     </div> -->
 </x-filament-panels::page>
+
+
+<script>
+    window.addEventListener('check.bill', event => {
+        window.open(event.detail.url, '_blank');
+    });
+</script>

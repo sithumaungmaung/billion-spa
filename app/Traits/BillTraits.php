@@ -63,7 +63,8 @@ trait BillTraits
                 $items[] = [
                     'branch_id' => 1,
                     'room_id'   => $first->room_id,
-                    'room_name' => "{$first->room->name} – {$therapistTypeTitle} (Free)",
+                    // 'room_name' => "{$first->room->name} – {$therapistTypeTitle} (Free)",
+                    'room_name' => "{$first->room->name}  - Plus",
                     'service_type' => $first->therapistType,
                     'service_type_price' => 0,
                     'quantity'  => $freeSlots, // 1

@@ -338,9 +338,11 @@ class RoomManagement extends Page implements HasForms
 
     public function checkBill()
     {
-        return redirect()->route('filament.admin.pages.check-bill', [
+        $url = route('filament.admin.pages.check-bill', [
             'bill_for' => implode(',', $this->checkRoomIds)
         ]);
+
+        $this->dispatch('check.bill', url: $url);
     }
 
 

@@ -17,8 +17,16 @@ class InvoiceController extends Controller
     use BillTraits;
 
     protected $roomIds;
+    // protected $total;
 
     public function previewInvoice($ids, $buy, $free) {
+
+        $req = request();
+
+        $disPercentage = $req->discountPercentage;
+        $serviceChargePercentage = $req->serviceChargePercentage;
+        $disAmount = $req->discountAmount;
+        $serviceChargeAmount = $req->serviceChargeAmount;
 
         $roomIds = array_map(
             'intval',
@@ -29,11 +37,19 @@ class InvoiceController extends Controller
         $billItems = $this->getBillItems($roomIds);
         $billExtraServices = $this->getBillExtraServices($roomIds);
 
+        $total = $this->totalBill($billItems, $billRooms, $billExtraServices);
+        $grandTotal = $total + $serviceChargeAmount - $disAmount;
+
         $invoice = [
             'items' => $billItems->toArray(),
             'rooms' => $billRooms,
             'extraServices' => $billExtraServices->toArray(),
-            'total' => $this->totalBill($billItems, $billRooms, $billExtraServices),
+            'total' => $total,
+            'grandTotal' => $grandTotal,
+            'disPercentage' => $disPercentage,
+            'disAmount' => $disAmount,
+            'serviceChargePercentage' => $serviceChargePercentage,
+            'serviceChargeAmount' => $serviceChargeAmount
         ];
 
         $pdf = PDF::loadView('pdf.bill', compact('invoice'))

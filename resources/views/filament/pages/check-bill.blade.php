@@ -1,34 +1,78 @@
 <x-filament-panels::page>
     <x-filament::section>
-        <div class="flex items-end gap-4 mb-3">
+        <x-filament::section compact class="p-0">
+            <x-filament::section.heading class="mb-2">
+                Room Promotion
+            </x-filament::section.heading>
+
+            <div class="flex items-end gap-4">
+                <div class="flex-1">
+                    <x-filament::input.wrapper label="Select Type">
+                        <x-filament::input.select wire:model.live="buy" wire:change="applyPromotion">
+                            <option value="1">Buy 1</option>
+                            <option value="2">Buy 2</option>
+                            <option value="3">Buy 3</option>
+                            <option value="4">Buy 4</option>
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </div>
+                <div class="flex-1">
+                    <x-filament::input.wrapper label="Select Type">
+                        <x-filament::input.select wire:model.live="free" wire:change="applyPromotion">
+                            <option value="0">Get 0</option>
+                            <option value="1">Get 1</option>
+                            <!-- <option value="2">Get 2</option> -->
+                            <!-- <option value="3">Get 3</option> -->
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </div>
+                {{-- <div class="flex-1"></div> --}}
+            </div>
+            @if ($this->free > 0)
+                <div class="mt-3 text-sm">
+                    <span class="border border-gray-200 dark:border-white/10 p-2 rounded-lg ">
+                        {{-- <br> --}}
+                        Promotion - {{ $this->buy }} + {{ $this->free }}
+                    </span>
+                </div>
+            @endif
+        </x-filament::section>
+
+        <div class="flex items-end gap-4">
             <div class="flex-1">
-                <x-filament::input.wrapper label="Select Type">
-                    <x-filament::input.select wire:model.live="buy" wire:change="applyPromotion">
-                        <option value="1">Buy 1</option>
-                        <option value="2">Buy 2</option>
-                        <option value="3">Buy 3</option>
-                        <option value="4">Buy 4</option>
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
+                <x-filament::section compact class="mt-2">
+                    <x-filament-forms::field-wrapper label="Discount Percent">
+                        <x-filament::input.wrapper>
+                            <x-filament::input.select wire:model.live="discountPercentage">
+                                <option value="0">Choose Discount %</option>
+                                @foreach ([5, 10, 15, 20, 25, 30] as $percent)
+                                    <option value="{{ $percent }}">{{ $percent }} % </option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </x-filament-forms::field-wrapper>
+                </x-filament::section>
             </div>
             <div class="flex-1">
-                <x-filament::input.wrapper label="Select Type">
-                    <x-filament::input.select wire:model.live="free" wire:change="applyPromotion">
-                        <option value="0">Get 0</option>
-                        <option value="1">Get 1</option>
-                        <!-- <option value="2">Get 2</option> -->
-                        <!-- <option value="3">Get 3</option> -->
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
+                <x-filament::section compact class="mt-2">
+                    <x-filament-forms::field-wrapper label="Service Charge Percent">
+                        <x-filament::input.wrapper>
+                            <x-filament::input.select wire:model.live="serviceChargePercentage">
+                                <option value="0">Choose service Charge %</option>
+                                @foreach ([5, 10, 15, 20, 25, 30] as $percent)
+                                    <option value="{{ $percent }}">{{ $percent }} % </option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </x-filament-forms::field-wrapper>
+                </x-filament::section>
             </div>
-            <div class="flex-1"></div>
+            {{-- <div class="flex-1"></div> --}}
         </div>
 
-        @if ($this->free > 0)
-            <div class="flex mt-1 mb-1">
-                <br> Promotion - {{ $this->buy }} + {{ $this->free }}
-            </div>
-        @endif
+
+
+
 
         <table
             class="w-full text-sm text-left border-collapse

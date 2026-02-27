@@ -4,8 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('filament.admin.auth.login');
 });
+
 
 
 Route::get('/invoice/preview/{ids}/{buy}/{free}/checkBill', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');

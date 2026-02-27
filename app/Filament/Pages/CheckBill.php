@@ -46,6 +46,10 @@ class CheckBill extends Page
     public $total;
     public $buy = 1;
     public $free = 0;
+    public $discountPercentage = 0;
+    public $discountAmount = 0;
+    public $serviceChargePercentage = 0;
+    public $serviceChargeAmount = 0;
 
 
     public function mount(): void
@@ -62,7 +66,8 @@ class CheckBill extends Page
         $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
 
-    public function totalBill() {
+    public function totalBill()
+    {
         $total = 0;
         foreach ($this->billItems as $item) {
             $total += $item->quantity * $item->unit_price;
@@ -79,17 +84,20 @@ class CheckBill extends Page
         return $total;
     }
 
-    public function getSystemDailyRecords() {
+    public function getSystemDailyRecords()
+    {
         $dailyRooms = DailyRoomRecord::whereIn('id', $this->roomIds)->with('room', 'therapist', 'therapistType')->get();
         return $dailyRooms;
     }
 
-    public function applyPromotion() {
+    public function applyPromotion()
+    {
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
         $this->total = $this->totalBill();
     }
 
-    public function confirmBill() {
+    public function confirmBill()
+    {
 
         $dailyRoomBillChecked = DailyRoomRecord::whereIn('id', $this->roomIds)->whereNotNull('invoice_id')->count();
         if($dailyRoomBillChecked > 0) {
@@ -203,11 +211,35 @@ class CheckBill extends Page
             'ids' => implode(',', $this->roomIds),
             'buy' => $this->buy,
             'free' => $this->free,
+            'discountPercentage' => $this->discountPercentage,
+            'discountAmount' => $this->discountAmount,
+            'serviceChargePercentage' => $this->serviceChargePercentage,
+            'serviceChargeAmount' => $this->serviceChargeAmount
         ]);
 
         $this->dispatch('invoice.preview', url: $url);
 
         // return redirect()->away()->route('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusone]);
+    }
+
+    public function updatedDiscountPercentage()
+    {
+        $this->total = $this->totalBill();
+        $this->discountAmount = $this->discountPercentage * $this->total / 100;
+        $this->total = $this->total - $this->discountAmount + $this->serviceChargeAmount;
+    }
+
+
+    public function updatedServiceChargePercentage()
+    {
+        $this->total = $this->totalBill();
+        $this->serviceChargeAmount = $this->serviceChargePercentage * $this->total / 100;
+        $this->total = $this->total + $this->serviceChargeAmount - $this->discountAmount;
+    }
+
+    public function updatedBuy()
+    {
+        $this->applyPromotion();
     }
 
 }
