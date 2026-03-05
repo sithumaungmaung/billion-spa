@@ -89,7 +89,8 @@ trait BillTraits
 
     public function getBillExtraServices($roomIds)
     {
-        return ExtraServiceSale::whereIn('daily_room_record_id', $roomIds)->with('extraService')->get();
+        $extraServices = ExtraServiceSale::whereIn('daily_room_record_id', $roomIds)->with('extraService')->get();
+        return $extraServices;
     }
 
 

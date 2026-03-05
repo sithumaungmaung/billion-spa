@@ -9,7 +9,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -112,7 +112,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -175,7 +175,8 @@
                 {{-- Extra Services --}}
                 @foreach ($invoice['extraServices'] as $service)
                     <tr>
-                        <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td>
+                        {{-- <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td> --}}
+                        <td class="col-item">{{ $service['title'] }}</td>
                         <td class="col-qty">{{ $service['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($service['total_price']) }}</td>
                     </tr>
@@ -195,7 +196,7 @@
                 <tr>
                     <td class="col-item">Discount</td>
                     <td class="col-qty">{{ $invoice['disPercentage'] }} %</td>
-                    <td class="col-amt"> - {{ $invoice['disAmount'] }}</td>
+                    <td class="col-amt"> {{ $invoice['disAmount'] }}</td>
                 </tr>
                 <tr>
                     <td class="col-item">service Charge</td>

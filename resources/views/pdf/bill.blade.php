@@ -9,7 +9,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -112,7 +112,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -138,7 +138,7 @@
         <div class="title">Invoice Preview</div>
 
         <div class="header-info">
-            {{-- Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br> --}}
+            {{-- Invoice: {{ $invoice['invoiceDetail'] }}<br> --}}
             {{ date('d-M-Y H:i') }}
         </div>
 
@@ -173,7 +173,9 @@
                 {{-- Items --}}
                 @foreach ($invoice['items'] as $item)
                     <tr>
-                        <td class="col-item">{{ $item['product']['name'] ?? 'Item' }}</td>
+                        <td class="col-item">
+                            {{ $item['product']['name'] ?? 'Item' }}
+                        </td>
                         <td class="col-qty">{{ $item['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($item['total_price']) }}</td>
                     </tr>
@@ -182,7 +184,7 @@
                 {{-- Extra Services --}}
                 @foreach ($invoice['extraServices'] as $service)
                     <tr>
-                        <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td>
+                        <td class="col-item">{{ $service['title'] }}</td>
                         <td class="col-qty">{{ $service['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($service['total_price']) }}</td>
                     </tr>
