@@ -84,8 +84,8 @@
                     <th class="px-4 py-3">Title</th>
                     <th class="px-4 py-3">Date & Time</th>
                     {{-- <th class="px-4 py-3">Section</th> --}}
-                    <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Unit Price</th>
+                    <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Therapist Price</th>
                     <th class="px-4 py-3 text-right">Total</th>
                 </tr>
@@ -94,6 +94,7 @@
             <tbody class="divide-y divide-gray-100
                    dark:divide-white/10">
 
+                {{-- Room --}}
                 @foreach ($this->billRooms as $key => $billRoom)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -107,20 +108,29 @@
                         </td>
 
                         <td class="px-4 py-3 font-medium">
-                            {{ $billRoom['start_time'] }} - {{ $billRoom['end_time'] }}
+                            {{ \Carbon\Carbon::parse($billRoom['start_time'])->isoFormat('DD/MM/YYYY') }}
+                            <span class="text-gray-500 dark:text-gray-400"> -
+                                {{ \Carbon\Carbon::parse($billRoom['start_time'])->isoFormat('hh:mm A') }}
+                            </span>
+                            <br>
+                            {{ \Carbon\Carbon::parse($billRoom['end_time'])->isoFormat('DD/MM/YYYY') }}
+                            <span class="text-gray-500 dark:text-gray-400"> -
+                                {{ \Carbon\Carbon::parse($billRoom['end_time'])->isoFormat('hh:mm A') }}
+                            </span>
                         </td>
 
                         {{-- <td class="px-4 py-3 font-medium">
                             {{ $billRoom['total_time'] ?? '-' }}
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ $billRoom['unit_price'] }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $billRoom['quantity'] }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ $billRoom['unit_price'] }}
-                        </td>
 
                         <td class="px-4 py-3 text-right font-mono">
                             {{ $billRoom['therapist_price'] }}
@@ -133,7 +143,7 @@
                     </tr>
                 @endforeach
 
-                <!-- bill for product -->
+                <!-- bill for product items -->
                 @foreach ($this->billItems as $key => $product)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -154,13 +164,15 @@
                             -
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($product->unit_price) }}
+                        </td>
+
+
                         <td class="px-4 py-3 text-right">
                             {{ $product->quantity }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($product->unit_price) }}
-                        </td>
 
                         <td class="px-4 py-3 font-medium text-center">
                             -
@@ -171,11 +183,9 @@
                         </td>
                     </tr>
                 @endforeach
-                <!-- bill for product End -->
 
 
                 <!-- bill for Extra Service -->
-
                 @foreach ($this->billExtraServices as $service)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -195,14 +205,14 @@
                             -
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($service->unit_price) }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $service->quantity }}
                         </td>
 
-
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($service->unit_price) }}
-                        </td>
 
                         <td class="px-4 py-3 text-center">
                             -
@@ -213,7 +223,36 @@
                         </td>
                     </tr>
                 @endforeach
-                <!--  bill for Extra Service End-->
+
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Sub Total</b> </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->subTotal) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Discount</b> </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold">
+                        {{ number_format($this->discountAmount) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Service Charge</b> </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold">
+                        {{ number_format($this->serviceChargeAmount) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
 
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -222,6 +261,7 @@
                     <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->total) }} </td>
                     {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
                 </tr>
+
             </tbody>
         </table>
 

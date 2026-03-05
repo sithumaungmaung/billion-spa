@@ -51,6 +51,7 @@ class CheckBill extends Page
     public $serviceChargePercentage = 0;
     public $serviceChargeAmount = 0;
 
+    public $subTotal = 0;
 
     public function mount(): void
     {
@@ -63,6 +64,7 @@ class CheckBill extends Page
         $this->billExtraServices = $this->getBillExtraServices($this->roomIds);
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
         $this->total = $this->totalBill();
+        $this->subTotal = $this->total;
         $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
 
@@ -124,7 +126,7 @@ class CheckBill extends Page
         $invoice->invoice_datetime = Carbon::now();
         $invoice->buy = $this->buy;
         $invoice->free = $this->free;
-        $invoice->sub_total = $this->total + $this->discountAmount - $this->serviceChargeAmount;
+        $invoice->sub_total = $this->total - $this->discountAmount + $this->serviceChargeAmount;
         $invoice->discount = 0;
         $invoice->tax = 0 ;
         $invoice->grand_total = $this->total;
