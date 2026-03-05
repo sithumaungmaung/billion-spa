@@ -1,34 +1,78 @@
 <x-filament-panels::page>
     <x-filament::section>
-        <div class="flex items-end gap-4 mb-3">
+        <x-filament::section compact class="p-0">
+            <x-filament::section.heading class="mb-2">
+                Room Promotion
+            </x-filament::section.heading>
+
+            <div class="flex items-end gap-4">
+                <div class="flex-1">
+                    <x-filament::input.wrapper label="Select Type">
+                        <x-filament::input.select wire:model.live="buy" wire:change="applyPromotion">
+                            <option value="1">Buy 1</option>
+                            <option value="2">Buy 2</option>
+                            <option value="3">Buy 3</option>
+                            <option value="4">Buy 4</option>
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </div>
+                <div class="flex-1">
+                    <x-filament::input.wrapper label="Select Type">
+                        <x-filament::input.select wire:model.live="free" wire:change="applyPromotion">
+                            <option value="0">Get 0</option>
+                            <option value="1">Get 1</option>
+                            <!-- <option value="2">Get 2</option> -->
+                            <!-- <option value="3">Get 3</option> -->
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </div>
+                {{-- <div class="flex-1"></div> --}}
+            </div>
+            @if ($this->free > 0)
+                <div class="mt-3 text-sm">
+                    <span class="border border-gray-200 dark:border-white/10 p-2 rounded-lg ">
+                        {{-- <br> --}}
+                        Promotion - {{ $this->buy }} + {{ $this->free }}
+                    </span>
+                </div>
+            @endif
+        </x-filament::section>
+
+        <div class="flex items-end gap-4">
             <div class="flex-1">
-                <x-filament::input.wrapper label="Select Type">
-                    <x-filament::input.select wire:model.live="buy" wire:change="applyPromotion">
-                        <option value="1">Buy 1</option>
-                        <option value="2">Buy 2</option>
-                        <option value="3">Buy 3</option>
-                        <option value="4">Buy 4</option>
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
+                <x-filament::section compact class="mt-2">
+                    <x-filament-forms::field-wrapper label="Discount Percent">
+                        <x-filament::input.wrapper>
+                            <x-filament::input.select wire:model.live="discountPercentage">
+                                <option value="0">Choose Discount %</option>
+                                @foreach ([5, 10, 15, 20, 25, 30] as $percent)
+                                    <option value="{{ $percent }}">{{ $percent }} % </option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </x-filament-forms::field-wrapper>
+                </x-filament::section>
             </div>
             <div class="flex-1">
-                <x-filament::input.wrapper label="Select Type">
-                    <x-filament::input.select wire:model.live="free" wire:change="applyPromotion">
-                        <option value="0">Get 0</option>
-                        <option value="1">Get 1</option>
-                        <!-- <option value="2">Get 2</option> -->
-                        <!-- <option value="3">Get 3</option> -->
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
+                <x-filament::section compact class="mt-2">
+                    <x-filament-forms::field-wrapper label="Service Charge Percent">
+                        <x-filament::input.wrapper>
+                            <x-filament::input.select wire:model.live="serviceChargePercentage">
+                                <option value="0">Choose service Charge %</option>
+                                @foreach ([5, 10, 15, 20, 25, 30] as $percent)
+                                    <option value="{{ $percent }}">{{ $percent }} % </option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </x-filament-forms::field-wrapper>
+                </x-filament::section>
             </div>
-            <div class="flex-1"></div>
+            {{-- <div class="flex-1"></div> --}}
         </div>
 
-        @if ($this->free > 0)
-            <div class="flex mt-1 mb-1">
-                <br> Promotion - {{ $this->buy }} + {{ $this->free }}
-            </div>
-        @endif
+
+
+
 
         <table
             class="w-full text-sm text-left border-collapse
@@ -40,8 +84,8 @@
                     <th class="px-4 py-3">Title</th>
                     <th class="px-4 py-3">Date & Time</th>
                     {{-- <th class="px-4 py-3">Section</th> --}}
-                    <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Unit Price</th>
+                    <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Therapist Price</th>
                     <th class="px-4 py-3 text-right">Total</th>
                 </tr>
@@ -50,6 +94,7 @@
             <tbody class="divide-y divide-gray-100
                    dark:divide-white/10">
 
+                {{-- Room --}}
                 @foreach ($this->billRooms as $key => $billRoom)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -63,20 +108,29 @@
                         </td>
 
                         <td class="px-4 py-3 font-medium">
-                            {{ $billRoom['start_time'] }} - {{ $billRoom['end_time'] }}
+                            {{ \Carbon\Carbon::parse($billRoom['start_time'])->isoFormat('DD/MM/YYYY') }}
+                            <span class="text-gray-500 dark:text-gray-400"> -
+                                {{ \Carbon\Carbon::parse($billRoom['start_time'])->isoFormat('hh:mm A') }}
+                            </span>
+                            <br>
+                            {{ \Carbon\Carbon::parse($billRoom['end_time'])->isoFormat('DD/MM/YYYY') }}
+                            <span class="text-gray-500 dark:text-gray-400"> -
+                                {{ \Carbon\Carbon::parse($billRoom['end_time'])->isoFormat('hh:mm A') }}
+                            </span>
                         </td>
 
                         {{-- <td class="px-4 py-3 font-medium">
                             {{ $billRoom['total_time'] ?? '-' }}
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ $billRoom['unit_price'] }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $billRoom['quantity'] }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ $billRoom['unit_price'] }}
-                        </td>
 
                         <td class="px-4 py-3 text-right font-mono">
                             {{ $billRoom['therapist_price'] }}
@@ -89,7 +143,7 @@
                     </tr>
                 @endforeach
 
-                <!-- bill for product -->
+                <!-- bill for product items -->
                 @foreach ($this->billItems as $key => $product)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -110,13 +164,15 @@
                             -
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($product->unit_price) }}
+                        </td>
+
+
                         <td class="px-4 py-3 text-right">
                             {{ $product->quantity }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($product->unit_price) }}
-                        </td>
 
                         <td class="px-4 py-3 font-medium text-center">
                             -
@@ -127,11 +183,9 @@
                         </td>
                     </tr>
                 @endforeach
-                <!-- bill for product End -->
 
 
                 <!-- bill for Extra Service -->
-
                 @foreach ($this->billExtraServices as $service)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -151,14 +205,14 @@
                             -
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($service->unit_price) }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $service->quantity }}
                         </td>
 
-
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($service->unit_price) }}
-                        </td>
 
                         <td class="px-4 py-3 text-center">
                             -
@@ -169,7 +223,36 @@
                         </td>
                     </tr>
                 @endforeach
-                <!--  bill for Extra Service End-->
+
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Sub Total</b> </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->subTotal) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Discount</b> </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold">
+                        {{ number_format($this->discountAmount) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Service Charge</b> </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold">
+                        {{ number_format($this->serviceChargeAmount) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
 
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
@@ -178,6 +261,7 @@
                     <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->total) }} </td>
                     {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
                 </tr>
+
             </tbody>
         </table>
 

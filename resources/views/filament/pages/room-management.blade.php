@@ -261,6 +261,7 @@
                                         @foreach ($extraServices as $service)
                                             <option value="{{ $service->id }}">
                                                 {{ $service->title }}
+                                                - {{ number_format($service->price) }}
                                                 {{ $this->selectedRoom && in_array($service->id, $this->selectedRoom->extraServices->pluck('id')->toArray()) ? '(included)' : '' }}
                                             </option>
                                         @endforeach
@@ -456,3 +457,10 @@
         <x-filament::loading-indicator class="h-10 w-10 text-white" />
     </div> -->
 </x-filament-panels::page>
+
+
+<script>
+    window.addEventListener('check.bill', event => {
+        window.open(event.detail.url, '_blank');
+    });
+</script>

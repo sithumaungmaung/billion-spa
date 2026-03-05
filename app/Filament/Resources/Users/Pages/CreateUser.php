@@ -8,4 +8,12 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
+
+    protected function afterCreate(): void
+    {
+        if (! $this->record->hasRole('admin')) {
+            $this->record->assignRole('admin');
+        }
+    }
+
 }

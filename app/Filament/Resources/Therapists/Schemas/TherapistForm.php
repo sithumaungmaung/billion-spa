@@ -18,6 +18,10 @@ class TherapistForm
                     ->label('Phone number')
                     ->numeric()
                     ->required(),
+                TextInput::make('therapist_code')
+                    ->label('Therapist Code')
+                    ->unique()
+                    ->required(),
                 TextInput::make('price')
                     ->label('Price')
 

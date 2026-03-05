@@ -9,7 +9,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -112,7 +112,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -135,10 +135,10 @@
 
 <body>
     <div class="receipt">
-        <div class="title">BILLION SPA</div>
+        <div class="title">Invoice Preview</div>
 
         <div class="header-info">
-            {{-- Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br> --}}
+            {{-- Invoice: {{ $invoice['invoiceDetail'] }}<br> --}}
             {{ date('d-M-Y H:i') }}
         </div>
 
@@ -159,14 +159,23 @@
                             <span class="small-text">{{ $room['service_type']['title'] ?? '' }}</span>
                         </td>
                         <td class="col-qty">{{ $room['quantity'] }}</td>
-                        <td class="col-amt">{{ number_format($room['total_price']) }}</td>
+                        <td class="col-amt">
+                            {{ number_format($room['total_price']) }}
+                            @if ((int) $room['service_type_price'] == 0)
+                                <span class="small-text">
+                                    Therapist Fees
+                                </span>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
 
                 {{-- Items --}}
                 @foreach ($invoice['items'] as $item)
                     <tr>
-                        <td class="col-item">{{ $item['product']['name'] ?? 'Item' }}</td>
+                        <td class="col-item">
+                            {{ $item['product']['name'] ?? 'Item' }}
+                        </td>
                         <td class="col-qty">{{ $item['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($item['total_price']) }}</td>
                     </tr>
@@ -175,17 +184,39 @@
                 {{-- Extra Services --}}
                 @foreach ($invoice['extraServices'] as $service)
                     <tr>
-                        <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td>
+                        <td class="col-item">{{ $service['title'] }}</td>
                         <td class="col-qty">{{ $service['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($service['total_price']) }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+        <hr>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="col-item">Sub Total</td>
+                    <td class="col-qty"> </td>
+                    <td class="col-amt">{{ number_format($invoice['total']) }}</td>
+                </tr>
+
+                <tr>
+                    <td class="col-item">Discount</td>
+                    <td class="col-qty">{{ $invoice['disPercentage'] }} %</td>
+                    <td class="col-amt"> {{ $invoice['disAmount'] }}</td>
+                </tr>
+                <tr>
+                    <td class="col-item">service Charge</td>
+                    <td class="col-qty">{{ $invoice['serviceChargePercentage'] }} %</td>
+                    <td class="col-amt">{{ $invoice['serviceCharge'] }}</td>
+                </tr>
+            </tbody>
+        </table>
 
         <div class="total-section">
+
             <div class="total-row">
-                TOTAL: {{ number_format($invoice['total']) }}
+                TOTAL: {{ number_format($invoice['grandTotal']) }}
             </div>
         </div>
 

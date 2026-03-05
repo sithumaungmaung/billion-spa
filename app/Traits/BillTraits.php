@@ -63,7 +63,8 @@ trait BillTraits
                 $items[] = [
                     'branch_id' => 1,
                     'room_id'   => $first->room_id,
-                    'room_name' => "{$first->room->name} – {$therapistTypeTitle} (Free)",
+                    // 'room_name' => "{$first->room->name} – {$therapistTypeTitle} (Free)",
+                    'room_name' => "{$first->room->name}  - Plus",
                     'service_type' => $first->therapistType,
                     'service_type_price' => 0,
                     'quantity'  => $freeSlots, // 1
@@ -88,7 +89,8 @@ trait BillTraits
 
     public function getBillExtraServices($roomIds)
     {
-        return ExtraServiceSale::whereIn('daily_room_record_id', $roomIds)->with('extraService')->get();
+        $extraServices = ExtraServiceSale::whereIn('daily_room_record_id', $roomIds)->with('extraService')->get();
+        return $extraServices;
     }
 
 

@@ -6,6 +6,7 @@ use App\Models\User;
 use Database\Seeders\BranchSeeder;
 use Database\Seeders\ExtraServiceSeeder;
 use Database\Seeders\ProductSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoomSeeder;
 use Database\Seeders\TherapistSeeder;
 use Database\Seeders\TherapistTypeSeeder;
@@ -24,11 +25,15 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        $this->call(RolePermissionSeeder::class);
+
+        $psn = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin123'),
         ]);
+        $psn->assignRole('admin');
+        // $psn->givePermissionTo('create_post');
 
         User::factory()->create([
             'name' => 'Ko Sithu',

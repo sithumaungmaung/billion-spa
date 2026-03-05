@@ -21,7 +21,7 @@ class TherapistResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Heart;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Admin & Therapists';
+    protected static string | UnitEnum | null $navigationGroup = 'Admin, Therapists & Customers ';
 
     protected static ?string $recordTitleAttribute = 'Therapist';
 
@@ -34,7 +34,7 @@ class TherapistResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return TherapistsTable::configure($table); 
+        return TherapistsTable::configure($table);
     }
 
     public static function getRelations(): array

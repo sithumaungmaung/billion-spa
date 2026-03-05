@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Users\Schemas;
+namespace App\Filament\Resources\Customers\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
-class UserForm
+class CustomerForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -22,8 +22,8 @@ class UserForm
                     ->password()
                     ->required(),
                 DateTimePicker::make('email_verified_at')
-                        ->disabledOn('edit')
-                        ->default(now())
+                    ->disabledOn('edit')
+                    ->default(now())
             ]);
     }
 }

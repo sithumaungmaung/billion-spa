@@ -9,7 +9,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -112,7 +112,7 @@
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
+            font-family: "myanmarunicode", sans-serif;
             font-size: 9pt;
             color: #000;
             line-height: 1.2;
@@ -135,7 +135,7 @@
 
 <body>
     <div class="receipt">
-        <div class="title">BILLION SPA</div>
+        {{-- <div class="title">BILLION SPA</div> --}}
 
         <div class="header-info">
             Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br>
@@ -175,7 +175,8 @@
                 {{-- Extra Services --}}
                 @foreach ($invoice['extraServices'] as $service)
                     <tr>
-                        <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td>
+                        {{-- <td class="col-item">{{ $service['extra_service']['title'] ?? 'Service' }}</td> --}}
+                        <td class="col-item">{{ $service['title'] }}</td>
                         <td class="col-qty">{{ $service['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($service['total_price']) }}</td>
                     </tr>
@@ -183,9 +184,31 @@
             </tbody>
         </table>
 
+        <hr>
+        <table>
+            <tbody>
+                <tr>
+                    <td class="col-item">Sub Total</td>
+                    <td class="col-qty"> </td>
+                    <td class="col-amt">{{ number_format($invoice['total']) }}</td>
+                </tr>
+
+                <tr>
+                    <td class="col-item">Discount</td>
+                    <td class="col-qty">{{ $invoice['disPercentage'] }} %</td>
+                    <td class="col-amt"> {{ $invoice['disAmount'] }}</td>
+                </tr>
+                <tr>
+                    <td class="col-item">service Charge</td>
+                    <td class="col-qty">{{ $invoice['serviceChargePercentage'] }} %</td>
+                    <td class="col-amt">{{ $invoice['serviceCharge'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+
         <div class="total-section">
             <div class="total-row">
-                TOTAL: {{ number_format($invoice['total']) }}
+                TOTAL: {{ number_format($invoice['grandTotal']) }}
             </div>
         </div>
 

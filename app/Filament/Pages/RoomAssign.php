@@ -142,7 +142,7 @@ class RoomAssign extends Page implements HasForms
         $this->endTime = null;
         $this->selectedRoomId = null;
         $this->selectedTherapistId = null;
-        $this->selectedTherapistTypeId = null;
+        $this->selectedTherapistTypeId = 1;
 
     }
 
