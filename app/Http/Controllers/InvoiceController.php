@@ -23,9 +23,13 @@ class InvoiceController extends Controller
     {
         $req = request();
 
+        $productDiscount = json_decode($req->productDiscount, true);
+        // $totalDiscountAmount = $req->totalDiscountAmount; // All
+        $totalProductDiscount = $req->totalProductDiscount;
+
         $disPercentage = $req->discountPercentage;
         $serviceChargePercentage = $req->serviceChargePercentage;
-        $disAmount = $req->discountAmount;
+        $discountAmountByPercentage = $req->discountAmountByPercentage;
         $serviceChargeAmount = $req->serviceChargeAmount;
 
         $roomIds = array_map('intval', explode(',', $ids));
@@ -35,13 +39,26 @@ class InvoiceController extends Controller
         $billExtraServices = $this->getBillExtraServices($roomIds);
 
         $total = $this->totalBill($billItems, $billRooms, $billExtraServices);
-        $grandTotal = $total + $serviceChargeAmount - $disAmount;
+        $grandTotal = $total + $serviceChargeAmount - $discountAmountByPercentage - $totalProductDiscount;
 
         $invoice = [
             // 'invoiceDetail' => '',
             'rooms' => $billRooms,
 
-            'items' => $billItems->map(function ($item) {
+            'items' => $billItems->map(function ($item) use ($productDiscount) {
+
+                if(in_array($item['id'], collect($productDiscount)->keys()->toArray()))
+                {
+                    $amount = $productDiscount[$item['id']] * $item['quantity'];
+                    $item['total_price'] = $item['total_price'] - $amount;
+                    $item['discount_amount'] = $amount;
+                }
+                else
+                {
+                    $item['discount_amount'] = 0;
+
+                }
+
                 $name = RabbitService::uni2zg($item['product']['name']);
                 $item['product']['name'] = RabbitService::zg2uni($name);
                 return $item;
@@ -54,11 +71,12 @@ class InvoiceController extends Controller
                 }),
                 // 'extraServices' => $billExtraServices->toArray(),
             'total' => $total,
-            'grandTotal' => $grandTotal,
+            'grandTotal' => $grandTotal ,
             'disPercentage' => $disPercentage,
-            'disAmount' => $disAmount,
+            'disAmount' => $discountAmountByPercentage,
             'serviceChargePercentage' => $serviceChargePercentage,
             'serviceCharge' => $serviceChargeAmount,
+            'productDiscount' => $req->productDiscount,
         ];
 
         $invoice = $this->normalizeMyanmarText($invoice);
@@ -75,7 +93,9 @@ class InvoiceController extends Controller
             ->pluck('id')
             ->toArray();
 
-        $billItems = $this->getBillItems($roomIds);
+        // $billItems = $this->getBillItems($roomIds);
+        $billItems = $invoiceDetail->invoiceProducts;
+
         $billExtraServices = $this->getBillExtraServices($roomIds);
 
         $disPercentage = $invoiceDetail->discount_percent;
@@ -88,8 +108,10 @@ class InvoiceController extends Controller
             'invoiceDetail' => $invoiceDetail->toArray(),
             'rooms' => $billRooms->toArray(),
             'items' => $billItems->map(function ($item) {
-                $name = RabbitService::uni2zg($item['product']['name']);
-                $item['product']['name'] = RabbitService::zg2uni($name);
+
+                $name = RabbitService::uni2zg($item->product_name);
+                $item['product_name'] = RabbitService::zg2uni($name);
+                // dump($item['product']->toArray());
                 return $item;
             }),
             'extraServices' => $billExtraServices->map(function ($service) {
@@ -136,11 +158,5 @@ class InvoiceController extends Controller
 
         return $value;
     }
-
-
-    // public static function zawGyi($value)
-    // {
-    //     return RabbitService::zg2uni($value);
-    // }
 
 }
