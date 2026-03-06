@@ -2,15 +2,17 @@
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
-use Carbon\Carbon;
+use App\Models\DailyRoomRecord;
 use App\Models\Room;
-use Filament\Pages\Page;
 use App\Models\Therapist;
 use App\Models\TherapistType;
-use App\Models\DailyRoomRecord;
+use BackedEnum;
+use Carbon\Carbon;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 
 class RoomAssign extends Page implements HasForms
 {
@@ -37,6 +39,8 @@ class RoomAssign extends Page implements HasForms
     public $selectedTherapistTypeId = 1;
 
     // -------------------------------- //
+    // For therapist and room form
+    public ?array $data = [];
 
     public function mount(): void
     {
@@ -50,6 +54,8 @@ class RoomAssign extends Page implements HasForms
         $this->rooms = Room::get();
         $this->avaliableRooms = $this->avaliavleRooms();
         $this->avaliableTherapists = $this->getFreeTherapists();
+        $this->therapist_form->fill();
+        $this->room_form->fill();
         $this->therapistTypes = TherapistType::get();
     }
 
@@ -86,7 +92,6 @@ class RoomAssign extends Page implements HasForms
     {
         $this->avaliableTherapists = $this->getFreeTherapists();
         $this->avaliableRooms = $this->avaliavleRooms();
-        // dump($this->avaliableTherapists->toArray());
     }
 
 
@@ -143,8 +148,60 @@ class RoomAssign extends Page implements HasForms
         $this->selectedRoomId = null;
         $this->selectedTherapistId = null;
         $this->selectedTherapistTypeId = 1;
+        $this->therapist_form->fill();
+        $this->room_form->fill();
 
     }
+
+
+    public function therapist_form(Schema $schema): Schema
+    {
+
+        return $schema
+            ->components([
+                Select::make('therapist_id')
+                    ->hiddenLabel()
+                    ->placeholder('Select Therapist')
+                    // Using a query makes it more efficient
+                    ->options(fn () => $this->avaliableTherapists->pluck('name', 'id')->toArray())
+                    ->disableOptionWhen(fn ($value) =>
+                        !$this->startTime && !$this->endTime
+                    )
+                    ->afterStateUpdated(function ($state) {
+                        $this->selectedTherapistId = $state;
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->live()
+                    ->native(false) // Forces the nice UI even on mobile,
+            ])
+            ->statePath('data');
+    }
+
+    public function room_form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('room_id')
+                    ->hiddenLabel()
+                    ->placeholder('Select Room')
+                    // Using a query makes it more efficient
+                    ->options(fn () => $this->avaliableRooms->pluck('name', 'id')->toArray())
+                    ->disableOptionWhen(fn ($value) =>
+                        !$this->startTime && !$this->endTime
+                    )
+                    ->afterStateUpdated(function ($state) {
+                        $this->selectedRoomId = $state;
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->live()
+                    ->native(false) // Forces the nice UI even on mobile,
+            ])
+            ->statePath('data');
+    }
+
+
 
     //  Notification
 
