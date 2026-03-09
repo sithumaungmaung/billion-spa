@@ -3,7 +3,6 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
 
-
             {{-- Start Time --}}
             <x-filament-forms::field-wrapper label="Start Time" id="startTime">
                 <x-filament::input.wrapper>
@@ -48,7 +47,7 @@
 
 
             {{-- Therapist Select --}}
-            <x-filament-forms::field-wrapper label="Therapist" id="therapist">
+            {{-- <x-filament-forms::field-wrapper label="Therapist" id="therapist">
                 <x-filament::input.wrapper>
                     <x-filament::input.select id="therapist" wire:model.live="selectedTherapistId" :disabled="!$startTime || !$endTime">
                         <option value="0">Choose Therapist</option>
@@ -57,7 +56,13 @@
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
-            </x-filament-forms::field-wrapper>
+            </x-filament-forms::field-wrapper> --}}
+            <div class="">
+                <div class="mb-1">Select Therapist</div>
+                <div class="">
+                    {{ $this->therapist_form }}
+                </div>
+            </div>
 
             {{-- Therapist Type Select --}}
             <x-filament-forms::field-wrapper label="Specialization / Type" id="type">
@@ -72,8 +77,15 @@
             </x-filament-forms::field-wrapper>
 
 
+
             {{-- Room Select --}}
-            <x-filament-forms::field-wrapper label="Room" id="room">
+            <div class="">
+                <div class="mb-1">Select Room</div>
+                <div class="">
+                    {{ $this->room_form }}
+                </div>
+            </div>
+            {{-- <x-filament-forms::field-wrapper label="Room" id="room">
                 <x-filament::input.wrapper>
                     <x-filament::input.select id="room" wire:model.live="selectedRoomId" :disabled="!$startTime || !$endTime">
                         <option value="0">Select a Room</option>
@@ -82,7 +94,7 @@
                         @endforeach
                     </x-filament::input.select>
                 </x-filament::input.wrapper>
-            </x-filament-forms::field-wrapper>
+            </x-filament-forms::field-wrapper> --}}
 
 
 

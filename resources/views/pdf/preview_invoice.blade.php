@@ -166,7 +166,8 @@
                 {{-- Items --}}
                 @foreach ($invoice['items'] as $item)
                     <tr>
-                        <td class="col-item">{{ $item['product']['name'] ?? 'Item' }}</td>
+                        {{-- <td class="col-item">{{ $item['product']['name'] ?? 'Item' }}</td> --}}
+                        <td class="col-item">{{ $item['product_name'] ?? 'Item' }}</td>
                         <td class="col-qty">{{ $item['quantity'] }}</td>
                         <td class="col-amt">{{ number_format($item['total_price']) }}</td>
                     </tr>

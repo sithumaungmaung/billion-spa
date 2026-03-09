@@ -63,8 +63,9 @@
                 <tr class="border-b border-gray-200 dark:border-white/10">
                     <th class="px-4 py-3 w-12 text-center">#</th>
                     <th class="px-4 py-3">Title</th>
-                    <th class="px-4 py-3 text-right">Unit</th>
                     <th class="px-4 py-3 text-right">Unit Price</th>
+                    <th class="px-4 py-3 text-right">Unit</th>
+                    <th class="px-4 py-3 text-right">Discount per Unit</th>
                     <th class="px-4 py-3 text-right">Therapist Price</th>
                     <th class="px-4 py-3 text-right">Total</th>
                 </tr>
@@ -85,12 +86,16 @@
                             {{ $invoiceRoom['room_name'] }}
                         </td>
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ $invoiceRoom['unit_price'] }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $invoiceRoom['quantity'] }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ $invoiceRoom['unit_price'] }}
+                        <td class="px-4 py-3 text-right">
+                            -
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono">
@@ -116,12 +121,16 @@
                             {{ $product->product->name }}
                         </td>
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($product->unit_price) }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $product->quantity }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($product->unit_price) }}
+                        <td class="px-4 py-3 text-right">
+                            {{ $product->unit_discount }}
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono">
@@ -130,7 +139,7 @@
 
 
                         <td class="px-4 py-3 text-right font-mono font-semibold ">
-                            {{ number_format($product->quantity * $product->unit_price) }}
+                            {{ number_format($product->quantity * $product->unit_price - $product->unit_discount * $product->quantity) }}
                         </td>
                     </tr>
                 @endforeach
@@ -150,12 +159,16 @@
                             {{ $service->extraService->title }}
                         </td>
 
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($service->unit_price) }}
+                        </td>
+
                         <td class="px-4 py-3 text-right">
                             {{ $service->quantity }}
                         </td>
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($service->unit_price) }}
+                        <td class="px-4 py-3 text-right">
+                            -
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono">
@@ -193,11 +206,20 @@
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
-                    <td class="px-4 py-3 text-right font-mono" colspan="5">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6">
+                        <b>Sub Total</b>
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono font-semibold text-gray-500">
+                        {{ number_format($this->invoiceDetail->sub_total) }} </td>
+                </tr>
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-3 text-right font-mono" colspan="6">
                         @if ($invoiceDetail->discount_percent || $invoiceDetail->service_charge_percent)
-                            (Included Discount & Service Charge)
+                            (Included Discounts & Service Charge)
                         @endif
-                        <b>Total</b>
+                        <b>Grand Total</b>
                     </td>
                     <td class="px-4 py-3 text-right font-mono font-semibold">
                         {{ number_format($this->invoiceDetail->grand_total) }} </td>

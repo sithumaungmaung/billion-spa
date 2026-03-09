@@ -1,6 +1,7 @@
 <x-filament-panels::page>
     <x-filament::section>
         <x-filament::section compact class="p-0">
+
             <x-filament::section.heading class="mb-2">
                 Room Promotion
             </x-filament::section.heading>
@@ -86,6 +87,7 @@
                     {{-- <th class="px-4 py-3">Section</th> --}}
                     <th class="px-4 py-3 text-right">Unit Price</th>
                     <th class="px-4 py-3 text-right">Unit</th>
+                    <th class="px-4 py-3 text-right">Discount</th>
                     <th class="px-4 py-3 text-right">Therapist Price</th>
                     <th class="px-4 py-3 text-right">Total</th>
                 </tr>
@@ -131,6 +133,9 @@
                             {{ $billRoom['quantity'] }}
                         </td>
 
+                        <td class="px-4 py-3 font-medium">
+                            -
+                        </td>
 
                         <td class="px-4 py-3 text-right font-mono">
                             {{ $billRoom['therapist_price'] }}
@@ -144,7 +149,7 @@
                 @endforeach
 
                 <!-- bill for product items -->
-                @foreach ($this->billItems as $key => $product)
+                @foreach ($this->billItems as $key => $productSale)
                     <tr
                         class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
@@ -153,7 +158,7 @@
                         </td>
 
                         <td class="px-4 py-3 font-medium">
-                            {{ $product->product->name }}
+                            {{ $productSale->product->name }}
                         </td>
 
                         <td class="px-4 py-3 font-medium text-center">
@@ -165,21 +170,33 @@
                         </td> --}}
 
                         <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($product->unit_price) }}
+                            {{ number_format($productSale->unit_price) }}
                         </td>
 
 
                         <td class="px-4 py-3 text-right">
-                            {{ $product->quantity }}
+                            {{ $productSale->quantity }}
                         </td>
 
+                        <td class="px-1 py-1 font-medium w-[150px]">
+                            <div class="flex items-center gap-2">
+
+                                <x-filament::input.wrapper class="flex-1 !rounded-none !ring-0 !shadow-none !border-0">
+                                    <x-filament::input type="number" min="0" step="500"
+                                        placeholder="disc/unit"
+                                        wire:model.lazy="applyProductDiscount.{{ $productSale->id }}"
+                                        class="w-full min-w-0 !rounded-none !ring-0 !border-0 focus:!ring-0 focus:!border-0" />
+                                </x-filament::input.wrapper>
+
+                            </div>
+                        </td>
 
                         <td class="px-4 py-3 font-medium text-center">
                             -
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono font-semibold ">
-                            {{ number_format($product->quantity * $product->unit_price) }}
+                            {{ number_format($productSale->quantity * $productSale->unit_price) }}
                         </td>
                     </tr>
                 @endforeach
@@ -213,6 +230,10 @@
                             {{ $service->quantity }}
                         </td>
 
+                        <td class="px-4 py-3 font-medium">
+                            -
+                        </td>
+
 
                         <td class="px-4 py-3 text-center">
                             -
@@ -228,7 +249,7 @@
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
-                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Sub Total</b> </td>
+                    <td class="px-4 py-3 text-right font-mono" colspan="7"> <b>Sub Total</b> </td>
                     <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->subTotal) }}
                     </td>
                     {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
@@ -237,9 +258,9 @@
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
-                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Discount</b> </td>
-                    <td class="px-4 py-3 text-right font-mono font-semibold">
-                        {{ number_format($this->discountAmount) }}
+                    <td class="px-4 py-2 text-right font-mono" colspan="7"> <b>Product Discounts</b> </td>
+                    <td class="px-4 py-2 text-right font-mono font-semibold">
+                        {{ number_format($this->totalProductDiscount) }}
                     </td>
                     {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
                 </tr>
@@ -247,8 +268,28 @@
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
-                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Service Charge</b> </td>
-                    <td class="px-4 py-3 text-right font-mono font-semibold">
+                    <td class="px-4 py-2 text-right font-mono" colspan="7"> <b>Invoice Discount</b> </td>
+                    <td class="px-4 py-2 text-right font-mono font-semibold">
+                        {{ number_format($this->discountAmountByPercentage) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-2 text-right font-mono" colspan="7"> <b>Total Discount</b> </td>
+                    <td class="px-4 py-2 text-right font-mono font-semibold">
+                        {{ number_format($this->totalDiscountAmount) }}
+                    </td>
+                    {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
+                </tr>
+
+                <tr
+                    class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
+                            dark:hover:bg-white/5 transition">
+                    <td class="px-4 py-2 text-right font-mono" colspan="7"> <b>Service Charge</b> </td>
+                    <td class="px-4 py-2 text-right font-mono font-semibold">
                         {{ number_format($this->serviceChargeAmount) }}
                     </td>
                     {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
@@ -257,7 +298,7 @@
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
-                    <td class="px-4 py-3 text-right font-mono" colspan="6"> <b>Total</b> </td>
+                    <td class="px-4 py-3 text-right font-mono" colspan="7"> <b>Grand Total</b> </td>
                     <td class="px-4 py-3 text-right font-mono font-semibold"> {{ number_format($this->total) }} </td>
                     {{-- <td class="px-4 py-3 text-right font-mono font-semibold"> "hee hee" </td> --}}
                 </tr>

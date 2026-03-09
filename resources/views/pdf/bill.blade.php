@@ -147,6 +147,7 @@
                 <tr>
                     <th class="col-item">Item</th>
                     <th class="col-qty">Qty</th>
+                    {{-- <th class="col-qty">Discount</th> --}}
                     <th class="col-amt">Amt</th>
                 </tr>
             </thead>
@@ -159,6 +160,7 @@
                             <span class="small-text">{{ $room['service_type']['title'] ?? '' }}</span>
                         </td>
                         <td class="col-qty">{{ $room['quantity'] }}</td>
+                        {{-- <td class="col-qty"> - </td> --}}
                         <td class="col-amt">
                             {{ number_format($room['total_price']) }}
                             @if ((int) $room['service_type_price'] == 0)
@@ -177,7 +179,16 @@
                             {{ $item['product']['name'] ?? 'Item' }}
                         </td>
                         <td class="col-qty">{{ $item['quantity'] }}</td>
-                        <td class="col-amt">{{ number_format($item['total_price']) }}</td>
+                        {{-- <td class="col-qty">{{ $item['discount_exist'] ? 'Yes' : 'No' }}</td> --}}
+                        <td class="col-amt">
+                            {{-- @if ($item['discount_amount'])
+                                <span style="color:#555">
+
+                                    ({{ $item['discount_amount'] }})
+                                </span>
+                            @endif --}}
+                            {{ number_format($item['total_price']) }}
+                        </td>
                     </tr>
                 @endforeach
 
