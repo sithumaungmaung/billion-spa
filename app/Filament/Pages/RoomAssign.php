@@ -36,7 +36,7 @@ class RoomAssign extends Page implements HasForms
 
     public $selectedRoomId;
     public $selectedTherapistId;
-    public $selectedTherapistTypeId = 1;
+    public $selectedTherapistTypeId;
 
     // -------------------------------- //
     // For therapist and room form
@@ -57,6 +57,8 @@ class RoomAssign extends Page implements HasForms
         $this->therapist_form->fill();
         $this->room_form->fill();
         $this->therapistTypes = TherapistType::get();
+        $this->selectedTherapistTypeId = TherapistType::first()->id;
+
     }
 
 
@@ -147,7 +149,7 @@ class RoomAssign extends Page implements HasForms
         $this->endTime = null;
         $this->selectedRoomId = null;
         $this->selectedTherapistId = null;
-        $this->selectedTherapistTypeId = 1;
+        $this->selectedTherapistTypeId = TherapistType::first()->id;
         $this->therapist_form->fill();
         $this->room_form->fill();
 
