@@ -183,7 +183,8 @@
 
                                 <x-filament::input.wrapper class="flex-1 !rounded-none !ring-0 !shadow-none !border-0">
                                     <x-filament::input type="number" min="0" step="500"
-                                        placeholder="disc/unit"
+                                        x-on:input="if ($event.target.value > {{ $productSale->unit_price }}) $event.target.value = {{ $productSale->unit_price }}"
+                                        type="number" max="{{ $productSale->unit_price }}" placeholder="disc/unit"
                                         wire:model.lazy="applyProductDiscount.{{ $productSale->id }}"
                                         class="w-full min-w-0 !rounded-none !ring-0 !border-0 focus:!ring-0 focus:!border-0" />
                                 </x-filament::input.wrapper>
@@ -196,7 +197,22 @@
                         </td>
 
                         <td class="px-4 py-3 text-right font-mono font-semibold ">
-                            {{ number_format($productSale->quantity * $productSale->unit_price) }}
+
+                            @php
+                                $discount = (int) ($this->applyProductDiscount[$productSale->id] ?? 0);
+                                $total = $productSale->quantity * ((int) $productSale->unit_price - $discount);
+                            @endphp
+                            {{ number_format($total) }}
+
+                            {{-- @if ($discount >= $productSale->unit_price)
+                                Error
+                            @else
+                                {{ number_format($total) }}
+                            @endif --}}
+                            {{-- {{ number_format(
+                                $productSale->quantity *
+                                    ((int) $productSale->unit_price - (int) ($this->applyProductDiscount[$productSale->id] ?? 0)),
+                            ) }} --}}
                         </td>
                     </tr>
                 @endforeach

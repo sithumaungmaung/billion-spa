@@ -258,8 +258,13 @@ class CheckBill extends Page
 
         $this->totalProductDiscount = 0;
         foreach ($this->applyProductDiscount as $saleId => $price) {
+            $item = $this->billItems->where('id', $saleId)->first();
             $quantity = $this->billItems->where('id', $saleId)->first()->quantity;
             $this->totalProductDiscount += (int) $price * (int) $quantity ?? 0;
+
+            if($price > $item->unit_price){
+                $this->applyProductDiscount[$saleId] = $item->unit_price;
+            }
         }
 
         $this->totalDiscountAmount = $this->discountAmountByPercentage + $this->totalProductDiscount;
