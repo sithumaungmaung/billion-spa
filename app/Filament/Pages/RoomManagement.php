@@ -29,7 +29,8 @@ class RoomManagement extends Page implements HasForms
     use InteractsWithForms;
 
     protected string $view = 'filament.pages.room-management';
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-text'; // Replace 'heroicon-o-document-text' with your desired icon
+    // protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-text'; // Replace 'heroicon-o-document-text' with your desired icon
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-office'; // Replace 'heroicon-o-document-text' with your desired icon
 
 
     // ----------------
@@ -70,27 +71,6 @@ class RoomManagement extends Page implements HasForms
 
     public $extraServiceAndProductSales = [];
 
-    // public ?array $selectedRoomIdsForBill = [];
-    // public ?int $selectedSlotId = null;
-    // public ?int $selectedTherapistId = null;
-
-    // public ?int $selectedType = null;
-    // public $therapistTypes;
-    // public $extraServices; // for dropdown (mount action)
-
-    // public $isExistingRecord = null;
-
-    // public $sameTimeSlotForTherapist = [];
-
-    // // for detail section view (Mini Info)
-    // public string $selectedRoomName = '';
-    // public string $selectedTherapistName = '';
-    // public string $selectedTherapistType = '';
-    // public string $selectedTimeSection = '';
-
-
-
-    // public ?string $selectedProductSaleId = null;
 
     public ?array $data = [];
 
@@ -101,26 +81,14 @@ class RoomManagement extends Page implements HasForms
         $this->activeRooms = $this->activeRooms();
         $this->rooms =  $this->activeRooms;
 
-        // dump($this->activeRooms->toArray());
-        // $this->rooms =  $this->avaliableRooms;
-        // dump($this->avaliableRooms->toArray());
-        // dump($this->rooms->toArray());
-        // $this->rooms = Room::get();
-        // $this->timeSlots = TimeSlot::get();
-        // $this->therapists = $this->getFreeTherapists();
         $this->therapistTypes = TherapistType::get();
         $this->extraServices = ExtraService::get();
-        // $this->selectedTherapistType = $this->therapistTypes->first()->id;
-        // dump($this->activeRooms->pluck('room_id')->toArray());
+
         $this->therapist_form->fill();
         $this->room_form->fill();
         $this->product_form->fill();
 
-        // dump($this->getFreeTherapists()->toArray());
 
-
-        // $this->products = Product::get();
-        // $this->extraServices = ExtraService::get();
     }
 
 
@@ -178,9 +146,6 @@ class RoomManagement extends Page implements HasForms
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
                         ->with('room', 'therapist', 'therapistType')
                         ->whereNull('invoice_id')
-                        // ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
-                        // ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))
-                        // ->orderBy('invoice_id', 'asc')
                         ->get();
 
 
@@ -250,12 +215,9 @@ class RoomManagement extends Page implements HasForms
                             $this->selectedRoomId = DailyRoomRecord::where('room_id', $state)->first()->id;
                             $this->selectedRoom = DailyRoomRecord::where('room_id', $state)->first();
                             $this->getSalesForDailyRoomRecord();
-                            // dump(DailyRoomRecord::where('id', $this->selectedRoomId)->get());
 
-                            // $this->rooms =  DailyRoomRecord::where('id', $this->selectedRoomId)->get();
                             $this->rooms =  DailyRoomRecord::whereIn('room_id', [$state])->get();
                             $this->data['therapist_id'] = $this->selectedRoom->therapist->id;
-                            // dump($this->rooms);
 
                         }else{
                             $this->rooms =  $this->activeRooms();
@@ -277,7 +239,6 @@ class RoomManagement extends Page implements HasForms
                 Select::make('product_id')
                     ->hiddenLabel()
                     ->placeholder('Select Product')
-                    // ->options(Product::all()->pluck('name', 'id'))
                     ->options(
                             Product::all()->mapWithKeys(function ($product) {
                                 return [$product->id => $product->name . ' - (' . number_format($product->price) . ')'];
@@ -292,37 +253,6 @@ class RoomManagement extends Page implements HasForms
             ])
             ->statePath('data');
     }
-
-    // public function extraService_form(Schema $schema): Schema
-    // {
-    //     return $schema
-    //         ->components([ // In v4, we use ->components([]) instead of ->schema([])
-    //             Select::make('extra_service_id')
-    //                 ->hiddenLabel()
-    //                 ->placeholder('Select Extra Service')
-    //                 // Using a query makes it more efficient
-    //                 ->options(ExtraService::all()->pluck('title', 'id'))
-    //                 ->searchable()
-    //                 ->preload()
-    //                 ->multiple()
-    //                 ->live()
-    //                 ->native(false), // Forces the nice UI even on mobile
-    //         ])
-    //         ->statePath('data');
-
-    // }
-
-
-    // public function updatedSelectedTherapistTypeId($value)
-    // {
-    //     // This method runs automatically when the select changes
-    //     // $value is the currently selected id
-    //     info("Selected therapist type ID: " . $value);
-
-    //     // Example: get the full model
-    //     $selectedType = TherapistType::find($value);
-    //     info("Selected therapist title: " . ($selectedType->title ?? 'None'));
-    // }
 
 
     public function switchTherapistAndTherapistType()
@@ -380,92 +310,6 @@ class RoomManagement extends Page implements HasForms
     }
 
 
-    // public function selectCell(int $roomId, int $slotId): void
-    // {
-
-    //     $this->selectedRoomId = $roomId;
-    //     $this->selectedSlotId = $slotId;
-
-    //     $this->selectedRoomName = Room::find($roomId)->name;
-    //     $this->selectedTherapistName = $this->getThapistName($roomId, $slotId);
-    //     $this->selectedTherapistType = $this->getTherapistType($roomId, $slotId);
-    //     $this->selectedExtraServicesList = $this->getRoomExtraServices($roomId, $slotId);
-
-    //     $this->selectedStartTime = TimeSlot::find($slotId)->start_time;
-    //     $this->selectedEndTime =  TimeSlot::find($slotId)->end_time;
-    //     $this->selectedTimeSection = $this->selectedStartTime . ' - ' . $this->selectedEndTime;
-
-    //     $this->isExistingRecord = DailyRoomRecord::where('record_date', $this->date)
-    //     ->where('room_id', $this->selectedRoomId)
-    //     ->where('time_slot_id', $this->selectedSlotId)
-    //     ->first();
-
-    //     $this->sameTimeSlotForTherapist = $this->getSameTimeSlotTherapist($roomId, $slotId);
-
-    //     // $this->mountAction('cellModal'); {{ to show up the modal box }}
-    //     //  $this->reset(['selectedRoomId', 'selectedSlotId', 'selectedTherapistId']);
-    // }
-
-    // public function assign(): void
-    // {
-    //     $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)
-    //                                         ->where('room_id', $this->selectedRoomId)
-    //                                         ->where('time_slot_id', $this->selectedSlotId)
-    //                                         ->whereNotNull('invoice_id')
-    //                                         ->first();
-
-    //     if ($dailyRoomRecord) {
-    //         Notification::make()
-    //         ->title('Billing Error')
-    //         ->body('This room has already been billed.')
-    //         ->danger()
-    //         ->send();
-
-    //         return;
-    //     }
-
-    //     $this->selectedTherapistId = $this->data['therapist_id'] ?? null;
-    //     $room = Room::find($this->selectedRoomId);
-
-    //     $therapistType = TherapistType::find($this->selectedType);
-
-    //     $alreadyAssigned = DailyRoomRecord::where([
-    //         'record_date' => $this->date,
-    //         'time_slot_id' => $this->selectedSlotId,
-    //         'therapist_id' => $this->selectedTherapistId,
-    //          'service_type' => $this->selectedType,
-    //          'service_type_price' => $therapistType ? $therapistType->price : 0,
-    //     ])->first();
-
-    //     if($alreadyAssigned) {
-    //         $this->notifyError(
-    //                 'Error: Assignment Error',
-    //                 'You have already selected a therapist for this time slot. Please select a different therapist.'
-    //             );
-    //             return;
-
-    //     }
-
-    //     DailyRoomRecord::updateOrCreate(
-    //         [
-    //             'record_date' => $this->date,
-    //             'room_id' => $this->selectedRoomId,
-    //             'time_slot_id' => $this->selectedSlotId,
-    //         ],
-    //         [
-    //             'therapist_id' => $this->selectedTherapistId,
-    //             'service_type' => $this->selectedType,
-    //             'price' => $room ? $room->price : 0,
-    //             'service_type_price' => $therapistType ? $therapistType->price : 0,
-    //         ]
-    //     );
-
-    //     $this->reset(['selectedRoomId', 'selectedSlotId']);
-
-    //     $this->data['therapist_id'] = null;
-    //     $this->therapist_form->fill();
-
-    // }
 
     public function removeTherapist(): void
     {
@@ -695,7 +539,6 @@ class RoomManagement extends Page implements HasForms
             $convertedEndTime <= $convertedStartTime ||
 
             $convertedStartTime >= $convertedEndTime
-            // $convertedStartTime >= $dailyRoomRecord->end_time
         ) {
             $this->notifyError('Error', 'End time must be greater than start time');
             $this->selectedStartTime = $dailyRoomRecord->start_time;
@@ -717,48 +560,6 @@ class RoomManagement extends Page implements HasForms
 
     }
 
-
-    // public function removeExtraService($saleproduct): void
-    // {
-    //     $productSale = ExtraServiceSale::where('id', $saleproduct)->delete();
-    //     $this->selectedExtraServicesList = $this->getRoomExtraServices($this->selectedRoomId, $this->selectedSlotId);
-    //     $this->notifySuccess(
-    //         'Success: Remove Success',
-    //         'Extra service removed successfully.'
-    //     );
-    // }
-
-    // public function getCanAddProductProperty() : bool {
-    //     $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)
-    //                         ->where('room_id', $this->selectedRoomId)
-    //                         ->where('time_slot_id', $this->selectedSlotId)
-    //                         ->first();
-
-    //     $result = $dailyRoomRecord ? 0 : 1;
-    //     return $result;
-    // }
-
-    // public function getThapistName($roomId, $slotId): string
-    // {
-    //     $schedule = DailyRoomRecord::where([
-    //         'record_date' => $this->date,
-    //         'room_id' => $roomId,
-    //         'time_slot_id' => $slotId,
-    //     ])->with('therapist')->first();
-
-    //     return $schedule?->therapist?->name ?? "";
-    // }
-
-    // public function getTherapistType($roomId, $slotId): string
-    // {
-    //     $schedule = DailyRoomRecord::where([
-    //         'record_date' => $this->date,
-    //         'room_id' => $roomId,
-    //         'time_slot_id' => $slotId,
-    //     ])->with('therapistType')->first();
-
-    //     return $schedule?->therapistType?->title ?? "";
-    // }
 
     public function getRoomExtraServices($roomId): array
     {
@@ -782,71 +583,6 @@ class RoomManagement extends Page implements HasForms
 
     }
 
-    // public function checkBill($roomId, $slotId): bool
-    // {
-    //     $billCheck = DailyRoomRecord::where([
-    //         'record_date' => $this->date,
-    //         'room_id' => $roomId,
-    //         'time_slot_id' => $slotId,
-    //     ])->whereNotNull('invoice_id')->count();
-
-    //     return $billCheck ? true : false;
-    // }
-
-    // public function getDailyRoomRecordId($roomId, $slotId): string
-    // {
-    //     $schedule = DailyRoomRecord::where([
-    //         'record_date' => $this->date,
-    //         'room_id' => $roomId,
-    //         'time_slot_id' => $slotId,
-    //     ])->select('id')->first();
-
-    //     return $schedule?->id ?? "";
-    // }
-
-    // public function getSelectedRoomRecordProductsProperty(): ? Array
-    // {
-    //     if ($this->selectedRoomId && $this->selectedSlotId) {
-
-    //         $dailyRoomRecord = DailyRoomRecord::where([
-    //             'record_date' => $this->date,
-    //             'room_id' => $this->selectedRoomId,
-    //             'time_slot_id' => $this->selectedSlotId,
-    //         ])->first();
-
-    //         if (!$dailyRoomRecord) {
-    //             return [];
-    //         }
-
-    //         $productSale = ProductSale::with('product')->where('daily_room_record_id', $dailyRoomRecord->id)->get();
-
-    //         return [
-    //             'dailyRoomRecord' => $dailyRoomRecord,
-    //             'productSales' => $productSale,
-    //             'productSaleTotal' => $productSale->sum('total_price'),
-    //         ];
-    //     }
-
-    //     return [];
-    // }
-
-    // public function goToCheckBill()
-    // {
-    //     // if (! $this->selectedRoomId || ! $this->selectedSlotId) {
-    //     //     return;
-    //     // }
-    //     return redirect()->route('filament.admin.pages.check-bill', [
-    //         'bill_for' => implode(',', $this->selectedRoomIdsForBill)
-    //     ]);
-    // }
-
-
-
-    // public function getTherapistTypes()
-    // {
-    //     return TherapistType::all();
-    // }
-
 
 
     public function getSalesForDailyRoomRecord()
@@ -865,40 +601,6 @@ class RoomManagement extends Page implements HasForms
         $this->extraServiceAndProductSales = $data;
 
     }
-
-
-
-
-
-
-
-    // public function getSameTimeSlotTherapist($roomId, $slotId)
-    // {
-    //     return DailyRoomRecord::where(['time_slot_id' => $this->selectedSlotId])
-    //     ->where('record_date', $this->date)->with('therapist')->pluck('therapist_id');
-    // }
-
-
-    // public function notifyError(string $type, string $message): void
-    // {
-    //     Notification::make()
-    //             ->title($type)
-    //             ->body($message)
-    //             ->danger() // Makes the notification red
-    //             ->persistent() // Stays on screen until they click it
-    //             ->send();
-    // }
-    // public function notifySuccess(string $type, string $message): void
-    // {
-    //     Notification::make()
-    //             ->title($type)
-    //             ->body($message)
-    //             ->success() // Makes the notification red
-    //             ->persistent() // Stays on screen until they click it
-    //             ->send();
-    // }
-
-
 
     public function notifyError(string $type, string $message): void
     {

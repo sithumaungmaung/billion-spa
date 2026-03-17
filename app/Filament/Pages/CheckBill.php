@@ -235,8 +235,6 @@ class CheckBill extends Page
         ]);
 
         $this->dispatch('invoice.preview', url: $url);
-
-        // return redirect()->away()->route('invoice.preview', ['ids' => implode(',', $this->roomIds), 'onePlusOne' => $this->onePlusone]);
     }
 
     public function updatedDiscountPercentage()
