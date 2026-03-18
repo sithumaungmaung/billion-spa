@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
 
+
 class CheckBill extends Page
 {
     use BillTraits;
@@ -44,6 +45,7 @@ class CheckBill extends Page
     public array $roomIds = [];
     public $billItems, $billExtraServices, $billRooms, $systemDailyRecords = [];
     public $total;
+    public $grandTotal = 0;
     public $buy = 1;
     public $free = 0;
     public $discountPercentage = 0;
@@ -57,18 +59,24 @@ class CheckBill extends Page
     public $applyProductDiscount = [];
     public $totalProductDiscount = 0;
 
+    public $user = null;
+
     public function mount(): void
     {
         $this->roomIds = array_map(
             'intval',
             explode(',', $this->bill_for)
         );
-        // $this->getBill();
+
         $this->billItems = $this->getBillItems($this->roomIds);
         $this->billExtraServices = $this->getBillExtraServices($this->roomIds);
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
-        $this->total = $this->totalBill();
-        $this->subTotal = $this->total;
+        // $this->total = $this->totalBill();
+        $this->total = $this->getSubTotal();
+
+        $this->user = Auth::user();
+
+        $this->subTotal = $this->getSubTotal();
         $this->systemDailyRecords = $this->getSystemDailyRecords();
     }
 
@@ -99,7 +107,9 @@ class CheckBill extends Page
     public function applyPromotion()
     {
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
-        $this->total = $this->totalBill() - $this->totalDiscountAmount + $this->serviceChargeAmount;
+        $this->subTotal = $this->getSubTotal();
+        $this->total = $this->getGrandTotal();
+
     }
 
     public function confirmBill()
@@ -130,10 +140,9 @@ class CheckBill extends Page
         $invoice->invoice_datetime = Carbon::now();
         $invoice->buy = $this->buy;
         $invoice->free = $this->free;
-        $invoice->sub_total = $this->total + $this->discountAmountByPercentage  + $this->totalProductDiscount - $this->serviceChargeAmount;
-        $invoice->discount = 0;
+        $invoice->sub_total = $this->getSubTotal();
         $invoice->tax = 0 ;
-        $invoice->grand_total = $this->total ;
+        $invoice->grand_total = $this->getGrandTotal();
         $invoice->discount_percent = $this->discountPercentage;
         $invoice->discount_amount = $this->discountAmountByPercentage;
         $invoice->service_charge_percent = $this->serviceChargePercentage;
@@ -232,30 +241,44 @@ class CheckBill extends Page
             'productDiscount' => json_encode($this->applyProductDiscount),
             // 'totalDiscountAmount' => $this->totalDiscountAmount,
             'totalProductDiscount' => $this->totalProductDiscount,
+            'subTotal' => $this->getSubTotal(),
+            'grandTotal' => $this->getGrandTotal(),
         ]);
 
         $this->dispatch('invoice.preview', url: $url);
     }
 
+
+    // main Dis By %
     public function updatedDiscountPercentage()
     {
-        $this->discountAmountByPercentage = $this->discountPercentage * $this->totalBill() / 100;
+        $this->discountAmountByPercentage = $this->discountPercentage * $this->getSubTotal() / 100;
         $this->totalDiscountAmount = $this->discountAmountByPercentage + $this->totalProductDiscount;
-        $this->total = $this->totalBill() - $this->totalDiscountAmount + $this->serviceChargeAmount ;
+
+        $this->subTotal = $this->getSubTotal();
+        $this->total = $this->getGrandTotal();
+
     }
 
-
+    // Service %
     public function updatedServiceChargePercentage()
     {
-        $this->serviceChargeAmount = $this->serviceChargePercentage * $this->totalBill() / 100;
-        $this->total = $this->totalBill() - $this->totalDiscountAmount + $this->serviceChargeAmount ;
+        $this->serviceChargeAmount = $this->serviceChargePercentage * $this->getSubTotal() / 100;
+        $this->subTotal = $this->getSubTotal();
+        $this->total = $this->getGrandTotal() ;
     }
 
+    // Product %
     public function updatedApplyProductDiscount($disPrice, $sale_id)
     {
 
         $this->totalProductDiscount = 0;
         foreach ($this->applyProductDiscount as $saleId => $price) {
+
+            if($price === null || $price === '' || $price == 0){
+                unset($this->applyProductDiscount[$saleId]);
+            }
+
             $item = $this->billItems->where('id', $saleId)->first();
             $quantity = $this->billItems->where('id', $saleId)->first()->quantity;
             $this->totalProductDiscount += (int) $price * (int) $quantity ?? 0;
@@ -265,11 +288,25 @@ class CheckBill extends Page
             }
         }
 
-        $this->totalDiscountAmount = $this->discountAmountByPercentage + $this->totalProductDiscount;
+        $this->subTotal = $this->getSubTotal();
+        $this->total = $this->getGrandTotal();
 
-        $this->total = $this->totalBill() - $this->totalDiscountAmount + $this->serviceChargeAmount;
+        $this->updatedDiscountPercentage();
+        $this->updatedServiceChargePercentage();
+
 
     }
+
+    public function getSubTotal()
+    {
+        return $this->totalBill() - $this->totalProductDiscount;
+    }
+
+    public function getGrandTotal()
+    {
+        return $this->subTotal + $this->serviceChargeAmount - $this->discountAmountByPercentage;
+    }
+
 
 
     public function updatedBuy()

@@ -31,6 +31,9 @@ class InvoiceController extends Controller
         $serviceChargePercentage = $req->serviceChargePercentage;
         $discountAmountByPercentage = $req->discountAmountByPercentage;
         $serviceChargeAmount = $req->serviceChargeAmount;
+        $subTotal = $req->subTotal;
+        $grandTotal = $req->grandTotal;
+
 
         $roomIds = array_map('intval', explode(',', $ids));
 
@@ -38,8 +41,8 @@ class InvoiceController extends Controller
         $billItems = $this->getBillItems($roomIds);
         $billExtraServices = $this->getBillExtraServices($roomIds);
 
-        $total = $this->totalBill($billItems, $billRooms, $billExtraServices);
-        $grandTotal = $total + $serviceChargeAmount - $discountAmountByPercentage - $totalProductDiscount;
+        // $total = $this->totalBill($billItems, $billRooms, $billExtraServices);
+        // $grandTotal = $total + $serviceChargeAmount - $discountAmountByPercentage - $totalProductDiscount;
 
         $invoice = [
             // 'invoiceDetail' => '',
@@ -70,8 +73,8 @@ class InvoiceController extends Controller
                 return $service;
                 }),
                 // 'extraServices' => $billExtraServices->toArray(),
-            'total' => $total,
-            'grandTotal' => $grandTotal ,
+            'total' => $subTotal,
+            'grandTotal' => $grandTotal,
             'disPercentage' => $disPercentage,
             'disAmount' => $discountAmountByPercentage,
             'serviceChargePercentage' => $serviceChargePercentage,

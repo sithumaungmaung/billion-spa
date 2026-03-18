@@ -23,7 +23,7 @@
 
                 <div class="h1 text-gray-500">
                     Confirm By: <span class="text-gray-100">
-                        {{ $invoiceDetail->users->name ?? '-' }}
+                        {{ $invoiceDetail->user->name ?? '-' }}
                     </span>
                 </div>
 
@@ -227,9 +227,15 @@
             </tbody>
         </table>
         <div class="my-2">
-            <x-filament::button wire:click="previewInvoice" target="_blank">
-                Download Invoice
-            </x-filament::button>
+            <div class="flex items-center justify-between">
+                <x-filament::button wire:click="previewInvoice" target="_blank">
+                    Download Invoice
+                </x-filament::button>
+
+                {{-- <div class="text-right">
+                    Invoice By {{ $invoiceDetail->user->name }} .
+                </div> --}}
+            </div>
         </div>
 
     </x-filament::section>

@@ -25,7 +25,7 @@ class InvoiceDetail extends Page
     {
 
         $this->invoiceDetail = Invoice::where('invoice_no', $this->invoice_no)
-        ->with('invoiceRooms', 'invoiceProducts', 'invoiceExtraServices', 'users', 'dailyRoomRecord.therapist')->first();
+        ->with('invoiceRooms', 'invoiceProducts', 'invoiceExtraServices', 'user', 'dailyRoomRecord.therapist')->first();
 
         $this->dailyRoomRecords = DailyRoomRecord::where('invoice_id', $this->invoiceDetail->id)->with('room', 'therapist', 'therapistType')->get();
     }
