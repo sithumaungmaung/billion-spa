@@ -159,6 +159,7 @@ class CheckBill extends Page
 
             $invoice->invoiceExtraServices()->create([
                 'branch_id' => 1,
+                'extra_service_title' => $extraService->extraService->title,
                 'quantity'    => $extraService->quantity,
                 'extra_service_id'  => $extraService->extra_service_id,
                 'unit_price'  => $extraService->unit_price,

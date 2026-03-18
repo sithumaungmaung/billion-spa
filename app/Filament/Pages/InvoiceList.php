@@ -2,8 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
+use App\Jobs\InvoiceExportExcelJob;
 use App\Models\Invoice;
+use App\Services\ExportService;
+use BackedEnum;
 use Filament\Pages\Page;
 use Livewire\WithPagination;
 
@@ -33,12 +35,13 @@ class InvoiceList extends Page
     public $startDate;
     public $endDate;
 
-    // public function mount(): void
-    // {
-    //     $this->invoices = Invoice::orderBy('id', 'desc')->paginate(10);
-    // }
 
+    public $excelStartDate;
+    public $excelEndDate ;
 
+    public function mount(){
+        $this->excelEndDate = now()->toDateString();
+    }
     public function getInvoices()
     {
         $query = Invoice::query();
@@ -64,13 +67,16 @@ class InvoiceList extends Page
 
     }
 
+    // public function exportInvoice()
+    // {
+    //     dispatch(new InvoiceExportExcelJob($this->excelStartDate, $this->excelEndDate));
+    //     return redirect()->route('filament.admin.pages.invoice-list');
+    // }
 
     public function showInvoiceDetail($invoice_no)
     {
         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice_no]);
-
     }
-
 
 
 
