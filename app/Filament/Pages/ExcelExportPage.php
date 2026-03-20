@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Exports\Invoices\InvoiceExport;
 use App\Jobs\InvoiceExportExcelJob;
 use App\Models\ExcelExportList;
+use App\Services\ExportService;
 use BackedEnum;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
@@ -41,13 +42,16 @@ class ExcelExportPage extends Page
 
     public function exportInvoice()
     {
-        dispatch(new InvoiceExportExcelJob($this->excelStartDate, $this->excelEndDate));
-        return redirect()->route('filament.admin.pages.excel-export-page');
+        $exportService = new ExportService();
+        $exportService->exportInvoice($this->excelStartDate, $this->excelEndDate);
+
+        // dispatch(new InvoiceExportExcelJob($this->excelStartDate, $this->excelEndDate));
+        // return redirect()->route('filament.admin.pages.excel-export-page');
     }
 
     public function downloadExcel($filename)
     {
-        return Storage::disk('local')->download('excel-export/' . $filename);
+        return Storage::disk('public')->download('excel-export/' . $filename);
     }
 
 

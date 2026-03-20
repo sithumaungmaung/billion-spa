@@ -81,7 +81,7 @@ class ExportService
                 new InvoiceExport($invoices, collect($details)),
                 'excel-export/' . $fileName,
                 // 'obs'
-                'local'
+                'public'
             );
 
             $this->addExcelExportList('Invoice', $fileName, $startDate, $endDate);
