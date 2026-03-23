@@ -12,7 +12,7 @@ class ExtraServiceForm
     {
         return $schema
             ->components([
-                  TextInput::make('title')
+                TextInput::make('title')
                     ->label('Title')
                     ->required(),
                 TextInput::make('price')
