@@ -36,7 +36,8 @@ class ExportService
                         'unit'            => $room->quantity,
                         'discount_per_unit' => null,
                         'therapist_price' => $invoice->dailyRoomRecord->therapist->price ?? 0,
-                        'total'           => ($room->unit_price * $room->quantity) + ($invoice->dailyRoomRecord->therapist->price ?? 0),
+                        // 'total'           => ($room->unit_price * $room->quantity) + ($invoice->dailyRoomRecord->therapist->price ?? 0),
+                        'total'           => $room->total_price,
                     ];
                 }
             }
