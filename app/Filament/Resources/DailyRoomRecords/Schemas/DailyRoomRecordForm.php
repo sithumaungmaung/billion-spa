@@ -28,7 +28,7 @@ class DailyRoomRecordForm
                         'name',
                         modifyQueryUsing: function ($query) {
                             $query->whereDoesntHave('dailyRoomRecords', function ($q) {
-                                $q->availableRooms(); // 👈 now valid
+                                $q->availableRooms(); // 👈 now valid  (scopeAvailableRooms from model)
                             });
                         }
                     )

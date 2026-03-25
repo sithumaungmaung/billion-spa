@@ -18,15 +18,12 @@ class InvoiceDetailExport implements FromCollection, WithHeadings, WithTitle
     public function __construct($details)
     {
         $this->details = $details;
-        // dd($this )
     }
 
 
     public function collection()
     {
-        // dd($this->details);
         return InvoiceDetailResource::collection($this->details);
-
     }
 
     public function title(): string
@@ -43,6 +40,7 @@ class InvoiceDetailExport implements FromCollection, WithHeadings, WithTitle
             'Unit',
             'Discount_Per_Unit',
             'Therapist_Price',
+            'Therapist',
             'Total'
         ];
     }
