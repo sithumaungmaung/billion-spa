@@ -85,8 +85,8 @@
                     <th class="px-4 py-3">Title</th>
                     <th class="px-4 py-3">Date & Time</th>
                     {{-- <th class="px-4 py-3">Section</th> --}}
-                    <th class="px-4 py-3 text-right">Unit Price</th>
                     <th class="px-4 py-3 text-right">Unit</th>
+                    <th class="px-4 py-3 text-right">Unit Price</th>
                     <th class="px-4 py-3 text-right">Discount</th>
                     <th class="px-4 py-3 text-right">Therapist Price</th>
                     <th class="px-4 py-3 text-right">Total</th>
@@ -125,12 +125,14 @@
                             {{ $billRoom['total_time'] ?? '-' }}
                         </td> --}}
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ $billRoom['unit_price'] }}
-                        </td>
 
                         <td class="px-4 py-3 text-right">
                             {{ $billRoom['quantity'] }}
+                        </td>
+
+
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ $billRoom['unit_price'] }}
                         </td>
 
                         <td class="px-4 py-3 font-medium">
@@ -169,14 +171,16 @@
                             -
                         </td> --}}
 
-                        <td class="px-4 py-3 text-right font-mono">
-                            {{ number_format($productSale->unit_price) }}
-                        </td>
-
 
                         <td class="px-4 py-3 text-right">
                             {{ $productSale->quantity }}
                         </td>
+
+
+                        <td class="px-4 py-3 text-right font-mono">
+                            {{ number_format($productSale->unit_price) }}
+                        </td>
+
 
                         <td class="px-1 py-1 font-medium w-[150px]">
                             <div class="flex items-center gap-2">
@@ -238,13 +242,14 @@
                             -
                         </td> --}}
 
+                        <td class="px-4 py-3 text-right">
+                            {{ $service->quantity }}
+                        </td>
+
                         <td class="px-4 py-3 text-right font-mono">
                             {{ number_format($service->unit_price) }}
                         </td>
 
-                        <td class="px-4 py-3 text-right">
-                            {{ $service->quantity }}
-                        </td>
 
                         <td class="px-4 py-3 font-medium">
                             -
@@ -289,14 +294,14 @@
                     </td>
                 </tr>
 
-                <tr
+                {{-- <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y
                             dark:hover:bg-white/5 transition">
                     <td class="px-4 py-2 text-right font-mono" colspan="7"> <b>Total Discount</b> </td>
                     <td class="px-4 py-2 text-right font-mono font-semibold">
                         {{ number_format($this->totalDiscountAmount) }}
                     </td>
-                </tr>
+                </tr> --}}
 
                 <tr
                     class="hover:bg-gray-50 divide-x divide-gray-100 dark:divide-white/10 divide-y

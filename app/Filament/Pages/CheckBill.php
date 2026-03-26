@@ -194,6 +194,30 @@ class CheckBill extends Page
         return 'IN'. 'BSPA' . $today . $invID;
     }
 
+    // public function getInvoiceNo()
+    // {
+    //     $month = date("m");
+    //     $year = date("Y");
+
+    //     $lastInvoice = Invoice::whereMonth('created_at', $month)
+    //         ->whereYear('created_at', $year)
+    //         ->where('branch_id', 1)
+    //         ->orderBy('id', 'desc')
+    //         ->first();
+
+    //     if ($lastInvoice) {
+    //         // get last number (last 5 digits)
+    //         $lastNumber = (int) substr($lastInvoice->invoice_no, -5);
+    //         $number = $lastNumber + 1;
+    //     } else {
+    //         $number = 1;
+    //     }
+
+    //     $invID = str_pad($number, 5, '0', STR_PAD_LEFT);
+
+    //     return 'INBSPA' . date("mY") . $invID;
+    // }
+
     public function getBillItemsForSave()
     {
         $items = [];

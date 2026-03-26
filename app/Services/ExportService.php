@@ -39,6 +39,9 @@ class ExportService
                         'therapist' => $invoice->dailyRoomRecord->therapist->name ?? "N/A",
                         // 'total'           => ($room->unit_price * $room->quantity) + ($invoice->dailyRoomRecord->therapist->price ?? 0),
                         'total'           => $room->total_price,
+                        'start_time' => $invoice->dailyRoomRecord->start_time,
+                        'end_time' => $invoice->dailyRoomRecord->end_time,
+                        'transaction_date' => $invoice->dailyRoomRecord->record_date,
                     ];
                 }
             }
@@ -56,6 +59,9 @@ class ExportService
                         'therapist_price' => null,
                         'therapist' => null,
                         'total' => $product->total_price,
+                        'start_time' => null,
+                        'end_time' => null,
+                        'transaction_date' => null,
                     ];
                 }
             }
@@ -72,12 +78,18 @@ class ExportService
                         'therapist_price' => null,
                         'therapist' => null,
                         'total' => $service->total_price,
+                        'start_time' => null,
+                        'end_time' => null,
+                        'transaction_date' => null,
                     ];
                 }
             }
 
 
         }
+
+        // dd($details);
+        // return;
 
             $fileName = 'billion-spa-invoice-export' . time() . '.xlsx';
 

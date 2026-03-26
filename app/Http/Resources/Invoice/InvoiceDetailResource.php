@@ -23,7 +23,11 @@ class InvoiceDetailResource extends JsonResource
             'Discount_per_unit' => $this['discount_per_unit'] ?? '-',
             'Therapist_Price'   => $this['therapist_price'] ?? '-',
             'Therapist'         => $this['therapist'] ?? 'N/A',
-            'Total'             => $this['total']
+            'Total'             => $this['total'],
+            'Start_time'        => $this['start_time'] ?? '-',
+            'End_time'          => $this['end_time'] ?? '-',
+            'Transaction_date'  => $this['transaction_date'] ?? '-',
+
         ];
     }
 }

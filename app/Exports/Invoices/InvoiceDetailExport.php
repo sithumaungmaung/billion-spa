@@ -41,7 +41,10 @@ class InvoiceDetailExport implements FromCollection, WithHeadings, WithTitle
             'Discount_Per_Unit',
             'Therapist_Price',
             'Therapist',
-            'Total'
+            'Total',
+            'Start_time',
+            'End_time',
+            'Transaction_date'
         ];
     }
 }
