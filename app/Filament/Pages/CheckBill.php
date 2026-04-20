@@ -2,22 +2,28 @@
 
 namespace App\Filament\Pages;
 
-use Carbon\Carbon;
-use App\Models\Invoice;
-use Filament\Pages\Page;
-use App\Traits\BillTraits;
-use App\Models\ProductSale;
+use App\Models\CustomerInfo;
+use App\Models\CustomerPrepaidTransaction;
 use App\Models\DailyRoomRecord;
 use App\Models\ExtraServiceSale;
-use App\Models\InvoiceExtraService;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Invoice;
+use App\Models\ProductSale;
+use App\Models\User;
+use App\Traits\BillTraits;
+use Carbon\Carbon;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 
 
 class CheckBill extends Page
 {
-    use BillTraits;
+    use BillTraits, InteractsWithForms;
+
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -61,6 +67,16 @@ class CheckBill extends Page
 
     public $user = null;
 
+    //  Prepaid
+    public $invoiceId = null;
+    public $selectedCustomer = null;
+    public $availableAmount = 0;
+    public $deductionAmount = null;
+    public $outstandingAmount = null;
+    public $note = '';
+
+    public ?array $data = [];
+
     public function mount(): void
     {
         $this->roomIds = array_map(
@@ -78,6 +94,9 @@ class CheckBill extends Page
 
         $this->subTotal = $this->getSubTotal();
         $this->systemDailyRecords = $this->getSystemDailyRecords();
+
+        // prepaid
+         $this->customer_form->fill();
     }
 
     public function totalBill()
@@ -98,6 +117,7 @@ class CheckBill extends Page
         return $total;
     }
 
+
     public function getSystemDailyRecords()
     {
         $dailyRooms = DailyRoomRecord::whereIn('id', $this->roomIds)->with('room', 'therapist', 'therapistType')->get();
@@ -109,6 +129,7 @@ class CheckBill extends Page
         $this->billRooms = $this->getBillRooms($this->roomIds, $this->buy, $this->free);
         $this->subTotal = $this->getSubTotal();
         $this->total = $this->getGrandTotal();
+        $this->updatedTotal();
 
     }
 
@@ -175,6 +196,13 @@ class CheckBill extends Page
         DailyRoomRecord::whereIn('id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
         ProductSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
         ExtraServiceSale::whereIn('daily_room_record_id', $this->roomIds)->update(['invoice_id' => $invoice->id]);
+
+        $this->invoiceId = $invoice->id;
+
+        if($this->selectedCustomer)
+        {
+           $this->payWithPrepaid();
+        }
 
         return redirect()->route('filament.admin.pages.invoice-detail', ['invoice_no' => $invoice->invoice_no]);
     }
@@ -258,6 +286,7 @@ class CheckBill extends Page
 
         $this->subTotal = $this->getSubTotal();
         $this->total = $this->getGrandTotal();
+        $this->updatedTotal();
 
     }
 
@@ -267,6 +296,7 @@ class CheckBill extends Page
         $this->serviceChargeAmount = $this->serviceChargePercentage * $this->getSubTotal() / 100;
         $this->subTotal = $this->getSubTotal();
         $this->total = $this->getGrandTotal() ;
+        $this->updatedTotal();
     }
 
     // Product %
@@ -291,6 +321,8 @@ class CheckBill extends Page
 
         $this->subTotal = $this->getSubTotal();
         $this->total = $this->getGrandTotal();
+        $this->updatedTotal();
+
 
         $this->updatedDiscountPercentage();
         $this->updatedServiceChargePercentage();
@@ -301,6 +333,11 @@ class CheckBill extends Page
     public function getSubTotal()
     {
         return $this->totalBill() - $this->totalProductDiscount;
+    }
+
+    public function updatedTotal()
+    {
+        $this->deductionWithPrepaidForTotal();
     }
 
     public function getGrandTotal()
@@ -314,5 +351,125 @@ class CheckBill extends Page
     {
         $this->applyPromotion();
     }
+
+
+    protected function customer_form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+             Select::make('user_id')
+                ->hiddenLabel()
+                // ->label('Customer')
+                ->placeholder('Select Customer')
+                ->options( $this->getCustomer())
+                ->searchable()
+                ->preload()
+                ->live()
+
+               ->afterStateUpdated(function ($state) {
+                    if($state){
+
+                        $selectedCustomer = User::where('id', $state)->with('customerInfo')->first();
+                        $this->selectedCustomer = $selectedCustomer;
+                        $this->availableAmount = $selectedCustomer->customerInfo?->current_amount ?? 0;
+                        $this->outstandingAmount = null;
+                        $this->deductionWithPrepaidForTotal();
+                    }else{
+                        $this->selectedCustomer = null;
+                        $this->availableAmount = 0;
+                        $this->outstandingAmount = null;
+                          $this->deductionWithPrepaidForTotal();
+                    }
+                })
+                ->native(true), // Forces the nice UI even on mobile
+            ])
+            ->statePath('data');
+    }
+
+    public function getCustomer(): array
+    {
+        return User::role('customer')
+            ->pluck('name', 'id')
+            ->toArray();
+    }
+
+    public function deductionWithPrepaidForTotal()
+    {
+        if($this->availableAmount < $this->total){
+            $this->deductionAmount = $this->availableAmount;
+        }else{
+            $this->deductionAmount = $this->total;
+        }
+    }
+
+    public function payWithPrepaid()
+    {
+        $customer = CustomerInfo::where('user_id',$this->selectedCustomer->id)->first();
+
+        if($customer->current_amount < $this->total)
+        {
+            $this->outstandingAmount =  $this->total - $customer->current_amount;
+            $this->availableAmount = 0;
+            $this->note = "split payment";
+            $customer->current_amount = 0;
+        }
+        else
+        {
+            $customer->current_amount = $customer->current_amount - $this->deductionAmount;
+            $this->availableAmount = $this->availableAmount - $this->deductionAmount;
+            $this->note = "fully prepaid payment";
+        }
+        $status = 1;
+        $customer->save();
+        $this->createPrepaidTransaction($status);
+
+    }
+
+    private function createPrepaidTransaction($status)
+    {
+
+        $transaction = new CustomerPrepaidTransaction();
+        $transaction->transaction_no = $this->getTransactionId();
+        $transaction->customer_info_id = $this->selectedCustomer->customerInfo->id;
+        $transaction->user_id = $this->selectedCustomer->id;
+        $transaction->branch_id = $this->selectedCustomer->customerInfo->branch_id;
+        $transaction->amount = $this->deductionAmount;
+        $transaction->transaction_type = 'use';
+        $transaction->reference_type = 'invoice';
+        $transaction->reference_id = $this->invoiceId;
+        $transaction->balance = $this->availableAmount;
+        $transaction->transaction_date = now();
+        $transaction->payment_method = 'prepaid';
+        $transaction->note = $this->note;
+        $transaction->status = $status;
+        $transaction->save();
+
+    }
+
+
+    private function getTransactionId()
+    {
+        $today = date("mY");
+        $month = date("m");
+        $year  = date("Y");
+
+        $customer = $this->selectedCustomer;
+        $amount   = $this->deductionAmount;
+        $invoice  = $this->invoiceId;
+        // $branch   = $customer->customerInfo->branch_id;
+
+        $transactionNo = sprintf(
+            'TX-1-%s%s-%s-%s',
+            // $branch,
+            $year,
+            $month,
+            $invoice,
+            rand(100, 999)
+        );
+        return $transactionNo;
+
+    }
+
+
 
 }
