@@ -434,7 +434,7 @@ class CheckBill extends Page
         $transaction->user_id = $this->selectedCustomer->id;
         $transaction->branch_id = $this->selectedCustomer->customerInfo->branch_id;
         $transaction->amount = $this->deductionAmount;
-        $transaction->transaction_type = 'use';
+        $transaction->transaction_type = 'debit';
         $transaction->reference_type = 'invoice';
         $transaction->reference_id = $this->invoiceId;
         $transaction->balance = $this->availableAmount;

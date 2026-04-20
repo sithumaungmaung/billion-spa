@@ -57,7 +57,7 @@
                         <th class="px-4 py-3 font-semibold">Phone</th>
                         <th class="px-4 py-3 font-semibold">Date of Birth</th>
                         <th class="px-4 py-3 font-semibold">Branch</th>
-                        <th class="px-4 py-3 font-semibold text-right">Prepaid Amount</th>
+                        <th class="px-4 py-3 font-semibold text-right">Total Prepaid Amount</th>
                         <th class="px-4 py-3 font-semibold text-right">Current Amount</th>
                     </tr>
                 </thead>
