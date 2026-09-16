@@ -3,7 +3,7 @@
     <x-filament::section compact class="p-0 gap-4">
 
         <x-filament::section.heading class="mb-2">
-            Prepid Deduction
+            Prepaid Deduction
         </x-filament::section.heading>
 
         <div class="flex items-end gap-4">
@@ -11,6 +11,7 @@
             {{-- Customer --}}
             <div class="flex-1">
                 <div class="mb-2">Customer</div>
+
                 <x-filament::input.wrapper>
                     {{ $this->customer_form }}
                 </x-filament::input.wrapper>
@@ -18,7 +19,7 @@
 
             {{-- Amount --}}
             <div class="flex-1">
-                <div class="grid grid-cols-2 gap-x-4">
+                <div class="grid grid-cols-2 gap-4">
 
                     <x-filament-forms::field-wrapper label="Current Amount">
                         <x-filament::input.wrapper class="bg-gray-50 dark:bg-white/5">
@@ -35,7 +36,7 @@
                 </div>
             </div>
 
-            {{-- BUTTON HERE --}}
+            {{-- Button --}}
             <div>
                 <x-filament::button color="primary" size="lg" wire:click="AddPrepaidAmount" :disabled="!$selectedCustomer || !$prepaidAmount">
                     Add Prepaid

@@ -17,13 +17,16 @@ class UserForm
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
+                    ->unique(ignoreRecord: true)
                     ->required(),
                 TextInput::make('password')
                     ->password()
                     ->required(),
                 DateTimePicker::make('email_verified_at')
                         ->disabledOn('edit')
-                        ->default(now())
+                        ->default(now()->format('Y-m-d H:i:s'))
+                        ->required(),
+                        //    ->default(fn () => now());
             ]);
     }
 }
