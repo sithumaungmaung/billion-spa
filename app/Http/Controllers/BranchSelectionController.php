@@ -10,9 +10,6 @@ class BranchSelectionController extends Controller
 {
     public function index()
     {
-        if(session()->has('branch_id')) {
-            return redirect('/admin');
-        }
 
         $branches = Branch::all();
 

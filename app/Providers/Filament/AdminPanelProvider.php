@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
                         Branch::find(session('branch_id'))?->name ?? 'Not Selected'
                     ))
                     ->icon('heroicon-o-building-office')
-                    // ->disabled(),
+                    ->url(fn () => route('branch.selection')),
             ])
             // ->favicon(asset('logo/images.png'))
 
