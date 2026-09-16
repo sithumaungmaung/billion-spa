@@ -21,7 +21,11 @@ class RoomsTable
 
                 TextColumn::make('room_number')
                     ->label('Room Number')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable()
+                    ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state),
+                    // ,
 
                 TextColumn::make('floor')
                     ->label('Floor')
@@ -33,6 +37,8 @@ class RoomsTable
 
                 TextColumn::make('branch.name')
                         ->label('Branch')
+                        ->badge()
+                        ->color('info')
                         ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state)
                         ->sortable()
                         ->toggleable(),
