@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\DailyRoomRecord;
 use App\Models\Invoice;
 use App\Models\InvoiceRoom;
@@ -80,6 +81,7 @@ class InvoiceController extends Controller
             'serviceChargePercentage' => $serviceChargePercentage,
             'serviceCharge' => $serviceChargeAmount,
             'productDiscount' => $req->productDiscount,
+            'branchName' => Branch::find(session('branch_id'))->name
         ];
 
         $invoice = $this->normalizeMyanmarText($invoice);
@@ -129,6 +131,7 @@ class InvoiceController extends Controller
             'disAmount' => $disAmount,
             'serviceChargePercentage' => $serviceChargePercentage,
             'serviceCharge' => $serviceCharge,
+            'branchName' => Branch::find(session('branch_id'))->name
         ];
 
         $invoice = $this->normalizeMyanmarText($invoice);

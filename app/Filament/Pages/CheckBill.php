@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+
 use App\Models\CustomerInfo;
 use App\Models\CustomerPrepaidTransaction;
 use App\Models\DailyRoomRecord;
@@ -48,6 +49,7 @@ class CheckBill extends Page
         ];
     }
 
+    public $branchId;
     public array $roomIds = [];
     public $billItems, $billExtraServices, $billRooms, $systemDailyRecords = [];
     public $total;
@@ -79,6 +81,7 @@ class CheckBill extends Page
 
     public function mount(): void
     {
+        $this->branchId = session('branch_id');
         $this->roomIds = array_map(
             'intval',
             explode(',', $this->bill_for)
@@ -155,7 +158,7 @@ class CheckBill extends Page
 
 
         $invoice = new Invoice();
-        $invoice->branch_id = 1;
+        $invoice->branch_id = $this->branchId;
         $invoice->user_id = Auth::id();
         $invoice->invoice_no = $this->getInvoiceNo();
         $invoice->invoice_datetime = Carbon::now();
@@ -179,7 +182,7 @@ class CheckBill extends Page
           foreach($this->billExtraServices as $extraService) {
 
             $invoice->invoiceExtraServices()->create([
-                'branch_id' => 1,
+                'branch_id' => $this->branchId,
                 'extra_service_title' => $extraService->extraService->title,
                 'quantity'    => $extraService->quantity,
                 'extra_service_id'  => $extraService->extra_service_id,
@@ -214,7 +217,7 @@ class CheckBill extends Page
         $year = date("Y");
         $row = Invoice::whereMonth('created_at', $month)
                 ->whereYear('created_at', $year)
-                ->where('branch_id' , 1)
+                ->where('branch_id' , $this->branchId)
                 ->count();
         $number = $row + 1;
 
@@ -228,7 +231,7 @@ class CheckBill extends Page
         foreach ($this->billItems as $key => $billItems) {
             $unit_discount = in_array($billItems->id, collect($this->applyProductDiscount)->keys()->toArray()) ? $this->applyProductDiscount[$billItems->id] : 0;
             $items[] = [
-                'branch_id' => 1,
+                'branch_id' => $this->branchId,
                 'quantity'    => $billItems->quantity,
                 'product_id'  => $billItems->product_id,
                 'product_name' => $billItems->product->name,
@@ -246,7 +249,7 @@ class CheckBill extends Page
         $items = [];
         foreach ($this->billExtraServices as $key => $service) {
             $items[] = [
-                'branch_id' => 1,
+                'branch_id' => $this->branchId,
                 'quantity'    => 1,
                 'extra_service_id'  => $service->extra_service_id,
                 'unit_price'  => $service->unit_price,
@@ -389,6 +392,9 @@ class CheckBill extends Page
     public function getCustomer(): array
     {
         return User::role('customer')
+        ->whereHas('customerInfo', function ($query) {
+            $query->where('branch_id', session('branch_id'));
+        })
             ->pluck('name', 'id')
             ->toArray();
     }
