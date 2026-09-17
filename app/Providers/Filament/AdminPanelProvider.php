@@ -40,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->font('Exo 2' , provider: GoogleFontProvider::class)
             // ->brandLogo(asset('/logo/images.png'))
             ->brandName('BILLION SPA')
-            ->userMenuItems([
+            ->userMenuItems([ // top right user menu drop down
                 MenuItem::make()
                     ->label(fn () => 'Branch: ' . (
                         Branch::find(session('branch_id'))?->name ?? 'Not Selected'

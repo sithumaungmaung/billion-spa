@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class DailyRoomRecord extends Model
 {
-    protected $fillable = ['record_date', 'room_id', 'start_time', 'end_time', 'therapist_id', 'user_id', 'service_type', 'room_price', 'service_type_price'];
+    protected $fillable = ['record_date', 'room_id', 'branch_id','start_time', 'end_time', 'therapist_id', 'user_id', 'service_type', 'room_price', 'service_type_price'];
     public function therapist()
     {
         return $this->belongsTo(Therapist::class);

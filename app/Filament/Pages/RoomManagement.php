@@ -35,6 +35,7 @@ class RoomManagement extends Page implements HasForms
 
     // ----------------
 
+    public $branchId = null;
     public string $date;
     public $rooms;
     public ?int $selectedRoomId = 0;
@@ -76,13 +77,14 @@ class RoomManagement extends Page implements HasForms
 
     public function mount(): void
     {
+        $this->branchId = session('branch_id');
         $this->date = now()->toDateString();
         $this->avaliableRooms = $this->avaliavleRooms();
         $this->activeRooms = $this->activeRooms();
         $this->rooms =  $this->activeRooms;
 
         $this->therapistTypes = TherapistType::get();
-        $this->extraServices = ExtraService::get();
+        $this->extraServices = ExtraService::where('branch_id', $this->branchId)->get();
 
         $this->therapist_form->fill();
         $this->room_form->fill();
@@ -117,12 +119,13 @@ class RoomManagement extends Page implements HasForms
 
     public function checkRoom(int $roomId)
     {
+
         if (in_array($roomId, $this->checkRoomIds)) {
             $key = array_search($roomId, $this->checkRoomIds);
             unset($this->checkRoomIds[$key]);
         }else{
             $this->checkRoomIds[] = $roomId;
-            }
+        }
 
     }
 
@@ -130,7 +133,7 @@ class RoomManagement extends Page implements HasForms
     {
         $activeRooms = DailyRoomRecord::where('record_date', $this->date)
                 ->with('room', 'therapist', 'therapistType')
-
+                ->where('branch_id', $this->branchId)
                 ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
                 ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))->get();
 
@@ -145,6 +148,7 @@ class RoomManagement extends Page implements HasForms
     {
         $roomRecords = DailyRoomRecord::where('record_date', $this->date)
                         ->with('room', 'therapist', 'therapistType')
+                        ->where('branch_id', $this->branchId)
                         ->whereNull('invoice_id')
                         ->get();
 
@@ -181,7 +185,7 @@ class RoomManagement extends Page implements HasForms
                         ->where('start_time' , '<=', now()->format('Y-m-d\TH:i'))
                         ->where('end_time', '>=', now()->format('Y-m-d\TH:i'))->get();
 
-        return Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->get();
+        return Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->where('branch_id', $this->branchId)->get();
     }
 
     protected function getTherapistOptions(): array
@@ -240,7 +244,7 @@ class RoomManagement extends Page implements HasForms
                     ->hiddenLabel()
                     ->placeholder('Select Product')
                     ->options(
-                            Product::all()->mapWithKeys(function ($product) {
+                            Product::where('branch_id', $this->branchId)->get()->mapWithKeys(function ($product) {
                                 return [$product->id => $product->name . ' - (' . number_format($product->price) . ')'];
                             })->toArray()
                         )
@@ -304,6 +308,9 @@ class RoomManagement extends Page implements HasForms
         $this->rooms =  $this->activeRooms;
 
 
+        $this->checkRoomIds = [];
+
+
         $this->notifySuccess(
             'Success', 'Unassigned successfully.'
         );
@@ -335,6 +342,8 @@ class RoomManagement extends Page implements HasForms
 
     public function addProduct(): void
     {
+
+
         $dailyRoomRecord = DailyRoomRecord::where('record_date', $this->date)->where('id', $this->selectedRoom->id)
                                             ->whereNull('invoice_id')
                                             ->first();
@@ -359,17 +368,16 @@ class RoomManagement extends Page implements HasForms
             $productSale->update([
                 'quantity' => $productSale->quantity + $this->selectedProductQty,
                 'unit_price' => $product->price,
-                'branch_id' => 1,
+                'branch_id' => $this->branchId,
                 'total_price' => ($productSale->quantity + $this->selectedProductQty ) * $product->price
             ]);
         } else {
-
             ProductSale::create([
                 'daily_room_record_id' => $dailyRoomRecord->id,
                 'product_id' => $this->selectedProductId,
                 'unit_price' => $product->price,
                 'quantity' => $this->selectedProductQty ?? 1,
-                'branch_id' => 1,
+                'branch_id' => $this->branchId,
                 'total_price' => $this->selectedProductQty  * $product->price
             ]);
         }
@@ -449,7 +457,7 @@ class RoomManagement extends Page implements HasForms
             ExtraServiceSale::create([
                 'extra_service_id' => $this->selectedExtraServiceId,
                 'daily_room_record_id' => $dailyRoom->id,
-                'branch_id' => 1,
+                'branch_id' => $this->branchId,
                 'quantity' => $this->selectedExtraServiceQty,
                 'unit_price' => $price,
                 'total_price' => $price * $this->selectedExtraServiceQty
@@ -588,8 +596,8 @@ class RoomManagement extends Page implements HasForms
     public function getSalesForDailyRoomRecord()
     {
 
-        $saleProducts = ProductSale::where('daily_room_record_id', $this->selectedRoomId)->with('product')->get();
-        $saleExtraServices = ExtraServiceSale::where('daily_room_record_id', $this->selectedRoomId)->with('extraService')->get();
+        $saleProducts = ProductSale::where('daily_room_record_id', $this->selectedRoomId)->with('product')->where('branch_id', $this->branchId)->get();
+        $saleExtraServices = ExtraServiceSale::where('daily_room_record_id', $this->selectedRoomId)->where('branch_id', $this->branchId)->with('extraService')->get();
 
         $data = [
             'saleProducts' => $saleProducts,
