@@ -9,11 +9,12 @@ use App\Filament\Resources\ExtraServices\Schemas\ExtraServiceForm;
 use App\Filament\Resources\ExtraServices\Tables\ExtraServicesTable;
 use App\Models\ExtraService;
 use BackedEnum;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class ExtraServiceResource extends Resource
 {
@@ -48,6 +49,12 @@ class ExtraServiceResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('branch_id', session('branch_id'));
     }
 
     public static function getPages(): array

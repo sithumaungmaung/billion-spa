@@ -5,12 +5,14 @@ namespace App\Filament\Pages;
 use App\Models\Branch;
 use App\Models\CustomerInfo;
 use App\Models\User;
-use BackedEnum, UnitEnum;
+use UnitEnum;
+use BackedEnum;
 use Carbon\Carbon;
-use Filament\Forms\Components\TextInput;
+
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+
 
 
 class CustomerCreatePage extends Page
@@ -31,7 +33,7 @@ class CustomerCreatePage extends Page
 
     public $name = '';
     public $phone = '';
-    public $selectedBranch = null;
+    public $selectedBranch = '';
     public $date_of_birth = '';
 
     public $branches = [];
@@ -42,6 +44,7 @@ class CustomerCreatePage extends Page
     public function mount(): void
     {
         $this->getBranches();
+        $this->selectedBranch = session('branch_id');
     }
 
     public function createCustomer(): void
@@ -82,7 +85,11 @@ class CustomerCreatePage extends Page
 
     public function getCustomerList()
     {
-        return User::role('customer')->with('customerInfo')->paginate(20);
+        return User::role('customer')->with('customerInfo')
+        ->whereHas('customerInfo', function ($query) {
+            $query->where('branch_id', session('branch_id'));
+        })
+        ->paginate(20);
     }
 
     // ======================================        ========================================

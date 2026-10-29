@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class TherapistTypeResource extends Resource
@@ -27,7 +28,7 @@ class TherapistTypeResource extends Resource
 
     protected static ?string $navigationLabel = "Therapist Types";
 
-    protected static ?string $modelLabel = "Therapist / Service Types";
+    protected static ?string $modelLabel = "Therapist/Service Types";
 
     protected static string | UnitEnum | null $navigationGroup = 'Categories & Types';
 
@@ -52,6 +53,14 @@ class TherapistTypeResource extends Resource
             //
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('branch_id', session('branch_id'));
+    }
+
+
 
     public static function getPages(): array
     {

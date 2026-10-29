@@ -25,6 +25,7 @@ class RoomAssign extends Page implements HasForms
 
     // -------------------------------- //
 
+    public $branchId;
     public $date;
     public $rooms;
     public $avaliableRooms;
@@ -50,14 +51,14 @@ class RoomAssign extends Page implements HasForms
 
     public function loadData()
     {
-
+        $this->branchId = session('branch_id');
         $this->date = now()->toDateString();
         $this->rooms = Room::get();
         $this->avaliableRooms = $this->avaliavleRooms();
         $this->avaliableTherapists = $this->getFreeTherapists();
         $this->therapist_form->fill();
         $this->room_form->fill();
-        $this->therapistTypes = TherapistType::get();
+        $this->therapistTypes = TherapistType::where('branch_id', $this->branchId)->get();
         $this->selectedTherapistTypeId = TherapistType::first()->id;
 
     }
@@ -69,7 +70,7 @@ class RoomAssign extends Page implements HasForms
                         ->where('start_time' , '<', $this->endTime ?? now()->format('Y-m-d\TH:i'))
                         ->where('end_time', '>', $this->startTime ?? now()->format('Y-m-d\TH:i'))
                         ->get();
-       return  Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->get();
+       return  Therapist::whereNotIn('id', $roomRecords->pluck('therapist_id'))->where('branch_id', $this->branchId)->get();
     }
 
 
@@ -80,7 +81,7 @@ class RoomAssign extends Page implements HasForms
                         ->where('end_time', '>', $this->startTime ?? now()->format('Y-m-d\TH:i'))
                         ->get();
 
-        return Room::whereNotIn('id', $roomRecords->pluck('room_id'))->get();
+        return Room::whereNotIn('id', $roomRecords->pluck('room_id'))->where('branch_id', $this->branchId)->get();
     }
 
 
@@ -127,6 +128,7 @@ class RoomAssign extends Page implements HasForms
         $record = DailyRoomRecord::create([
             'record_date' => $this->date,
             'room_id' => $this->selectedRoomId,
+            'branch_id' => $this->branchId,
             'therapist_id' => $this->selectedTherapistId,
             'service_type' => $this->selectedTherapistTypeId,
             'start_time' => Carbon::parse($this->startTime),

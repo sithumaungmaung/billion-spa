@@ -2,10 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\EnsureBranchSelected;
+use App\Models\Branch;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -18,7 +22,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\FontProviders\GoogleFontProvider;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -37,6 +40,14 @@ class AdminPanelProvider extends PanelProvider
             ->font('Exo 2' , provider: GoogleFontProvider::class)
             // ->brandLogo(asset('/logo/images.png'))
             ->brandName('BILLION SPA')
+            ->userMenuItems([ // top right user menu drop down
+                MenuItem::make()
+                    ->label(fn () => 'Branch: ' . (
+                        Branch::find(session('branch_id'))?->name ?? 'Not Selected'
+                    ))
+                    ->icon('heroicon-o-building-office')
+                    ->url(fn () => route('branch.selection')),
+            ])
             // ->favicon(asset('logo/images.png'))
 
             ->sidebarCollapsibleOnDesktop()
@@ -65,6 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->authMiddleware([
                 Authenticate::class,
+                EnsureBranchSelected::class,
             ]);
     }
 }

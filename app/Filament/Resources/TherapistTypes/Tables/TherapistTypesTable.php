@@ -24,6 +24,8 @@ class TherapistTypesTable
 
                 TextColumn::make('branch.name')
                         ->label('Branch')
+                        ->badge()
+                        ->color('info')
                         ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state)
                         ->sortable()
                         ->toggleable(),

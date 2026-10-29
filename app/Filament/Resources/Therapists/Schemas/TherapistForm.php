@@ -30,6 +30,8 @@ class TherapistForm
                 Select::make('branch_id')
                     ->label('Branch')
                     ->preload()
+                    ->disabled(fn (string $operation) => $operation === 'edit')
+                    ->default(session('branch_id'))
                     ->relationship('branch', 'name')
                     ->required(),
 

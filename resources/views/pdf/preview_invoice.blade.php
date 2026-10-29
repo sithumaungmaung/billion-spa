@@ -139,7 +139,7 @@
 
         <div class="header-info">
             Invoice: {{ $invoice['invoiceDetail']['invoice_no'] }}<br>
-            {{ date('d-M-Y H:i') }}
+            {{ date('d-M-Y H:i') }} || {{ $invoice['branchName'] }}
         </div>
 
         <table>

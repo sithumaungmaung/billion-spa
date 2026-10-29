@@ -66,6 +66,9 @@ class AddPrepaidAmount extends Page
     public function getCustomer(): array
     {
         return User::role('customer')
+            ->whereHas('customerInfo', function ($query) {
+                $query->where('branch_id', session('branch_id'));
+            })
             ->pluck('name', 'id')
             ->toArray();
     }
@@ -86,6 +89,10 @@ class AddPrepaidAmount extends Page
             $customerInfo->current_amount = $this->prepaidAmount;
             $customerInfo->prepaid_amount = $this->prepaidAmount;
         }
+
+        $this->currentAmount = $this->currentAmount + $this->prepaidAmount;
+        $this->prepaidAmount = 0;
+
             $customerInfo->save();
             $this->addPrepaidTransaction();
 

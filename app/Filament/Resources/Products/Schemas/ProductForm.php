@@ -26,6 +26,7 @@ class ProductForm
                     ->required(),
                 Select::make('branch_id')
                     ->label('Branch')
+                    ->default(session('branch_id'))
                     ->preload()
                     ->relationship('branch', 'name')
                     ->required(),
