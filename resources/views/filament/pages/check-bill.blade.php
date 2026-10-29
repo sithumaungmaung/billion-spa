@@ -1,5 +1,88 @@
 <x-filament-panels::page>
     <x-filament::section>
+
+        <x-filament::section compact class="p-0 gap-4">
+
+            <x-filament::section.heading class="mb-2">
+                Prepid Deduction
+            </x-filament::section.heading>
+
+            <div class="flex items-end gap-4">
+                <div class="flex-1">
+                    <div class="mb-2">Customer</div>
+                    <x-filament::input.wrapper label="Select Type">
+                        {{ $this->customer_form }}
+                    </x-filament::input.wrapper>
+                </div>
+
+                <div class="flex-1">
+                    <div class="grid grid-cols-2 gap-x-4">
+                        {{-- Available Amount (Readonly) --}}
+                        <x-filament-forms::field-wrapper id="available_amount_wrapper" label="Available Amount">
+                            <x-filament::input.wrapper class="bg-gray-50 dark:bg-white/5">
+                                <x-filament::input type="number" wire:model="availableAmount" readonly
+                                    class="cursor-not-allowed font-medium text-primary-600" />
+                                <x-slot name="prefix">
+                                    <x-filament::icon icon="heroicon-m-wallet" class="h-5 w-5 text-gray-400" />
+                                </x-slot>
+                            </x-filament::input.wrapper>
+                        </x-filament-forms::field-wrapper>
+
+                        {{-- Deduction Amount (Input) --}}
+                        @if (!$this->outstandingAmount)
+                            <x-filament-forms::field-wrapper id="deduction_amount_wrapper" label="Deduction Amount">
+                                <x-filament::input.wrapper :disabled="!$selectedCustomer">
+                                    <x-filament::input id="deduction_amount" type="number" min="0" readonly
+                                        class="cursor-not-allowed font-medium text-primary-600"
+                                        max="{{ $this->total }}" step="500" wire:model.live="deductionAmount"
+                                        :disabled="!$selectedCustomer" />
+
+                                    {{-- <x-slot name="suffix">
+                                        <div class="flex items-center pe-2">
+                                            <x-filament::button size="xs" color="info"
+                                                wire:click="deductionWithPrepaidForTotal" :disabled="!$selectedCustomer">
+                                                Total Bill
+                                            </x-filament::button>
+                                        </div>
+                                    </x-slot> --}}
+                                </x-filament::input.wrapper>
+                            </x-filament-forms::field-wrapper>
+                        @endif
+
+                        @if ($this->outstandingAmount)
+                            <x-filament-forms::field-wrapper id="outstanding_amount_wrapper" label="Outstanding Amount">
+                                <x-filament::input.wrapper :disabled="!$selectedCustomer">
+                                    <x-filament::input id="oustanding_amount" type="number" min="0"
+                                        step="500" wire:model.live="outstandingAmount" placeholder="0.00"
+                                        :disabled="true" />
+
+                                    {{-- <x-slot name="suffix">
+                                        <div class="flex items-center pe-2">
+                                            <x-filament::button size="xs" color="info"
+                                                wire:click="deductionWithPrepaidForTotal" :disabled="!$selectedCustomer">
+                                                Total Bill
+                                            </x-filament::button>
+                                        </div>
+                                    </x-slot> --}}
+                                </x-filament::input.wrapper>
+                            </x-filament-forms::field-wrapper>
+                        @endif
+
+                    </div>
+                </div>
+                {{-- <div class="flex-1"></div> --}}
+            </div>
+            @if ($this->free > 0)
+                <div class="mt-3 text-sm">
+                    <span class="border border-gray-200 dark:border-white/10 p-2 rounded-lg ">
+                        {{-- <br> --}}
+                        Promotion - {{ $this->buy }} + {{ $this->free }}
+                    </span>
+                </div>
+            @endif
+        </x-filament::section>
+
+        {{-- // --}}
         <x-filament::section compact class="p-0">
 
             <x-filament::section.heading class="mb-2">
@@ -319,6 +402,7 @@
                     <td class="px-4 py-3 text-right font-mono font-semibold">
                         {{-- {{ number_format($this->total - $this->totalDiscountAmount + $this->serviceChargeAmount) }} --}}
                         {{ number_format($this->total) }}
+
                     </td>
                 </tr>
 
@@ -335,6 +419,12 @@
                     wire:confirm="Are you sure you want to generate this invoice?">
                     Confirm Bill
                 </x-filament::button>
+                {{--  --}}
+                {{-- <x-filament::button color="primary" class="bg-blue-700 hover:bg-blue-500 text-white"
+                    wire:click="payWithPrepaid" wire:confirm="Are you sure you want to use Prepaid?"
+                    :disabled="!$selectedCustomer || (!$deductionAmount || $this->availableAmount == 0)">
+                    Use Prepaid
+                </x-filament::button> --}}
             </div>
             <div class="text-right">
                 <span>
@@ -342,6 +432,8 @@
                 </span>
             </div>
         </div>
+
+
     </x-filament::section>
 
     <!-- system over view -->
@@ -421,4 +513,11 @@
     window.addEventListener('invoice.preview', event => {
         window.open(event.detail.url, '_blank');
     });
+
+    window.addEventListener('prepaid-payment', event => {
+        window.open(event.detail.url, '_blank');
+    });
 </script>
+
+
+{{-- <script></script> --}}
