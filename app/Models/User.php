@@ -66,6 +66,17 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(CustomerInfo::class);
     }
 
+    public function adminBranches()
+    {
+        return $this->belongsToMany(Branch::class,
+            'admin_branches',
+            'user_id',
+            'branch_id'
+        );
+    }
+
+
+
 
 
 

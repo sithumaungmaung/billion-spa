@@ -10,10 +10,15 @@ class BranchSelectionController extends Controller
 {
     public function index()
     {
+        $user = auth()->user()->load('adminBranches');
+
+        $admin_branches = $user->adminBranches->pluck('id')->toArray();
+
+        // dd($admin_branches->pluck('id'));
 
         $branches = Branch::all();
 
-        return view('branch-select/branch-selection', compact('branches'));
+        return view('branch-select/branch-selection', compact('branches', 'admin_branches'));
     }
 
     public function select(Branch $branch): RedirectResponse

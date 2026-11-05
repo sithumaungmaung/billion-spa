@@ -86,8 +86,18 @@
                         <form method="POST" action="{{ route('branch.select', $branch) }}">
                             @csrf
 
-                            <button type="submit"
-                                class="group relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-700 dark:focus:ring-offset-gray-950">
+                            <button type="submit" @disabled(!in_array($branch->id, $admin_branches)) @class([
+                                'group relative w-full overflow-hidden rounded-2xl border p-5 text-left shadow-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                // Disable မဖြစ်သေးရင် (Enabled ဖြစ်နေရင်) ပြမယ့် အရောင်တွေ
+                                'bg-white border-gray-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg focus:ring-primary-500 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-700 dark:focus:ring-offset-gray-950' => in_array(
+                                    $branch->id,
+                                    $admin_branches),
+                            
+                                // Disable ဖြစ်သွားရင် (Conditions ကိုက်ရင်) ပြမယ့် အရောင်နဲ့ ပုံစံတွေ
+                                'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60 dark:bg-gray-800 dark:border-gray-800 dark:opacity-50' => !in_array(
+                                    $branch->id,
+                                    $admin_branches),
+                            ])>
 
                                 {{-- Subtle hover effect --}}
                                 <div
